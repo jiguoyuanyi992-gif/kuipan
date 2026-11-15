@@ -6,4 +6,53 @@
 
 ## M0 · 平台探针（2026-11-15，不打 tag）
 
-（待 M0 收尾填写：六项探针结论按「Secret/百炼调用 → 超时/请求体 → IP/KV」顺序 + 四段记录 + 迭代对比）
+### 六项探针结论（按「Secret/百炼调用 → 超时/请求体 → IP/KV」顺序）
+
+| # | 项目 | 结论 | 证据 |
+|---|---|---|---|
+| 1 | 能否读 Secret | **能** | `item=secret` → `present:true`（HTTP 200） |
+| 2 | 能否外网调百炼 | **能** | `item=llm` → `ok:true, status:200, latencyMs:230`；qwen-flash，1 次调用（授权 ≤3） |
+| 3 | 超时时长 | **网关约 60s（区间 45–60s）** | delay 5s/15s/30s/45s 均 200；60s → HTTP 504 `upstream request timeout`（60.6s） |
+| 4 | 请求体上限 | **≥4MB，未触顶** | POST 64KB/256KB/1MB/4MB 均 200（需同源 Origin 头）；远超约 60KB（2 万字）规划输入 |
+| 5 | 能否拿到调用方 IP | **能** | `item=ip` → `xff:true, realIp:true, publicLike:true` → 每 IP 每分钟 N 次限流可行 |
+| 6 | KV 能力是否存在 | **不存在** | 运行时 `openKvApi:false, openKvWorks:false` + 管理面 36 个工具无 KV 接口（双重证据） |
+
+**分支决策**：百炼调通 → 主路径维持模型语义匹配，**未触发**退回纯正则分支。
+
+**与计划假设核对**：六项均在假设范围内 —— KV 不存在为计划预期情形；超时（约 60s）与请求体（≥4MB）容量远超批量调用所需（每次数秒级、整份 ≤30s、约 60KB）；IP 可得。**未触发「探针结果与假设不符停下来报告」条件。** 两处平台行为如实记录（非冲突）：① POST 写请求需同源 Origin 校验，浏览器同源调用不受影响；② 删除接口后网关返回 409 而非 404（见下）。
+
+### ① 关键提示词（逐字保留）
+
+1. 「不建独立探针站，直接在正式站 qianqian-yicha 上验。做最小部署 + 一个只返回「是/否」状态的检查接口。」（初始执行层指令节选）
+2. 「全部授权（推荐）」（M0 云端动作一并授权）
+3. 「地址我怎么打开啊」
+4. 「BAILIAN_API_KEY 已填好，继续 M0。」
+5. 「请重读该文件，据新版更新 AGENTS.md 并提交，M1 起一律按新版执行。」（策略更新指令节选）
+
+### ② 报错与解决
+
+1. **Deno 未安装**：`deno: command not found` → `check:function`/`dev:function` 不可用。解法：用 `node -e` 调 `typescript.transpileModule` 做语法级校验（结果 syntax ok），完整验证靠线上探针；Function 本地校验标「待验（Deno 未安装）」，不声称已通过。试错 1 次。
+2. **Secret 阻塞（预期流程）**：prepare_site 后 blocker `sites_secret_not_ready`（BAILIAN_API_KEY missing）。解法：停下请用户在 Sites Settings 界面填值；填好后 `dependenciesReady:true`、`canPublish:true`。试错 0 次。
+3. **Secret 录入入口找不到**：用户「地址我怎么打开啊」。解法：本地知识无 Sites 条目 → 查官方文档 docs.qoder.com/qoder/sites.md 验证入口：侧边栏 Sites → Owned by you → More → Settings → Secrets 录入区。试错 1 次。
+4. **POST 探针全部 403**：完整报错 `{"code":"sites_gateway_origin_forbidden","message":"request origin is invalid"}`（HTTP 403，4 档全失败）。原因：网关对写请求做同源校验。解法：curl 加 `Origin: https://qianqian-yicha-odzma4gogrf.qoder.zone` 头模拟浏览器同源请求，4 档全过。试错 1 次。
+5. **60s 探针 504**：HTTP 504 `upstream request timeout`（60.6s）。这是探针目标结果而非故障；加测 45s 通过，超时区间收窄为 (45s, 60s]。试错 0 次。
+6. **删接口后复验状态码与假设不同**：预期 404，实际 409 `{"code":"sites_gateway_supabase_not_ready","message":"Supabase backend is not ready"}`。诊断：`get_site` 证实当前版本 `functions:[]`（纯静态、无函数部署），409 是网关对「无函数路由」的应答，探针逻辑已不可达。纯静态目标达成；平台未保留旧函数，**未启用** 404 stub 应急预案。试错 0 次（一次诊断定位）。
+
+### ③ 部署与运行记录
+
+- 设计登记：`open_design_workbench` 生成 `.签前一查.qoder.site`（工具所有，不手写）。
+- **发布 1**（探针）：actionId `529b3cc6-fb63-4069-af21-78490de73830`，publishOperationId `01a1df79-ebd6-7364-9881-eeb68494eec5`，succeeded+committed，`published:true`；`access_mode` 创建即 public，无需额外改策略。
+- **百炼调用**：1 次（授权 ≤3），qwen-flash，输入 "ping"、max_tokens=1，HTTP 200、latencyMs=230。全程未打印 Key、模型响应原文、请求内容；探针接口以 nonce 守卫防公网路人触发（nonce 不入 log）。
+- **日志**：`get_function_logs(type=requests)` 近 1 小时无 5xx；60s 的 504 与 POST 的 403 均为网关侧产生，未到达函数。
+- **发布 2**（纯静态，删接口）：actionId `0d5f8f0b-2f93-4be2-8cb9-f064c24bf624`，omit functionDirectory，publishOperationId `01a1df81-0981-7f3b-8136-3b10ee0509b6`，succeeded+committed，`published:true`；`functions:[]`，`/functions/v1/app/check` 与 `/functions/v1/app` 均 409（网关），首页 200，public 不变。handler.ts 已恢复 starter 原样（与 commit 7f6643c 逐字节一致）。
+- 临时小额度 Key **待用户作废**；正式 Key 到 M3 才接入。
+
+### ④ 线上链接与验证方式
+
+- 公网地址：https://qianqian-yicha-odzma4gogrf.qoder.zone
+- 验证：curl 首页 200；内置浏览器桌面视口控制台 0 error；390px iframe 窄视口无横向溢出、控制台 0 error（真机/无痕窗口复验由用户执行）。
+- 截图：（待补：m0-deploy-sites.png）、（待补：m0-probe-results.png）、（待补：m0-home-mobile.png）
+
+### ⑤ 迭代对比
+
+本里程碑无产品界面需求变更（占位页 → 占位页）。策略文件有 8 处更新，已同步 AGENTS.md（commit `0a87742`），属策略层修订而非产品迭代，不凑三行格式。
