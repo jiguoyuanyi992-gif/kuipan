@@ -1,0 +1,27 @@
+{
+  "id": "rent-待填-唯一英文短id",
+  "scene": "rent",
+  "title": "待填：风险短标题（不含禁用词）",
+  "severity": "high",
+  "detect": {
+    "anyRegex": ["待填：命中正则，如 押金[^。]*不予退还"],
+    "allKeywords": [["待填关键词A", "待填关键词B"]],
+    "absentOf": [["待填：必备条款表述1", "待填：必备条款表述2"]]
+  },
+  "traits": ["待填：给模型看的白话识别特征1", "待填：识别特征2"],
+  "why": "待填：产品语言解释风险，用「存在……风险，建议……」，不下法律结论",
+  "askTalk": "待填：签约前可以问对方的话",
+  "sourceCase": "待填：脱敏案例编号（可留空字符串）",
+  "legalBasis": [
+    {
+      "law": "待填：法律名称",
+      "article": "待填：第X条",
+      "quote": "待填：法条原文摘录（官方原文，不受禁用词约束）",
+      "source": "待填：权威来源链接",
+      "effectiveOn": "待填：生效日期 YYYY-MM-DD（可选）"
+    }
+  ],
+  "verified": false,
+  "reviewer": "",
+  "reviewNote": ""
+}

@@ -4,6 +4,41 @@
 > 红线：只出现编造或脱敏样例，不得含真实合同内容、真实姓名、身份证、手机号、住址、公司名。
 > 截图由用户用系统截图工具放入 docs/shots/，文件名带里程碑编号；缺图写「（待补：xxx.png）」，不编造截图内容。
 
+## M1 · 核心纯函数层（2026-11-15，tag m1-core）
+
+### 交付概览
+
+src/core 平台无关纯函数全部落地：types / extract（mammoth+pdfjs-dist）/ chunk / regex / redact / llm（prompt+zod schema+合并去重）/ scene / risk（总体三档）。5 条假规则（verified 全 false）+ 3 份编造示例合同（租房/实习/通用清洁版，页面 M2 标注「示例，虚构」）。导出 RiskRule/TrapEntry JSON 模板（docs/templates/）交用户先填 3 条验证格式。vitest 40 测试全绿，npm run build 无 error。本里程碑不发布线上（纯核心层，界面 M2 铺开）。
+
+### ① 关键提示词（逐字保留）
+
+1. 「M0 验收通过。先修 4 件事，再连续往下跑。」
+2. 「约束4「整份合同 2–4 次调用」改为「批次并行发出，总调用 ≤8 次」……「禁止逐块串行调用」不变。同步改 AGENTS.md。」
+3. 「视觉方向我现在就定：A 卷宗（米白底 + 墨黑正文 + 单一朱红强调）。M2 不再出三方向效果图等我选，直接按 A 写 docs/design-spec.md 并铺开页面。」
+4. 「然后 M1 → M2 → M3 → M4 → M5 → M6 连续执行，不要停下来问我下一步。」
+
+### ② 报错与解决
+
+1. **redact 金额正则笔误**：`人民币?` 被正则解析为「人民」+ 可选「币」，导致不含「人民币」字样的「押金9000元」「违约金6000元」匹配不到。完整报错：`AssertionError: expected '…月租，押金9000元…' to contain '押金=月租×3'`（redact.test.ts 2 例失败，其余 38 例通过）。解法：三处金额正则 `人民币?` 改为 `(?:人民币)?`（整体可选）。改后 40/40 全绿。试错 1 次。
+2. **Deno 仍未安装（沿袭 M0）**：M1 未改 Function，`check:function` 仍标「待验（Deno 未安装）」；核心层为纯 TS，由 tsc --noEmit + vitest 覆盖，不依赖 Deno。试错 0 次。
+
+### ③ 部署与运行记录
+
+- 依赖新增：mammoth ^1.13.0、pdfjs-dist ^6.5.438（运行时，extract 用）、vitest ^5.1.0（开发）。未跑 npm audit fix --force（3 个 high 遗留，按策略需处理先问用户）。
+- `npm test`：7 个测试文件 40 例全绿（chunk 区间不变量/regex 三示例命中与缺失/redact 移除+比例占位符+本地抽取/llm schema 拒绝畸形与 offset/合并去重/三档映射/verified 全 false/扫描版判定）。
+- `npm run build`：tsc --noEmit 无类型错误，vite 打包成功（dist/）。
+- 无云端动作、无百炼调用（M1 纯本地核心层）。
+
+### ④ 线上链接与验证方式
+
+- 线上仍为 M0 纯静态占位页（M1 不改线上）：https://qianqian-yicha-odzma4gogrf.qoder.zone
+- 本地验证：`npm test`（40 绿）+ `npm run build`（无 error）。界面 golden path 与移动视口验证留待 M2。
+- 截图：（待补：m1-tests.png）
+
+### ⑤ 迭代对比
+
+本里程碑无产品界面需求变更（核心纯函数层，界面仍为占位页，M2 按 A 卷宗铺开）。约束4 并行 ≤8 次、视觉定 A、预授权清单属策略层修订，已在 M0 收尾 commit `748ef1c` 同步 AGENTS.md，不凑三行格式。
+
 ## M0 · 平台探针（2026-11-15，不打 tag）
 
 ### 六项探针结论（按「Secret/百炼调用 → 超时/请求体 → IP/KV」顺序）

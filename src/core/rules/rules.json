@@ -1,0 +1,72 @@
+[
+  {
+    "id": "rent-deposit-forfeit",
+    "scene": "rent",
+    "title": "押金可能被没收",
+    "severity": "high",
+    "detect": {
+      "anyRegex": ["押金[^。]*不予退还", "押金[^。]*归甲方所有", "押金[^。]*不退"]
+    },
+    "traits": ["约定押金在提前退租等情形下不予退还", "押金直接归出租方所有"],
+    "why": "条款约定押金在特定情形下不予退还，存在押金损失风险，建议签约前问清退还条件与扣款标准。",
+    "askTalk": "押金在什么情况下退还？提前退租会扣多少？退租后多久能拿到押金？",
+    "legalBasis": [],
+    "verified": false
+  },
+  {
+    "id": "rent-penalty-high",
+    "scene": "rent",
+    "title": "违约金偏高",
+    "severity": "medium",
+    "detect": {
+      "anyRegex": ["违约金[^。]*两个月租金", "违约金[^。]*双倍月租", "违约金[^。]*[2-9]倍月租"]
+    },
+    "traits": ["违约金相当于两个月或更高倍数月租", "违约成本明显偏高"],
+    "why": "违约金相当于数月租金，存在违约成本偏高的风险，建议协商降低或明确计算方式。",
+    "askTalk": "违约金怎么算？能不能改成按实际损失或一个月租金计算？",
+    "legalBasis": [],
+    "verified": false
+  },
+  {
+    "id": "rent-missing-deposit-return",
+    "scene": "rent",
+    "title": "缺少押金退还约定",
+    "severity": "high",
+    "detect": {
+      "absentOf": [["退还押金", "押金退还", "押金退回"]]
+    },
+    "traits": ["整份合同没有写明押金何时、按什么条件退还"],
+    "why": "合同未约定押金退还条件与时间，存在退租时押金难追回的风险，建议补充退还条款。",
+    "askTalk": "退租时押金怎么退？多久退？需要扣哪些费用，能不能写进合同？",
+    "legalBasis": [],
+    "verified": false
+  },
+  {
+    "id": "intern-unpaid-probation",
+    "scene": "internship",
+    "title": "试用期无薪",
+    "severity": "high",
+    "detect": {
+      "anyRegex": ["试用期[^。]*无薪", "试用期[^。]*不支付工资", "试用期[^。]*没有工资"]
+    },
+    "traits": ["约定试用期不支付工资或无薪", "以试用为名不付报酬"],
+    "why": "条款约定试用期无薪，存在付出劳动却拿不到报酬的风险，建议明确试用期报酬。",
+    "askTalk": "试用期有没有工资？按什么标准发？能不能写进协议？",
+    "legalBasis": [],
+    "verified": false
+  },
+  {
+    "id": "common-unilateral-terminate",
+    "scene": "common",
+    "title": "单方随时解除权",
+    "severity": "medium",
+    "detect": {
+      "anyRegex": ["甲方[^。]*随时解除", "出租方[^。]*随时解除", "用人单位[^。]*随时解除"]
+    },
+    "traits": ["一方享有随时解除合同的权利", "对方解除却受限制"],
+    "why": "条款赋予一方随时解除权，存在关系不稳定、权益不对等的风险，建议约定对等解除条件与提前通知期。",
+    "askTalk": "双方解除合同的条件是否对等？需要提前多久通知？",
+    "legalBasis": [],
+    "verified": false
+  }
+]
