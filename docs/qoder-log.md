@@ -4,6 +4,45 @@
 > 红线：只出现编造或脱敏样例，不得含真实合同内容、真实姓名、身份证、手机号、住址、公司名。
 > 截图由用户用系统截图工具放入 docs/shots/，文件名带里程碑编号；缺图写「（待补：xxx.png）」，不编造截图内容。
 
+## M2 · P0 界面闭环 + A 卷宗视觉 + 首次功能发布（2026-11-15，tag m2-ui）
+
+### 交付概览
+
+按用户预选的 A 卷宗方向写 docs/design-spec.md 并铺开全部 P0 界面：输入页（粘贴 / 上传 Word·PDF / 3 份编造示例 + 高命中演示合同，均标「示例，虚构」）、结果页（总体三档概览卡 + 类型改选 + 月租/押金/期限/违约金 + 缺失条款区 + 左侧红黄绿条款目录 + 原文背色 + 命中句下划线 + 风险详情）。法律依据仅 verified:true 显示（当前假规则全 false，故不显示）。自托管思源宋体标题子集（OFL）。补齐上传实测基础设施：pdfjs GB1 CMap 自托管（支持非嵌入中文 PDF）、PDF 提取保留换行、mammoth node/浏览器双入口兼容、dev 生成编造 PDF/DOCX fixture、dev/viewport-qa.mjs 用本机 Chrome headless+CDP 做 390/1280 双视口 golden path 实测（20 项全过、控制台 0 error）。首次功能发布 public 并复验。
+
+### ① 关键提示词（逐字保留）
+
+1. 「视觉方向我现在就定：A 卷宗（米白底 + 墨黑正文 + 单一朱红强调）。M2 不再出三方向效果图等我选，直接按 A 写 docs/design-spec.md 并铺开页面。」
+2. 「然后 M1 → M2 → M3 → M4 → M5 → M6 连续执行，不要停下来问我下一步。」
+3. 「预先授权（一次性，覆盖后续全部里程碑）：所有 prepare_site / publish_site / 改 public……」
+
+### ② 报错与解决
+
+1. **PDF 提取整页压成一行**：原 `join(" ")` 丢失换行，切块依赖行首条款标记会失效。解法：按 `item.hasEOL` 补 `\n` 再 `join("")`。单测断言 `\n第一条 租赁期限` 通过。试错 1 次。
+2. **pdfjs-dist 6 在 Node 报 `a.toHex is not a function`**：pdfjs 6 依赖 ES2026 的 Uint8Array hex/base64 方法，Node 24 尚未提供（Chrome 157 已有）。解法：仅测试环境加 src/core/__tests__/shims.ts 补齐（vitest setupFiles），产品代码不动（浏览器自带）。试错 1 次。
+3. **node 下 CMap 加载失败 `Unable to load CMap data`**：node 的 CMap 读取走 `fs.readFile`，需纯文件路径且带尾斜杠（http URL 与 file:// 字符串都不行）；浏览器走 http URL。且需补齐反向映射 Adobe-GB1-UCS2.bcmap。解法：public/pdf-cmaps/ 自托管全部 GB1 CMap；测试传纯路径、浏览器传 origin URL。试错 3 次（http→file://→纯路径）。
+4. **mammoth node 入口报 `Could not find file in options`**：node 读 `buffer`、浏览器读 `arrayBuffer`。解法：同传两键 + 一次类型断言兼容联合类型。试错 1 次。
+5. **mobile 视口 favicon 404 / 目录跳转误报**：缺 favicon 补 public/favicon.svg；QA 脚本在已滚到底时测跳转、及 mobile:true 模拟把视口撑高导致整页可见，均为脚本 artifacts，修正脚本（先回顶、mobile:false 仅缩宽度）后 20/20 全过。试错 2 次。
+
+### ③ 部署与运行记录
+
+- `npm test`：7 文件 43 例全绿（新增 PDF 中文换行/扫描版/DOCX 三例）。
+- `npm run build`：tsc --noEmit 无 error；dist 含 fonts/ 与 pdf-cmaps/。
+- `node dev/viewport-qa.mjs`：390 与 1280 双视口，输入/示例/高亮/目录跳转/类型改选/粘贴/上传PDF/扫描版提示/上传DOCX/控制台 0 error 共 20 项全过（exit 0）。
+- 云端：prepare_site(actionId 4cd3a373…) → publish_site → get_publish_status published=true → get_site_access policy.mode=public → 线上 home/favicon/cmap/font 均 200 且 bundle hash 与 dist 一致 → show_publish_confirmation。M2 为纯静态（Function 留 M3）。
+- 无百炼调用（M2 正则驱动）。
+
+### ④ 线上链接与验证方式
+
+- 线上：https://qianqian-yicha-odzma4gogrf.qoder.zone （public，get_site_access 复验）
+- 验证：无痕/真机打开 → 点「高命中演示合同」→ 概览「需重点留意」+ 缺失条款 + 目录红黄绿 + 原文背色/下划线；上传 dev/fixtures/contract.pdf 与 contract.docx 复现；扫描版 scanned.pdf 出改用粘贴提示。
+- 截图：（待补：m2-input.png）（待补：m2-result-desktop.png）（待补：m2-result-mobile.png）
+
+### ⑤ 迭代对比
+
+1. 改之前：M0/M1 线上为占位页，无可用界面。我说了什么：「直接按 A 写 docs/design-spec.md 并铺开页面」。改之后：输入→结果完整闭环，A 卷宗文书感（米白/墨黑/朱红、宋体标题、红黄绿图标+文字）。（待补：m2-result-desktop.png）
+2. 改之前：上传 PDF 中文提取丢换行、非嵌入字体提取为空。我说了什么：（执行层自查发现，非用户指令）。改之后：保留换行 + 自托管 GB1 CMap，编造 PDF/DOCX 上传实测命中风险。（待补：m2-pdf-upload.png）
+
 ## M1 · 核心纯函数层（2026-11-15，tag m1-core）
 
 ### 交付概览

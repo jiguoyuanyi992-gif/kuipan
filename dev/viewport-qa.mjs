@@ -1,0 +1,211 @@
+// 双视口 golden-path 实测：node dev/viewport-qa.mjs [url]
+// 用本机 Chrome headless + CDP（Node 内置 WebSocket），不引入新依赖。
+import { spawn } from "node:child_process";
+import { mkdirSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { setTimeout as sleep } from "node:timers/promises";
+
+const URL_BASE = process.argv[2] ?? "http://127.0.0.1:4173/";
+const CHROME =
+  "C:/Program Files/Google/Chrome/Application/chrome.exe";
+const PORT = 9222;
+const outDir = join(tmpdir(), "qqy-qa");
+mkdirSync(outDir, { recursive: true });
+const fixture = (n) =>
+  join(process.cwd(), "dev", "fixtures", n).replace(/\//g, "\\");
+
+const PASTE =
+  "房屋租赁合同（粘贴示例，虚构）\n第一条 押金 押金为人民币6000元。租赁期满，押金归甲方所有。\n第二条 解除 甲方可随时解除本合同。";
+
+const chrome = spawn(CHROME, [
+  "--headless=new",
+  `--remote-debugging-port=${PORT}`,
+  `--user-data-dir=${join(tmpdir(), "qqy-qa-profile")}`,
+  "--no-first-run",
+  "--no-default-browser-check",
+  "--hide-scrollbars",
+  "about:blank",
+]);
+
+async function getWsUrl() {
+  for (let i = 0; i < 50; i++) {
+    try {
+      const res = await fetch(`http://127.0.0.1:${PORT}/json/list`);
+      const list = await res.json();
+      const page = list.find((t) => t.type === "page");
+      if (page) return page.webSocketDebuggerUrl;
+    } catch {}
+    await sleep(200);
+  }
+  throw new Error("chrome devtools not reachable");
+}
+
+const ws = new WebSocket(await getWsUrl());
+await new Promise((r) => (ws.onopen = r));
+let msgId = 0;
+const pending = new Map();
+const consoleErrors = [];
+ws.onmessage = (ev) => {
+  const m = JSON.parse(ev.data);
+  if (m.id && pending.has(m.id)) {
+    pending.get(m.id)(m);
+    pending.delete(m.id);
+  }
+  if (m.method === "Runtime.consoleAPICalled" && m.params.type === "error")
+    consoleErrors.push(m.params.args.map((a) => a.value ?? a.description).join(" "));
+  if (m.method === "Runtime.exceptionThrown")
+    consoleErrors.push(m.params.exceptionDetails?.text ?? "exception");
+  if (m.method === "Log.entryAdded" && m.params.entry.level === "error")
+    consoleErrors.push(`${m.params.entry.text} @ ${m.params.entry.url ?? ""}`);
+};
+function send(method, params = {}) {
+  return new Promise((resolve) => {
+    const id = ++msgId;
+    pending.set(id, resolve);
+    ws.send(JSON.stringify({ id, method, params }));
+  });
+}
+async function evaluate(expression) {
+  const m = await send("Runtime.evaluate", {
+    expression,
+    returnByValue: true,
+    awaitPromise: true,
+  });
+  if (m.result?.exceptionDetails)
+    throw new Error(JSON.stringify(m.result.exceptionDetails));
+  return m.result?.result?.value;
+}
+async function shot(name) {
+  const m = await send("Page.captureScreenshot", { format: "png" });
+  writeFileSync(join(outDir, `${name}.png`), Buffer.from(m.result.data, "base64"));
+}
+const clickText = (t) =>
+  evaluate(
+    `(() => { const b=[...document.querySelectorAll('button')].find(x=>x.textContent.includes(${JSON.stringify(
+      t,
+    )})); if(!b) return false; b.click(); return true; })()`,
+  );
+const bodyText = () => evaluate("document.body.innerText");
+
+await send("Page.enable");
+await send("Runtime.enable");
+await send("Log.enable");
+await send("DOM.enable");
+
+const results = [];
+function record(viewport, step, ok, detail = "") {
+  results.push({ viewport, step, ok, detail });
+}
+
+async function setFiles(selector, file) {
+  const doc = await send("DOM.getDocument");
+  const q = await send("DOM.querySelector", {
+    nodeId: doc.result.root.nodeId,
+    selector,
+  });
+  await send("DOM.setFileInputFiles", {
+    nodeId: q.result.nodeId,
+    files: [file],
+  });
+}
+
+for (const vp of [
+  { name: "mobile", width: 390, height: 844, mobile: false },
+  { name: "desktop", width: 1280, height: 900, mobile: false },
+]) {
+  consoleErrors.length = 0;
+  await send("Emulation.setDeviceMetricsOverride", {
+    width: vp.width,
+    height: vp.height,
+    deviceScaleFactor: 1,
+    mobile: vp.mobile,
+  });
+  await send("Page.navigate", { url: URL_BASE });
+  await sleep(1200);
+  await shot(`${vp.name}-1-input`);
+  record(vp.name, "input-load", (await bodyText()).includes("签前一查"));
+
+  // 示例一键试用
+  await clickText("高命中演示合同");
+  await sleep(600);
+  let txt = await bodyText();
+  record(vp.name, "demo-result", txt.includes("需重点留意") && txt.includes("缺失的条款"));
+  const marks = await evaluate("document.querySelectorAll('mark').length");
+  record(vp.name, "demo-highlights", marks > 0, `marks=${marks}`);
+  await shot(`${vp.name}-2-demo-top`);
+  await evaluate("window.scrollTo(0, document.body.scrollHeight)");
+  await sleep(300);
+  await shot(`${vp.name}-3-demo-bottom`);
+
+  // 目录跳转
+  await evaluate("window.scrollTo(0, 0)");
+  await sleep(300);
+  const jumped = await evaluate(
+    `(() => { const before=window.scrollY; const nav=document.querySelector('nav'); const btns=[...nav.querySelectorAll('button')]; const b=btns[btns.length-1]; b.click(); const el=document.getElementById('b6'); const top0=el?el.getBoundingClientRect().top:null; return new Promise(r=>setTimeout(()=>r({before, after:window.scrollY, n:btns.length, top0, top1:el?el.getBoundingClientRect().top:null, docH:document.body.scrollHeight, winH:window.innerHeight}),1500)); })()`,
+  );
+  record(vp.name, "toc-jump", jumped && jumped.after !== jumped.before, JSON.stringify(jumped));
+
+  // 类型改选
+  await evaluate(
+    `(() => { const sel=document.querySelector('select'); const set=Object.getOwnPropertyDescriptor(window.HTMLSelectElement.prototype,'value').set; set.call(sel,'internship'); sel.dispatchEvent(new Event('change',{bubbles:true})); return true; })()`,
+  );
+  await sleep(400);
+  txt = await bodyText();
+  record(vp.name, "type-reselect", txt.includes("当前：实习兼职"));
+
+  // 返回 → 粘贴
+  await clickText("返回");
+  await sleep(400);
+  await evaluate(
+    `(() => { const ta=document.querySelector('textarea'); const set=Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype,'value').set; set.call(ta, ${JSON.stringify(
+      PASTE,
+    )}); ta.dispatchEvent(new Event('input',{bubbles:true})); return true; })()`,
+  );
+  await clickText("开始分析");
+  await sleep(600);
+  txt = await bodyText();
+  record(vp.name, "paste-result", txt.includes("押金可能被没收"));
+  await shot(`${vp.name}-4-paste`);
+
+  // 上传 PDF
+  await clickText("返回");
+  await sleep(400);
+  await setFiles('input[type="file"]', fixture("contract.pdf"));
+  await sleep(1500);
+  await clickText("开始分析");
+  await sleep(600);
+  txt = await bodyText();
+  record(vp.name, "upload-pdf", txt.includes("押金归甲方所有") && txt.includes("需重点留意"));
+  await shot(`${vp.name}-5-pdf`);
+
+  // 上传扫描版 PDF → 提示
+  await clickText("返回");
+  await sleep(400);
+  await setFiles('input[type="file"]', fixture("scanned.pdf"));
+  await sleep(1200);
+  txt = await bodyText();
+  record(vp.name, "scanned-pdf-hint", txt.includes("这是扫描版 PDF"));
+  await shot(`${vp.name}-6-scanned`);
+
+  // 上传 DOCX
+  await clickText("返回");
+  await sleep(400);
+  await setFiles('input[type="file"]', fixture("contract.docx"));
+  await sleep(1200);
+  await clickText("开始分析");
+  await sleep(600);
+  txt = await bodyText();
+  record(vp.name, "upload-docx", txt.includes("押金归甲方所有"));
+  await shot(`${vp.name}-7-docx`);
+
+  record(vp.name, "console-0-error", consoleErrors.length === 0, consoleErrors.join(" | ").slice(0, 300));
+}
+
+writeFileSync(join(outDir, "results.json"), JSON.stringify(results, null, 2));
+console.log(JSON.stringify(results, null, 2));
+console.log("screenshots:", outDir);
+ws.close();
+chrome.kill();
+const failed = results.filter((r) => !r.ok);
+process.exit(failed.length ? 1 : 0);

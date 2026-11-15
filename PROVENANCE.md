@@ -7,3 +7,5 @@ The UI catalog, hooks, utilities, Tailwind stylesheet and vendored Shadcn CSS or
 Qoder adaptations replace Vinext/Next server rendering and Cloudflare configuration with a Vite static build; remove D1/Drizzle, R2 and ChatGPT authentication scaffolding; set Shadcn to client rendering; and make the toast component use its system theme without a Next theme provider. The Function example reuses Qoder Sites' credential-free handler. No upstream hosting, auth or resource configuration is copied into generated projects.
 
 Qoder adds the Sites design contract and maps the starter theme, spacing, typography and transition scales to Nudge variables. Original light/dark colors are preserved as named project variables.
+
+Project-added assets: `public/fonts/title-serif.woff2` is a self-hosted subset of Noto Serif SC (SIL OFL 1.1, license text beside it in `public/fonts/OFL.txt`). `public/pdf-cmaps/*.bcmap` are the Adobe-GB1 CMaps shipped with pdfjs-dist (Apache-2.0), copied unmodified so non-embedded Chinese PDF fonts can be extracted locally.

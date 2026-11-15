@@ -1,0 +1,5 @@
+# 编造 fixture 与自托管二进制资源不做换行转换
+dev/fixtures/*.pdf binary
+dev/fixtures/*.docx binary
+public/fonts/*.woff2 binary
+public/pdf-cmaps/*.bcmap binary
