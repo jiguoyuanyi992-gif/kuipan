@@ -41,10 +41,11 @@
 ### ③ 部署与运行记录
 
 - 设计登记：`open_design_workbench` 生成 `.签前一查.qoder.site`（工具所有，不手写）。
-- **发布 1**（探针）：actionId `529b3cc6-fb63-4069-af21-78490de73830`，publishOperationId `01a1df79-ebd6-7364-9881-eeb68494eec5`，succeeded+committed，`published:true`；`access_mode` 创建即 public，无需额外改策略。
+- **发布 1**（探针）：actionId `529b3cc6-fb63-4069-af21-78490de73830`，publishOperationId `01a1df79-ebd6-7364-9881-eeb68494eec5`，succeeded+committed，`published:true`；分享策略 **private**（M0 两次发布均 private，public 当时尚未设置）。
 - **百炼调用**：1 次（授权 ≤3），qwen-flash，输入 "ping"、max_tokens=1，HTTP 200、latencyMs=230。全程未打印 Key、模型响应原文、请求内容；探针接口以 nonce 守卫防公网路人触发（nonce 不入 log）。
 - **日志**：`get_function_logs(type=requests)` 近 1 小时无 5xx；60s 的 504 与 POST 的 403 均为网关侧产生，未到达函数。
-- **发布 2**（纯静态，删接口）：actionId `0d5f8f0b-2f93-4be2-8cb9-f064c24bf624`，omit functionDirectory，publishOperationId `01a1df81-0981-7f3b-8136-3b10ee0509b6`，succeeded+committed，`published:true`；`functions:[]`，`/functions/v1/app/check` 与 `/functions/v1/app` 均 409（网关），首页 200，public 不变。handler.ts 已恢复 starter 原样（与 commit 7f6643c 逐字节一致）。
+- **发布 2**（纯静态，删接口）：actionId `0d5f8f0b-2f93-4be2-8cb9-f064c24bf624`，omit functionDirectory，publishOperationId `01a1df81-0981-7f3b-8136-3b10ee0509b6`，succeeded+committed，`published:true`；`functions:[]`，`/functions/v1/app/check` 与 `/functions/v1/app` 均 409（网关），首页 200，分享策略仍 **private**。handler.ts 已恢复 starter 原样（与 commit 7f6643c 逐字节一致）。
+- **访问策略更正与置 public（2026-11-15，用户授权 confirmPublic=true）**：此前本 log 误记「创建即 public／public 不变」。事实：`get_site`/`get_publish_status` 的 `access_mode` 字段是名义值，真实分享策略以 `get_site_access.policy.mode` 为准 —— M0 两次发布后均为 **private**。经用户授权调用 `update_access_policy(mode=public)`，`get_site_access` 复验 **mode=public** 已生效。教训：访问状态一律以 `get_site_access` 复核，不采信 `get_site` 的 `access_mode` 字段。
 - 临时小额度 Key **待用户作废**；正式 Key 到 M3 才接入。
 
 ### ④ 线上链接与验证方式
