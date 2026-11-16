@@ -40,7 +40,7 @@ src/core/            平台无关纯函数（无 React、无网络）★ 业务�
   llm/               prompt 构造 + 返回 JSON 校验 + 与兜底结果合并去重
   scene/             场景规则子集裁剪
 src/pages|components/  React 界面
-functions/           单 app Edge Function（平台只支持一个），analyze/advisory 为同一函数内子路径
+functions/           单 app Edge Function（平台只支持一个），只有 /analyze 一个子路径；含「其他可疑条款」（aiSuggested=true、ruleId 空串、不附法律依据）
 vite.config.ts 等    单应用，不用 monorepo
 ```
 
@@ -137,7 +137,7 @@ ModelFinding { ruleId, blockId, explanation, askTalk, rewrite, aiSuggested: bool
 | 扫描对象 | 时机 | 命中后果 |
 |---|---|---|
 | 我们自己的文案：src/ 全部 UI 文本 + rules/、traps/ JSON 的展示字段，**排除 legalBasis.quote 及 law/article/source 引用元数据**（官方法条原文不是我们的表述，不受措辞规范约束） | 构建时（测试） | 构建失败 |
-| 模型返回的 explanation / askTalk / rewrite | 运行时，渲染前 | 该条降级为只显示规则库原文 |
+| 模型返回的 explanation / askTalk / rewrite | 运行时，渲染前 | 命中规则项：该条降级为只显示规则库原文；`aiSuggested` 项（其他可疑条款，无规则库原文可退）→ 整条丢弃、不显示 |
 | 用户上传的合同原文 | 永不扫描 | —— |
 
 构建时测试必须含反例：AGENTS.md、docs/qoder-log.md、计划文件里出现禁用词不得误报；含「保证金」的规则文案不得误报；**含「无效」的 legalBasis.quote 不得误报**；含「我们保证」的 UI 文本必须报错。
@@ -219,7 +219,7 @@ Key 值始终由用户（天赐）新建并自己在 Sites Settings 界面填，
 
 ## 平台落地约束（已实测，直接采信）
 
-1. Sites 只支持一个 app Edge Function：入口 `functions/index.ts`，浏览器走同源 `/functions/v1/app`，analyze/advisory 落成同一函数内子路径（如 `/functions/v1/app/analyze`）。这是平台落地方式，不是架构变更。
+1. Sites 只支持一个 app Edge Function：入口 `functions/index.ts`，浏览器走同源 `/functions/v1/app`，**只有 `/functions/v1/app/analyze` 一个子路径，其余 404；不设 advisory 独立端点**——「其他可疑条款」与规则命中出自同一批块的同一次模型调用，拆成第二个端点等于对同样的块再调一次百炼，会撞总调用 ≤8 次与 ≤30s 两条硬线。这是平台落地方式，不是架构变更。
 2. 不再跑官方初始化脚本 create-site.mjs（拒绝非空目录），脚手架已就位。
 3. Node 要求 ^22.13.0 || >=24.0.0；preinstall/predev/prebuild 都跑 scripts/check-node.mjs。
 4. `npm run build` = tsc --noEmit + scripts/build.mjs → dist/；`npm run check:function`/`dev:function` 需要 Deno，本机未安装时 Function 校验标待验，不得声称已通过。本地 fixture 服务放 dev/，不进 dist/ 或 functions/。

@@ -32,7 +32,8 @@
 - 本地双视口 QA（390×844 与 1280×900）：fixture 在（model）36/36 全过；fixture 关（`QQY_EXPECT=degraded`）36/36 全过。每视口 18 步、新增 7 步：`traps-jump-from-result`、`traps-jump-to-result`、`traps-loan-category`、`traps-search-empty`、`checklist-toggle`、`checklist-persisted`、`traps-check-to-input`；应用级控制台 0 error。
 - 云端：prepare_site(actionId 33ed593b-71d7-46f7-a0f9-39e72dc9feea，webDirectory=dist，functionDirectory=functions，spa=false，secretNames=[BAILIAN_API_KEY] 只传名称) → publish_site(publishOperation 01a1e2c5-ca07-79f1-98d2-3cf2dff85c42 succeeded, committed=true) → get_publish_status `published: true`、`access_mode: public`（本里程碑未改访问策略）。
 - 百炼调用：用户告知 M0 临时小额度 Key 已作废；线上真实浏览器跑一次演示合同（1 批）后页面出现「（AI 生成，仅供参考）」改写，`get_function_logs` 最近 1 小时 3 条 `POST /app/analyze` 全 status_code 200、无 5xx —— 说明 Secrets 里的现值仍可用，需用户确认那是新建的正式 Key（若当前值就是已作废 Key，模型主路径会整批失败进降级，请重填）。
-- 未完成项：① `/advisory` 子路径未实现——策略只写了它作为同一函数内子路径，没有定义它的功能，P0/P1 也无对应交付项，按「执行层不自扩范围」留待策略层决定；② 检查清单「竖版长图友好」排版优化留到 M5；③ 本节截图待用户用系统截图工具补。
+- 策略裁定（非未完成）：① `/advisory` 独立端点取消。功能已在 analyze 内实现——`src/core/llm/prompt.ts:25` 要求「未命中任何规则但可疑」的条款以 `aiSuggested=true`、`ruleId` 空串返回，`src/core/llm/merge.ts:26` 按 `ai|blockId` 去重并入「其他可疑条款」，`src/components/FindingDetail.tsx:12` 走弱样式且不附法律依据。依据：同一批块的同一次调用已带全部脱敏块，拆第二个端点等于再调一次百炼，会撞「总调用 ≤8 次」与「≤30 秒出全部结果」两条硬线。代码不动，AGENTS.md 架构行与平台约束行已同步。
+- 未完成项：② 检查清单「竖版长图友好」排版优化留到 M5；③ 本节截图待用户用系统截图工具补。
 
 ### ④ 线上链接与验证方式
 
