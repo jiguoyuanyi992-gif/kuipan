@@ -175,12 +175,12 @@ for (const vp of [
   await clickText("套餐");
   await sleep(300);
   txt = await bodyText();
-  record(vp.name, "contracts-plan-fallback", txt.includes("签前怎么办") && txt.includes("典例分析") && txt.includes("整理中"));
+  record(vp.name, "contracts-plan-basis", txt.includes("自动续费或自动续约") && txt.includes("典例分析") && txt.includes("整理中"));
   await shot(`${vp.name}-contracts-plan`, true);
   await clickText("贷款分期");
   await sleep(300);
   txt = await bodyText();
-  record(vp.name, "contracts-loan", txt.includes("已核对 0 / 8") && txt.includes("分期"));
+  record(vp.name, "contracts-loan", txt.includes("已核对 0 / 8") && txt.includes("分期") && txt.includes("预付费用概不退还"));
   await clickText("租房");
   await sleep(300);
 

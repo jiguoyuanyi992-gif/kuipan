@@ -12,7 +12,14 @@
         "rent-unauthorized-entry",
         "rent-agent-collects-rent",
         "common-unilateral-terminate",
-        "common-final-interpretation"
+        "common-final-interpretation",
+        "common-auto-renew",
+        "common-prepaid-no-refund",
+        "common-exempt-liability",
+        "common-penalty-excessive",
+        "common-unilateral-change",
+        "common-jurisdiction",
+        "common-personal-info"
       ],
       "trapIds": [
         "trap-rent-deposit-forfeit",
@@ -34,7 +41,13 @@
         "intern-missing-school-party",
         "intern-night-shift",
         "common-unilateral-terminate",
-        "common-final-interpretation"
+        "common-final-interpretation",
+        "common-prepaid-no-refund",
+        "common-exempt-liability",
+        "common-penalty-excessive",
+        "common-unilateral-change",
+        "common-jurisdiction",
+        "common-personal-info"
       ],
       "trapIds": [
         "trap-intern-collects-money",
@@ -47,11 +60,58 @@
       "id": "loan",
       "label": "贷款分期",
       "checklist": "loan",
-      "ruleIds": [],
+      "ruleIds": [
+        "common-auto-renew",
+        "common-prepaid-no-refund",
+        "common-exempt-liability",
+        "common-penalty-excessive",
+        "common-unilateral-change",
+        "common-jurisdiction",
+        "common-personal-info"
+      ],
       "trapIds": ["trap-loan-training-loan", "trap-loan-installment-fees"]
     },
-    { "id": "plan", "label": "套餐", "ruleIds": [], "trapIds": [] },
-    { "id": "cert", "label": "考证", "ruleIds": [], "trapIds": [] },
-    { "id": "insurance", "label": "保险", "ruleIds": [], "trapIds": [] }
+    {
+      "id": "plan",
+      "label": "套餐",
+      "ruleIds": [
+        "common-auto-renew",
+        "common-prepaid-no-refund",
+        "common-exempt-liability",
+        "common-penalty-excessive",
+        "common-unilateral-change",
+        "common-jurisdiction",
+        "common-personal-info"
+      ],
+      "trapIds": []
+    },
+    {
+      "id": "cert",
+      "label": "考证",
+      "ruleIds": [
+        "common-auto-renew",
+        "common-prepaid-no-refund",
+        "common-exempt-liability",
+        "common-penalty-excessive",
+        "common-unilateral-change",
+        "common-jurisdiction",
+        "common-personal-info"
+      ],
+      "trapIds": []
+    },
+    {
+      "id": "insurance",
+      "label": "保险",
+      "ruleIds": [
+        "common-auto-renew",
+        "common-prepaid-no-refund",
+        "common-exempt-liability",
+        "common-penalty-excessive",
+        "common-unilateral-change",
+        "common-jurisdiction",
+        "common-personal-info"
+      ],
+      "trapIds": []
+    }
   ]
 }

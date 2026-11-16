@@ -9,11 +9,11 @@ describe("规则库与场景", () => {
     expect(rules.length).toBeGreaterThanOrEqual(12);
   });
 
-  it("场景分布满足租房 6 / 实习兼职 5 / 通用 2", () => {
+  it("场景分布满足租房 6 / 实习兼职 5 / 通用 9", () => {
     const count = (scene: string) => rules.filter((r) => r.scene === scene).length;
     expect(count("rent")).toBe(6);
     expect(count("internship")).toBe(5);
-    expect(count("common")).toBe(2);
+    expect(count("common")).toBe(9);
   });
 
   it("verified 置真必须登记授权/复核记录与核对底本", () => {
@@ -48,7 +48,8 @@ describe("规则库与场景", () => {
         expect(b.quote).not.toMatch(/等([。；！？，、]|$)/);
         expect(b.source).toBe(LEGAL_BASIS_SOURCE);
         if (b.sourceUrl) expect(b.sourceUrl.startsWith("https://flk.npc.gov.cn/")).toBe(true);
-        expect(b.reprintUrl).toMatch(/^https?:\/\/[^/]*(gov\.cn|moe\.edu\.cn)/);
+        // 新通用规则可以没有转载链接；有才校验域名。
+        if (b.reprintUrl) expect(b.reprintUrl).toMatch(/^https?:\/\/[^/]*(gov\.cn|moe\.edu\.cn)/);
       }
     }
   });

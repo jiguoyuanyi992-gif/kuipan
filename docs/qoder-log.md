@@ -4,6 +4,32 @@
 > 红线：只出现编造或脱敏样例，不得含真实合同内容、真实姓名、身份证、手机号、住址、公司名。
 > 截图由用户用系统截图工具放入 docs/shots/，文件名带里程碑编号；缺图写「（待补：xxx.png）」，不编造截图内容。
 
+## M4 后追加 · 兜底依据三项任务 B：通用兜底规则（2026-11-16，不打 tag）
+
+### 做了什么
+
+- rules.json 新增 7 条 scene=common 规则：common-auto-renew（自动续费或自动续约）、common-prepaid-no-refund（预付费用概不退还）、common-exempt-liability（免除己方责任或概不负责）、common-penalty-excessive（违约金或滞纳金过高）、common-unilateral-change（一方可单方调整价格或条款）、common-jurisdiction（约定对方所在地法院或仲裁管辖）、common-personal-info（个人信息授权范围过宽）。每条 detect 覆盖 ≥3 种常见写法，traits/why/askTalk/severity 写全；12 处 legalBasis 的 quote 全部逐字取自 flk 官方 DOCX（脚本比对 12/12 命中），verified=true、reviewer=「执行层自动引用」、reviewNote 记检索日期与 flk 页面标题；source 仍由加载器注入常量，不手写。现有 13 条规则内容与署名零改动。
+- 候选条号全部与打开的原文对上：民法典 496/497/506/543/585、消保法 26/53、民诉法 35（2023 修正版确为协议管辖）、个保法 14/16，无换条或留空。
+- data/contracts.json：loan/plan/cert/insurance 四类 ruleIds 挂全部 7 条新通用规则；租房加 7 条、实习加 6 条（不含自动续费）。照契四类不再空着。scene/index.ts 判定逻辑未动。
+- 测试：新增 commonRules.test.ts（每规则 3 正例＋1 反例，另加清洁示例零命中）；rules.test.ts 通用计数 2→9、reprintUrl 断言改「有才校验域名」。试错 1 轮：两句正例写法（「缴费后一律不退」「可随时修改合同条款」）初版正则未覆盖，补「缴费/付费…一律不退」与「随时…修改/变更」两种写法后全绿。
+- dev/kuipan-qa.mjs：套餐断言改 contracts-plan-basis（自动续费或自动续约＋典例分析＋整理中），贷款断言加「预付费用概不退还」。
+
+### flk 检索记录（检索日期均 2026-11-16，亲自搜索并打开详情页）
+
+- 中华人民共和国消费者权益保护法：https://flk.npc.gov.cn/detail?id=2c909fdd678bf17901678bf7670606ef ，页面标题「中华人民共和国消费者权益保护法-国家法律法规数据库」，2013-10-25 公布、2014-03-15 施行；官方 DOCX 8337 字，第二十六、五十三条逐字取用；裸 detail 链接亲自导航确认直达。
+- 中华人民共和国个人信息保护法：https://flk.npc.gov.cn/detail?id=ff8081817b6472a3017b656cc2040044 ，页面标题「中华人民共和国个人信息保护法-国家法律法规数据库」，2021-08-20 公布、2021-11-01 施行；官方 DOCX 9636 字，第十四、十六条逐字取用；裸链确认直达。
+- 中华人民共和国民事诉讼法：https://flk.npc.gov.cn/detail?id=ff8081818a21dc13018b425303b7086d ，页面标题「中华人民共和国民事诉讼法-国家法律法规数据库」，2023-09-01 公布、2024-01-01 施行；官方 DOCX 36214 字，第三十五条（协议管辖）逐字取用；裸链确认直达。
+- 中华人民共和国民法典：沿用本节下方已登记的详情页与官方 DOCX（113975 字），第四百九十六、四百九十七、五百零六、五百四十三、五百八十五条逐字取用。
+
+### 改了哪些文件
+
+src/core/rules/rules.json、src/core/__tests__/rules.test.ts、src/core/__tests__/commonRules.test.ts（新）、data/contracts.json、dev/kuipan-qa.mjs、docs/qoder-log.md。
+
+### 测试结果
+
+- npm test 104/104；npm run build 通过；node dev/kuipan-qa.mjs 66/66、双视口控制台 0 error。
+- 截图目视：照契套餐页左栏显示 7 条通用规则的正式法律依据与 flk 来源链接，右栏典例分析仍「整理中」；贷款分期页同。
+
 ## M4 后追加 · 兜底依据三项任务 A：签前怎么办（2026-11-16，不打 tag）
 
 ### 做了什么
