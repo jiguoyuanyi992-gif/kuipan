@@ -1,9 +1,14 @@
+import { LEGAL_BASIS_SOURCE } from "../legalSource";
 import type { RiskRule } from "../types";
 import rulesJson from "./rules.json";
 
-// M1 假规则（verified 全 false，仅用于打通流程与测试）。
-// M4 由用户案例 + 权威依据替换为真实规则库；web 与 function 共用同一份 JSON。
-export const rules = rulesJson as unknown as RiskRule[];
+// M4 真实规则库；web 与 function 共用同一份 JSON。
+// 2026-11-16 用户授权后全部 verified=true，reviewer/reviewNote 登记授权与核对底本。
+// source 不手写进数据文件，加载时从唯一常量注入。
+export const rules: RiskRule[] = (rulesJson as unknown as RiskRule[]).map((r) => ({
+  ...r,
+  legalBasis: r.legalBasis.map((lb) => ({ ...lb, source: LEGAL_BASIS_SOURCE })),
+}));
 
 export function ruleById(id: string): RiskRule | undefined {
   return rules.find((r) => r.id === id);

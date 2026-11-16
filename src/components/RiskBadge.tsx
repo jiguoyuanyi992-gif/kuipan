@@ -12,7 +12,7 @@ export function RiskBadge({
   return (
     <span
       className={`inline-flex items-center gap-1 rounded px-2 py-0.5 text-xs font-medium ${className}`}
-      style={{ color: s.color, backgroundColor: s.bg }}
+      style={{ color: s.color, backgroundColor: s.bg, border: `1px solid ${s.color}` }}
     >
       <span aria-hidden>{s.icon}</span>
       {s.label}

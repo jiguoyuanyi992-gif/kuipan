@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { examples } from "../examples";
+import { LEGAL_BASIS_SOURCE } from "../legalSource";
 import { rules } from "../rules";
 import { detectType, rulesForScene, scenesFor } from "../scene";
 
@@ -15,8 +16,12 @@ describe("规则库与场景", () => {
     expect(count("common")).toBe(2);
   });
 
-  it("verified 默认 false，执行层无置真路径", () => {
-    expect(rules.every((r) => r.verified === false)).toBe(true);
+  it("verified 置真必须登记授权/复核记录与核对底本", () => {
+    for (const r of rules) {
+      if (!r.verified) continue;
+      expect(r.reviewer).toBeTruthy();
+      expect(r.reviewNote).toBeTruthy();
+    }
   });
 
   it("每条规则字段完整", () => {
@@ -38,7 +43,12 @@ describe("规则库与场景", () => {
         expect(b.law).toBeTruthy();
         expect(b.article).toBeTruthy();
         expect(b.quote.length).toBeGreaterThan(8);
-        expect(b.source).toMatch(/^https?:\/\/[^/]*(gov\.cn|moe\.edu\.cn)/);
+        // 逐字原文：禁省略号；「等」只允许法条枚举用法（等事项/等方式），禁句末省略。
+        expect(b.quote).not.toMatch(/……|…|\.\.\./);
+        expect(b.quote).not.toMatch(/等([。；！？，、]|$)/);
+        expect(b.source).toBe(LEGAL_BASIS_SOURCE);
+        if (b.sourceUrl) expect(b.sourceUrl.startsWith("https://flk.npc.gov.cn/")).toBe(true);
+        expect(b.reprintUrl).toMatch(/^https?:\/\/[^/]*(gov\.cn|moe\.edu\.cn)/);
       }
     }
   });

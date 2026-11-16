@@ -1,0 +1,57 @@
+{
+  "types": [
+    {
+      "id": "rent",
+      "label": "租房",
+      "checklist": "rent",
+      "ruleIds": [
+        "rent-deposit-forfeit",
+        "rent-missing-deposit-return",
+        "rent-penalty-high",
+        "rent-non-residential-space",
+        "rent-unauthorized-entry",
+        "rent-agent-collects-rent",
+        "common-unilateral-terminate",
+        "common-final-interpretation"
+      ],
+      "trapIds": [
+        "trap-rent-deposit-forfeit",
+        "trap-rent-agent-collects-rent",
+        "trap-rent-penalty-high",
+        "trap-rent-non-residential-space",
+        "trap-rent-unauthorized-entry",
+        "trap-rent-utility-and-fees"
+      ]
+    },
+    {
+      "id": "internship",
+      "label": "实习",
+      "checklist": "internship",
+      "ruleIds": [
+        "intern-collects-money",
+        "intern-unpaid-probation",
+        "intern-penalty-clause",
+        "intern-missing-school-party",
+        "intern-night-shift",
+        "common-unilateral-terminate",
+        "common-final-interpretation"
+      ],
+      "trapIds": [
+        "trap-intern-collects-money",
+        "trap-intern-unpaid-probation",
+        "trap-intern-penalty-clause",
+        "trap-intern-missing-written-agreement"
+      ]
+    },
+    {
+      "id": "loan",
+      "label": "贷款分期",
+      "checklist": "loan",
+      "ruleIds": [],
+      "trapIds": ["trap-loan-training-loan", "trap-loan-installment-fees"]
+    },
+    { "id": "plan", "label": "套餐", "ruleIds": [], "trapIds": [] },
+    { "id": "cert", "label": "考证", "ruleIds": [], "trapIds": [] },
+    { "id": "insurance", "label": "保险", "ruleIds": [], "trapIds": [] }
+  ]
+}

@@ -43,8 +43,7 @@ export function Checklist({ category }: Props) {
 
   return (
     <section
-      className="space-y-2 rounded-[var(--site-radius)] border border-border p-3.5"
-      style={{ backgroundColor: "var(--site-surface)" }}
+      className="paper space-y-2 rounded-[var(--site-radius)] border border-border p-3.5"
     >
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h2 className="font-title text-base">签约前检查清单</h2>
@@ -57,7 +56,7 @@ export function Checklist({ category }: Props) {
           const on = !!checked[it.id];
           return (
             <li key={it.id}>
-              <label className="flex cursor-pointer items-start gap-2 rounded px-1 py-1 text-sm leading-snug hover:bg-background">
+              <label className="flex cursor-pointer items-start gap-2 rounded px-1 py-1 text-sm leading-snug hover:bg-[var(--paper-soft)]">
                 <input
                   type="checkbox"
                   checked={on}

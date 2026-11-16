@@ -1,3 +1,4 @@
+import { LEGAL_BASIS_SOURCE } from "../legalSource";
 import checklistsJson from "./checklists.json";
 import trapsJson from "./traps.json";
 import { rules } from "../rules";
@@ -17,7 +18,10 @@ export interface SceneChecklist {
   items: ChecklistItem[];
 }
 
-export const traps = trapsJson as unknown as TrapEntry[];
+export const traps: TrapEntry[] = (trapsJson as unknown as TrapEntry[]).map((t) => ({
+  ...t,
+  legalBasis: t.legalBasis.map((lb) => ({ ...lb, source: LEGAL_BASIS_SOURCE })),
+}));
 export const checklists = checklistsJson as unknown as {
   categories: SceneChecklist[];
 };

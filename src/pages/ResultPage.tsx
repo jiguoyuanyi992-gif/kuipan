@@ -1,5 +1,4 @@
 import { useEffect, type ReactNode } from "react";
-import { Disclaimer } from "@/src/components/Disclaimer";
 import { FindingDetail } from "@/src/components/FindingDetail";
 import { RiskBadge } from "@/src/components/RiskBadge";
 import {
@@ -15,8 +14,8 @@ interface Props {
   onBack: () => void;
   onReanalyze: (type: ContractType) => void;
   onViewCases: (trapId: string) => void;
-  onOpenTraps: () => void;
-  // 从陷阱库「用我的合同检查这一项」跳回时定位到对应风险详情。
+  onOpenContracts: () => void;
+  // 从照契「用我的合同检查这一项」跳回时定位到对应风险详情。
   highlightRuleId: string | null;
 }
 
@@ -52,16 +51,7 @@ function Highlighted({
   ranges.forEach((r, i) => {
     if (r.start > cursor) nodes.push(block.text.slice(cursor, r.start));
     nodes.push(
-      <mark
-        key={i}
-        style={{
-          backgroundColor: "transparent",
-          textDecoration: "underline",
-          textDecorationColor: r.color,
-          textDecorationThickness: "2px",
-          textUnderlineOffset: "3px",
-        }}
-      >
+      <mark key={i} className="brush-mark" style={{ color: r.color }}>
         {block.text.slice(r.start, r.end)}
       </mark>,
     );
@@ -76,7 +66,7 @@ export function ResultPage({
   onBack,
   onReanalyze,
   onViewCases,
-  onOpenTraps,
+  onOpenContracts,
   highlightRuleId,
 }: Props) {
   const { doc, findings, overall, amounts } = analysis;
@@ -85,7 +75,7 @@ export function ResultPage({
   const overallStyle =
     overall.level === "none" ? NONE_STYLE : RISK_STYLE[overall.level];
 
-  // 从陷阱库跳回时定位到该规则的第一条风险详情。
+  // 从照契跳回时定位到该规则的第一条风险详情。
   useEffect(() => {
     if (!highlightRuleId) return;
     document
@@ -94,32 +84,38 @@ export function ResultPage({
   }, [highlightRuleId, findings.length]);
 
   return (
-    <main className="mx-auto w-full max-w-[1100px] px-5 py-8">
+    <main className="mx-auto w-full max-w-[1100px] px-4 py-6 sm:px-5 sm:py-8">
       <header className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <button
             type="button"
             onClick={onBack}
-            className="rounded-[var(--site-radius)] border border-border px-3 py-1.5 text-sm hover:border-[var(--site-accent)]"
+            className="rounded-[var(--site-radius)] border border-border px-3 py-1.5 text-sm hover:border-[var(--site-gold)]"
           >
             ← 返回
           </button>
-          <h1 className="font-title text-2xl">签前一查 · 分析结果</h1>
+          <h1 className="flex items-center gap-2 font-title text-2xl">
+            <span className="seal h-7 w-7 text-sm" aria-hidden>
+              判
+            </span>
+            分析结果
+          </h1>
         </div>
         <div className="flex items-center gap-3">
           <button
             type="button"
-            onClick={onOpenTraps}
-            className="rounded-[var(--site-radius)] border border-border px-3 py-1.5 text-sm hover:border-[var(--site-accent)]"
+            onClick={onOpenContracts}
+            className="rounded-[var(--site-radius)] border border-border px-3 py-1.5 text-sm hover:border-[var(--site-gold)]"
           >
-            浏览陷阱库
+            去照契
           </button>
           {isExample && (
             <span
               className="rounded px-2 py-1 text-xs"
               style={{
-                color: "var(--site-accent)",
-                backgroundColor: "var(--risk-high-bg)",
+                color: "var(--site-fg)",
+                backgroundColor: "var(--site-surface)",
+                border: "1px solid var(--site-accent)",
               }}
             >
               示例，虚构
@@ -128,10 +124,7 @@ export function ResultPage({
         </div>
       </header>
 
-      <section
-        className="mb-6 space-y-4 rounded-[var(--site-radius)] border border-border p-5"
-        style={{ backgroundColor: "var(--site-surface)" }}
-      >
+      <section className="paper mb-6 space-y-4 rounded-[var(--site-radius)] border border-border p-4 sm:p-5">
         <div className="flex flex-wrap items-center gap-3">
           <span
             className="inline-flex items-center gap-2 rounded px-3 py-1 text-base font-medium"
@@ -145,7 +138,7 @@ export function ResultPage({
             <select
               value={doc.type}
               onChange={(e) => onReanalyze(e.target.value as ContractType)}
-              className="rounded border border-border bg-background px-2 py-1 text-sm text-foreground"
+              className="rounded border border-border bg-[var(--paper-soft)] px-2 py-1 text-sm text-foreground"
             >
               <option value="rent">租房</option>
               <option value="internship">实习兼职</option>
@@ -210,20 +203,21 @@ export function ResultPage({
       </section>
 
       {absent.length > 0 && (
-        <section className="mb-6 space-y-2">
+        <section className="paper mb-6 space-y-2 rounded-[var(--site-radius)] border border-border p-4 sm:p-5">
           <h2 className="font-title text-lg">缺失的条款</h2>
           {absent.map((f, i) => (
             <FindingDetail
               key={`absent-${i}`}
               finding={f}
+              contractType={doc.type}
               onViewCases={onViewCases}
             />
           ))}
         </section>
       )}
 
-      <div className="grid gap-6 md:grid-cols-[220px_1fr]">
-        <nav className="md:sticky md:top-6 md:self-start">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-6 md:grid-cols-[220px_minmax(0,1fr)]">
+        <nav className="min-w-0 md:sticky md:top-6 md:self-start">
           <h2 className="mb-2 font-title text-lg">条款目录</h2>
           <ul className="flex gap-2 overflow-x-auto pb-2 md:flex-col md:overflow-visible">
             {doc.blocks.map((b) => {
@@ -246,7 +240,7 @@ export function ResultPage({
                       className="inline-flex h-5 w-5 items-center justify-center rounded-full text-xs"
                       style={{
                         color: style ? style.color : "var(--site-muted)",
-                        backgroundColor: style ? style.bg : "var(--risk-low-bg)",
+                        backgroundColor: style ? style.bg : "var(--site-surface)",
                       }}
                     >
                       {style ? style.icon : "✓"}
@@ -259,7 +253,7 @@ export function ResultPage({
           </ul>
         </nav>
 
-        <section className="space-y-4">
+        <section className="min-w-0 space-y-4">
           {doc.blocks.map((b) => {
             const sev = blockSeverity(b.id, findings);
             const blockFindings = findings.filter((f) => f.blockId === b.id);
@@ -267,8 +261,8 @@ export function ResultPage({
               <article
                 key={b.id}
                 id={b.id}
-                className="scroll-mt-6 space-y-3 rounded-[var(--site-radius)] border border-border p-4"
-                style={{ backgroundColor: sev ? RISK_STYLE[sev].bg : "var(--site-surface)" }}
+                className="paper scroll-mt-6 space-y-3 rounded-[var(--site-radius)] border border-border p-4"
+                style={{ backgroundColor: sev ? RISK_STYLE[sev].bg : undefined }}
               >
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-xs text-muted-foreground">
@@ -283,6 +277,7 @@ export function ResultPage({
                   <FindingDetail
                     key={`${b.id}-${i}`}
                     finding={f}
+                    contractType={doc.type}
                     onViewCases={onViewCases}
                   />
                 ))}
@@ -291,10 +286,6 @@ export function ResultPage({
           })}
         </section>
       </div>
-
-      <footer className="mt-8 border-t border-border pt-4">
-        <Disclaimer />
-      </footer>
     </main>
   );
 }

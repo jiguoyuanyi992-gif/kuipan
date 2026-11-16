@@ -1,13 +1,14 @@
 import { useRef, useState } from "react";
-import { DISCLAIMER_SUMMARY } from "@/src/components/Disclaimer";
+import { SiteFooter, SiteHeader, type NavKey } from "@/src/components/SiteChrome";
+import { ContractsPage } from "@/src/pages/ContractsPage";
+import { GhostsPage } from "@/src/pages/GhostsPage";
 import { InputPage } from "@/src/pages/InputPage";
 import { ResultPage } from "@/src/pages/ResultPage";
-import { TrapLibraryPage } from "@/src/pages/TrapLibraryPage";
 import { analyzeAll, type Analysis } from "@/src/lib/analyze";
 import type { ContractSource, ContractType } from "@/src/core/types";
 
-// 三个视图用状态切换，不引入客户端深路由（站点 spa=false）。
-type View = "input" | "result" | "traps";
+// 四个视图用状态切换，不引入客户端深路由（站点 spa=false）。
+type View = "input" | "result" | "ghosts" | "contracts";
 
 export default function App() {
   const [analysis, setAnalysis] = useState<Analysis | null>(null);
@@ -34,13 +35,20 @@ export default function App() {
     });
   }
 
-  function openTraps(trapId: string | null) {
-    setFocusTrapId(trapId);
-    setView("traps");
+  function nav(key: NavKey) {
+    setFocusTrapId(null);
+    setView(key);
     window.scrollTo({ top: 0 });
   }
 
-  // 陷阱条目 →「用我的合同检查这一项」。
+  // 结果页「查看同类案例」→ 照契对应合同类型的卷轴。
+  function openContracts(trapId: string | null) {
+    setFocusTrapId(trapId);
+    setView("contracts");
+    window.scrollTo({ top: 0 });
+  }
+
+  // 典例「用我的合同检查这一项」：有结果回结果页定位，否则回首页带提示。
   function checkRule(ruleId: string, title: string) {
     setFocusTrapId(null);
     if (analysis) {
@@ -57,12 +65,8 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-dvh bg-background text-foreground">
-      <div className="border-b border-border bg-[var(--site-surface)] px-5 py-1.5">
-        <p className="mx-auto max-w-[1100px] text-xs text-muted-foreground">
-          {DISCLAIMER_SUMMARY}
-        </p>
-      </div>
+    <div className="flex min-h-dvh flex-col bg-background text-foreground">
+      <SiteHeader active={view === "result" ? "input" : view} onNav={nav} />
 
       {view === "result" && analysis ? (
         <ResultPage
@@ -82,11 +86,13 @@ export default function App() {
               type,
             )
           }
-          onViewCases={(trapId) => openTraps(trapId)}
-          onOpenTraps={() => openTraps(null)}
+          onViewCases={(trapId) => openContracts(trapId)}
+          onOpenContracts={() => openContracts(null)}
         />
-      ) : view === "traps" ? (
-        <TrapLibraryPage
+      ) : view === "ghosts" ? (
+        <GhostsPage />
+      ) : view === "contracts" ? (
+        <ContractsPage
           focusTrapId={focusTrapId}
           hasAnalysis={!!analysis}
           onBack={() => setView(analysis ? "result" : "input")}
@@ -95,10 +101,11 @@ export default function App() {
       ) : (
         <InputPage
           checkHint={checkHint}
-          onOpenTraps={() => openTraps(null)}
           onAnalyze={(text, source, fileName) => start(text, source, fileName)}
         />
       )}
+
+      <SiteFooter />
     </div>
   );
 }

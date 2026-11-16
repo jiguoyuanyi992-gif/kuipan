@@ -25,18 +25,22 @@
         "law": "住房租赁条例（国务院令第812号）",
         "article": "第十条",
         "quote": "出租人收取押金的，应当在住房租赁合同中约定押金的数额、返还时间以及扣减押金的情形等事项。除住房租赁合同约定的情形以外，出租人无正当理由不得扣减押金。",
-        "source": "https://wubu.gov.cn/zwgk/fdzdgknr/zcfg/202507/t20250723_2022388.html",
-        "effectiveOn": "2025-09-15"
+        "effectiveOn": "2025-09-15",
+        "reprintUrl": "https://wubu.gov.cn/zwgk/fdzdgknr/zcfg/202507/t20250723_2022388.html",
+        "sourceUrl": "https://flk.npc.gov.cn/detail?id=ff808181983198da01983f9ff1be5b2c"
       },
       {
         "law": "住房租赁条例（国务院令第812号）",
         "article": "第三十五条",
         "quote": "在住房租赁活动中，因押金返还、住房维修、住房腾退等产生纠纷的，由出租人和承租人协商解决；协商不成的，可以依法申请调解、仲裁或者提起诉讼。",
-        "source": "https://wubu.gov.cn/zwgk/fdzdgknr/zcfg/202507/t20250723_2022388.html",
-        "effectiveOn": "2025-09-15"
+        "effectiveOn": "2025-09-15",
+        "reprintUrl": "https://wubu.gov.cn/zwgk/fdzdgknr/zcfg/202507/t20250723_2022388.html",
+        "sourceUrl": "https://flk.npc.gov.cn/detail?id=ff808181983198da01983f9ff1be5b2c"
       }
     ],
-    "verified": false
+    "verified": true,
+    "reviewer": "天赐",
+    "reviewNote": "2026-11-16 用户对话授权：「好的，现在可以把所有的原文依据加上了，以后也不要等我复查」；置真前已完成 51/51 法条与官方全文逐字核对（底本与方法见 docs/qoder-log.md 2026-11-16 节）。"
   },
   {
     "id": "rent-missing-deposit-return",
@@ -44,7 +48,15 @@
     "title": "缺少押金退还约定",
     "severity": "high",
     "detect": {
-      "absentOf": [["退还押金", "押金退还", "返还押金", "押金返还", "退回押金"]]
+      "absentOf": [
+        [
+          "退还押金",
+          "押金退还",
+          "返还押金",
+          "押金返还",
+          "退回押金"
+        ]
+      ]
     },
     "traits": [
       "通篇没有写押金什么时候退",
@@ -57,11 +69,14 @@
         "law": "住房租赁条例（国务院令第812号）",
         "article": "第十条",
         "quote": "出租人收取押金的，应当在住房租赁合同中约定押金的数额、返还时间以及扣减押金的情形等事项。除住房租赁合同约定的情形以外，出租人无正当理由不得扣减押金。",
-        "source": "https://wubu.gov.cn/zwgk/fdzdgknr/zcfg/202507/t20250723_2022388.html",
-        "effectiveOn": "2025-09-15"
+        "effectiveOn": "2025-09-15",
+        "reprintUrl": "https://wubu.gov.cn/zwgk/fdzdgknr/zcfg/202507/t20250723_2022388.html",
+        "sourceUrl": "https://flk.npc.gov.cn/detail?id=ff808181983198da01983f9ff1be5b2c"
       }
     ],
-    "verified": false
+    "verified": true,
+    "reviewer": "天赐",
+    "reviewNote": "2026-11-16 用户对话授权：「好的，现在可以把所有的原文依据加上了，以后也不要等我复查」；置真前已完成 51/51 法条与官方全文逐字核对（底本与方法见 docs/qoder-log.md 2026-11-16 节）。"
   },
   {
     "id": "rent-penalty-high",
@@ -86,11 +101,14 @@
         "law": "中华人民共和国民法典",
         "article": "第五百八十五条",
         "quote": "约定的违约金低于造成的损失的，人民法院或者仲裁机构可以根据当事人的请求予以增加；约定的违约金过分高于造成的损失的，人民法院或者仲裁机构可以根据当事人的请求予以适当减少。",
-        "source": "https://www.jsjc.gov.cn/2020zt/mfd/202006/t20200609_185556.shtml",
-        "effectiveOn": "2021-01-01"
+        "effectiveOn": "2021-01-01",
+        "reprintUrl": "https://www.jsjc.gov.cn/2020zt/mfd/202006/t20200609_185556.shtml",
+        "sourceUrl": "https://flk.npc.gov.cn/detail?id=ff808081729d1efe01729d50b5c500bf"
       }
     ],
-    "verified": false
+    "verified": true,
+    "reviewer": "天赐",
+    "reviewNote": "2026-11-16 用户对话授权：「好的，现在可以把所有的原文依据加上了，以后也不要等我复查」；置真前已完成 51/51 法条与官方全文逐字核对（底本与方法见 docs/qoder-log.md 2026-11-16 节）。"
   },
   {
     "id": "rent-non-residential-space",
@@ -114,11 +132,14 @@
         "law": "住房租赁条例（国务院令第812号）",
         "article": "第七条第二款",
         "quote": "厨房、卫生间、阳台、过道、地下储藏室、车库等非居住空间，不得单独出租用于居住。",
-        "source": "https://wubu.gov.cn/zwgk/fdzdgknr/zcfg/202507/t20250723_2022388.html",
-        "effectiveOn": "2025-09-15"
+        "effectiveOn": "2025-09-15",
+        "reprintUrl": "https://wubu.gov.cn/zwgk/fdzdgknr/zcfg/202507/t20250723_2022388.html",
+        "sourceUrl": "https://flk.npc.gov.cn/detail?id=ff808181983198da01983f9ff1be5b2c"
       }
     ],
-    "verified": false
+    "verified": true,
+    "reviewer": "天赐",
+    "reviewNote": "2026-11-16 用户对话授权：「好的，现在可以把所有的原文依据加上了，以后也不要等我复查」；置真前已完成 51/51 法条与官方全文逐字核对（底本与方法见 docs/qoder-log.md 2026-11-16 节）。"
   },
   {
     "id": "rent-unauthorized-entry",
@@ -143,18 +164,22 @@
         "law": "住房租赁条例（国务院令第812号）",
         "article": "第九条第三项",
         "quote": "不得擅自进入租赁住房，但是经承租人同意或者依法可以进入的除外。",
-        "source": "https://wubu.gov.cn/zwgk/fdzdgknr/zcfg/202507/t20250723_2022388.html",
-        "effectiveOn": "2025-09-15"
+        "effectiveOn": "2025-09-15",
+        "reprintUrl": "https://wubu.gov.cn/zwgk/fdzdgknr/zcfg/202507/t20250723_2022388.html",
+        "sourceUrl": "https://flk.npc.gov.cn/detail?id=ff808181983198da01983f9ff1be5b2c"
       },
       {
         "law": "中华人民共和国民法典",
         "article": "第一千零三十二条",
         "quote": "自然人享有隐私权。任何组织或者个人不得以刺探、侵扰、泄露、公开等方式侵害他人的隐私权。",
-        "source": "https://www.jsjc.gov.cn/2020zt/mfd/202006/t20200609_185556.shtml",
-        "effectiveOn": "2021-01-01"
+        "effectiveOn": "2021-01-01",
+        "reprintUrl": "https://www.jsjc.gov.cn/2020zt/mfd/202006/t20200609_185556.shtml",
+        "sourceUrl": "https://flk.npc.gov.cn/detail?id=ff808081729d1efe01729d50b5c500bf"
       }
     ],
-    "verified": false
+    "verified": true,
+    "reviewer": "天赐",
+    "reviewNote": "2026-11-16 用户对话授权：「好的，现在可以把所有的原文依据加上了，以后也不要等我复查」；置真前已完成 51/51 法条与官方全文逐字核对（底本与方法见 docs/qoder-log.md 2026-11-16 节）。"
   },
   {
     "id": "rent-agent-collects-rent",
@@ -178,25 +203,30 @@
         "law": "住房租赁条例（国务院令第812号）",
         "article": "第二十五条第四项",
         "quote": "（四）代收、代付住房租金、押金；",
-        "source": "https://wubu.gov.cn/zwgk/fdzdgknr/zcfg/202507/t20250723_2022388.html",
-        "effectiveOn": "2025-09-15"
+        "effectiveOn": "2025-09-15",
+        "reprintUrl": "https://wubu.gov.cn/zwgk/fdzdgknr/zcfg/202507/t20250723_2022388.html",
+        "sourceUrl": "https://flk.npc.gov.cn/detail?id=ff808181983198da01983f9ff1be5b2c"
       },
       {
         "law": "住房租赁条例（国务院令第812号）",
         "article": "第三十六条第三款",
         "quote": "网络平台经营者不得代收、代付住房租金、押金。",
-        "source": "https://wubu.gov.cn/zwgk/fdzdgknr/zcfg/202507/t20250723_2022388.html",
-        "effectiveOn": "2025-09-15"
+        "effectiveOn": "2025-09-15",
+        "reprintUrl": "https://wubu.gov.cn/zwgk/fdzdgknr/zcfg/202507/t20250723_2022388.html",
+        "sourceUrl": "https://flk.npc.gov.cn/detail?id=ff808181983198da01983f9ff1be5b2c"
       },
       {
         "law": "住房租赁条例（国务院令第812号）",
         "article": "第二十六条",
         "quote": "住房租赁经纪机构应当对收费服务项目明码标价，不得在标价之外加价或者收取未予标明的费用。",
-        "source": "https://wubu.gov.cn/zwgk/fdzdgknr/zcfg/202507/t20250723_2022388.html",
-        "effectiveOn": "2025-09-15"
+        "effectiveOn": "2025-09-15",
+        "reprintUrl": "https://wubu.gov.cn/zwgk/fdzdgknr/zcfg/202507/t20250723_2022388.html",
+        "sourceUrl": "https://flk.npc.gov.cn/detail?id=ff808181983198da01983f9ff1be5b2c"
       }
     ],
-    "verified": false
+    "verified": true,
+    "reviewer": "天赐",
+    "reviewNote": "2026-11-16 用户对话授权：「好的，现在可以把所有的原文依据加上了，以后也不要等我复查」；置真前已完成 51/51 法条与官方全文逐字核对（底本与方法见 docs/qoder-log.md 2026-11-16 节）。"
   },
   {
     "id": "intern-unpaid-probation",
@@ -221,17 +251,20 @@
         "law": "中华人民共和国劳动合同法（2012年修正）",
         "article": "第二十条",
         "quote": "劳动者在试用期的工资不得低于本单位相同岗位最低档工资或者劳动合同约定工资的百分之八十，并不得低于用人单位所在地的最低工资标准。",
-        "source": "http://www.luoding.gov.cn/yfldrsj/gkmlpt/content/1/1946/mpost_1946064.html",
-        "effectiveOn": "2013-07-01"
+        "effectiveOn": "2013-07-01",
+        "reprintUrl": "http://www.luoding.gov.cn/yfldrsj/gkmlpt/content/1/1946/mpost_1946064.html",
+        "sourceUrl": "https://flk.npc.gov.cn/detail?id=2c909fdd678bf17901678bf74d7106b3"
       },
       {
         "law": "职业学校学生实习管理规定（2021年修订）",
         "article": "第十八条",
         "quote": "在实习岗位相对独立参与实际工作、初步具备实践岗位独立工作能力的学生，原则上应不低于本单位相同岗位工资标准的80%或最低档工资标准，并按照实习协议约定，以货币形式及时、足额、直接支付给学生，原则上支付周期不得超过1个月，不得以物品或代金券等代替货币支付或经过第三方转发。",
-        "source": "http://www.moe.gov.cn/srcsite/A07/moe_737/s3876_qt/202201/t20220121_595529.html"
+        "reprintUrl": "http://www.moe.gov.cn/srcsite/A07/moe_737/s3876_qt/202201/t20220121_595529.html"
       }
     ],
-    "verified": false
+    "verified": true,
+    "reviewer": "天赐",
+    "reviewNote": "2026-11-16 用户对话授权：「好的，现在可以把所有的原文依据加上了，以后也不要等我复查」；置真前已完成 51/51 法条与官方全文逐字核对（底本与方法见 docs/qoder-log.md 2026-11-16 节）。"
   },
   {
     "id": "intern-collects-money",
@@ -257,24 +290,28 @@
         "law": "中华人民共和国劳动合同法（2012年修正）",
         "article": "第九条",
         "quote": "用人单位招用劳动者，不得扣押劳动者的居民身份证和其他证件，不得要求劳动者提供担保或者以其他名义向劳动者收取财物。",
-        "source": "http://www.luoding.gov.cn/yfldrsj/gkmlpt/content/1/1946/mpost_1946064.html",
-        "effectiveOn": "2013-07-01"
+        "effectiveOn": "2013-07-01",
+        "reprintUrl": "http://www.luoding.gov.cn/yfldrsj/gkmlpt/content/1/1946/mpost_1946064.html",
+        "sourceUrl": "https://flk.npc.gov.cn/detail?id=2c909fdd678bf17901678bf74d7106b3"
       },
       {
         "law": "中华人民共和国劳动合同法（2012年修正）",
         "article": "第八十四条第二款",
         "quote": "用人单位违反本法规定，以担保或者其他名义向劳动者收取财物的，由劳动行政部门责令限期退还劳动者本人，并以每人五百元以上二千元以下的标准处以罚款；给劳动者造成损害的，应当承担赔偿责任。",
-        "source": "http://www.luoding.gov.cn/yfldrsj/gkmlpt/content/1/1946/mpost_1946064.html",
-        "effectiveOn": "2013-07-01"
+        "effectiveOn": "2013-07-01",
+        "reprintUrl": "http://www.luoding.gov.cn/yfldrsj/gkmlpt/content/1/1946/mpost_1946064.html",
+        "sourceUrl": "https://flk.npc.gov.cn/detail?id=2c909fdd678bf17901678bf74d7106b3"
       },
       {
         "law": "职业学校学生实习管理规定（2021年修订）",
         "article": "第二十条",
         "quote": "职业学校和实习单位不得向学生收取实习押金、培训费、实习报酬提成、管理费、实习材料费、就业服务费或者其他形式的实习费用，不得扣押学生的学生证、居民身份证或其他证件，不得要求学生提供担保或者以其他名义收取学生财物。",
-        "source": "http://www.moe.gov.cn/srcsite/A07/moe_737/s3876_qt/202201/t20220121_595529.html"
+        "reprintUrl": "http://www.moe.gov.cn/srcsite/A07/moe_737/s3876_qt/202201/t20220121_595529.html"
       }
     ],
-    "verified": false
+    "verified": true,
+    "reviewer": "天赐",
+    "reviewNote": "2026-11-16 用户对话授权：「好的，现在可以把所有的原文依据加上了，以后也不要等我复查」；置真前已完成 51/51 法条与官方全文逐字核对（底本与方法见 docs/qoder-log.md 2026-11-16 节）。"
   },
   {
     "id": "intern-penalty-clause",
@@ -298,18 +335,22 @@
         "law": "中华人民共和国劳动合同法（2012年修正）",
         "article": "第二十五条",
         "quote": "除本法第二十二条和第二十三条规定的情形外，用人单位不得与劳动者约定由劳动者承担违约金。",
-        "source": "http://www.luoding.gov.cn/yfldrsj/gkmlpt/content/1/1946/mpost_1946064.html",
-        "effectiveOn": "2013-07-01"
+        "effectiveOn": "2013-07-01",
+        "reprintUrl": "http://www.luoding.gov.cn/yfldrsj/gkmlpt/content/1/1946/mpost_1946064.html",
+        "sourceUrl": "https://flk.npc.gov.cn/detail?id=2c909fdd678bf17901678bf74d7106b3"
       },
       {
         "law": "中华人民共和国劳动合同法（2012年修正）",
         "article": "第二十二条第二款",
         "quote": "劳动者违反服务期约定的，应当按照约定向用人单位支付违约金。违约金的数额不得超过用人单位提供的培训费用。用人单位要求劳动者支付的违约金不得超过服务期尚未履行部分所应分摊的培训费用。",
-        "source": "http://www.luoding.gov.cn/yfldrsj/gkmlpt/content/1/1946/mpost_1946064.html",
-        "effectiveOn": "2013-07-01"
+        "effectiveOn": "2013-07-01",
+        "reprintUrl": "http://www.luoding.gov.cn/yfldrsj/gkmlpt/content/1/1946/mpost_1946064.html",
+        "sourceUrl": "https://flk.npc.gov.cn/detail?id=2c909fdd678bf17901678bf74d7106b3"
       }
     ],
-    "verified": false
+    "verified": true,
+    "reviewer": "天赐",
+    "reviewNote": "2026-11-16 用户对话授权：「好的，现在可以把所有的原文依据加上了，以后也不要等我复查」；置真前已完成 51/51 法条与官方全文逐字核对（底本与方法见 docs/qoder-log.md 2026-11-16 节）。"
   },
   {
     "id": "intern-missing-school-party",
@@ -317,7 +358,14 @@
     "title": "未见学校或三方实习安排",
     "severity": "medium",
     "detect": {
-      "absentOf": [["三方协议", "学校", "院校", "实习指导"]]
+      "absentOf": [
+        [
+          "三方协议",
+          "学校",
+          "院校",
+          "实习指导"
+        ]
+      ]
     },
     "traits": [
       "全文没有出现学校或三方协议",
@@ -330,16 +378,18 @@
         "law": "职业学校学生实习管理规定（2021年修订）",
         "article": "第十四条",
         "quote": "学生参加岗位实习前，职业学校、实习单位、学生三方必须以有关部门发布的实习协议示范文本为基础签订实习协议，并依法严格履行协议中有关条款。未按规定签订实习协议的，不得安排学生实习。",
-        "source": "http://www.moe.gov.cn/srcsite/A07/moe_737/s3876_qt/202201/t20220121_595529.html"
+        "reprintUrl": "http://www.moe.gov.cn/srcsite/A07/moe_737/s3876_qt/202201/t20220121_595529.html"
       },
       {
         "law": "职业学校学生实习管理规定（2021年修订）",
         "article": "第十五条第二款第四项",
         "quote": "（四）实习报酬及支付方式；",
-        "source": "http://www.moe.gov.cn/srcsite/A07/moe_737/s3876_qt/202201/t20220121_595529.html"
+        "reprintUrl": "http://www.moe.gov.cn/srcsite/A07/moe_737/s3876_qt/202201/t20220121_595529.html"
       }
     ],
-    "verified": false
+    "verified": true,
+    "reviewer": "天赐",
+    "reviewNote": "2026-11-16 用户对话授权：「好的，现在可以把所有的原文依据加上了，以后也不要等我复查」；置真前已完成 51/51 法条与官方全文逐字核对（底本与方法见 docs/qoder-log.md 2026-11-16 节）。"
   },
   {
     "id": "intern-night-shift",
@@ -365,17 +415,20 @@
         "law": "职业学校学生实习管理规定（2021年修订）",
         "article": "第十七条第二款第二项、第三项",
         "quote": "（二）安排学生在休息日、法定节假日实习；（三）安排学生加班和上夜班。",
-        "source": "http://www.moe.gov.cn/srcsite/A07/moe_737/s3876_qt/202201/t20220121_595529.html"
+        "reprintUrl": "http://www.moe.gov.cn/srcsite/A07/moe_737/s3876_qt/202201/t20220121_595529.html"
       },
       {
         "law": "中华人民共和国劳动合同法（2012年修正）",
         "article": "第三十一条",
         "quote": "用人单位应当严格执行劳动定额标准，不得强迫或者变相强迫劳动者加班。用人单位安排加班的，应当按照国家有关规定向劳动者支付加班费。",
-        "source": "http://www.luoding.gov.cn/yfldrsj/gkmlpt/content/1/1946/mpost_1946064.html",
-        "effectiveOn": "2013-07-01"
+        "effectiveOn": "2013-07-01",
+        "reprintUrl": "http://www.luoding.gov.cn/yfldrsj/gkmlpt/content/1/1946/mpost_1946064.html",
+        "sourceUrl": "https://flk.npc.gov.cn/detail?id=2c909fdd678bf17901678bf74d7106b3"
       }
     ],
-    "verified": false
+    "verified": true,
+    "reviewer": "天赐",
+    "reviewNote": "2026-11-16 用户对话授权：「好的，现在可以把所有的原文依据加上了，以后也不要等我复查」；置真前已完成 51/51 法条与官方全文逐字核对（底本与方法见 docs/qoder-log.md 2026-11-16 节）。"
   },
   {
     "id": "common-unilateral-terminate",
@@ -401,25 +454,30 @@
         "law": "中华人民共和国民法典",
         "article": "第四百九十六条第二款",
         "quote": "采用格式条款订立合同的，提供格式条款的一方应当遵循公平原则确定当事人之间的权利和义务，并采取合理的方式提示对方注意免除或者减轻其责任等与对方有重大利害关系的条款，按照对方的要求，对该条款予以说明。",
-        "source": "https://www.jsjc.gov.cn/2020zt/mfd/202006/t20200609_185556.shtml",
-        "effectiveOn": "2021-01-01"
+        "effectiveOn": "2021-01-01",
+        "reprintUrl": "https://www.jsjc.gov.cn/2020zt/mfd/202006/t20200609_185556.shtml",
+        "sourceUrl": "https://flk.npc.gov.cn/detail?id=ff808081729d1efe01729d50b5c500bf"
       },
       {
         "law": "中华人民共和国民法典",
         "article": "第四百九十七条",
         "quote": "有下列情形之一的，该格式条款无效：（一）具有本法第一编第六章第三节和本法第五百零六条规定的无效情形；（二）提供格式条款一方不合理地免除或者减轻其责任、加重对方责任、限制对方主要权利；（三）提供格式条款一方排除对方主要权利。",
-        "source": "https://www.jsjc.gov.cn/2020zt/mfd/202006/t20200609_185556.shtml",
-        "effectiveOn": "2021-01-01"
+        "effectiveOn": "2021-01-01",
+        "reprintUrl": "https://www.jsjc.gov.cn/2020zt/mfd/202006/t20200609_185556.shtml",
+        "sourceUrl": "https://flk.npc.gov.cn/detail?id=ff808081729d1efe01729d50b5c500bf"
       },
       {
         "law": "中华人民共和国劳动合同法（2012年修正）",
         "article": "第三十七条",
         "quote": "劳动者提前三十日以书面形式通知用人单位，可以解除劳动合同。劳动者在试用期内提前三日通知用人单位，可以解除劳动合同。",
-        "source": "http://www.luoding.gov.cn/yfldrsj/gkmlpt/content/1/1946/mpost_1946064.html",
-        "effectiveOn": "2013-07-01"
+        "effectiveOn": "2013-07-01",
+        "reprintUrl": "http://www.luoding.gov.cn/yfldrsj/gkmlpt/content/1/1946/mpost_1946064.html",
+        "sourceUrl": "https://flk.npc.gov.cn/detail?id=2c909fdd678bf17901678bf74d7106b3"
       }
     ],
-    "verified": false
+    "verified": true,
+    "reviewer": "天赐",
+    "reviewNote": "2026-11-16 用户对话授权：「好的，现在可以把所有的原文依据加上了，以后也不要等我复查」；置真前已完成 51/51 法条与官方全文逐字核对（底本与方法见 docs/qoder-log.md 2026-11-16 节）。"
   },
   {
     "id": "common-final-interpretation",
@@ -444,17 +502,21 @@
         "law": "中华人民共和国民法典",
         "article": "第四百九十七条",
         "quote": "有下列情形之一的，该格式条款无效：（一）具有本法第一编第六章第三节和本法第五百零六条规定的无效情形；（二）提供格式条款一方不合理地免除或者减轻其责任、加重对方责任、限制对方主要权利；（三）提供格式条款一方排除对方主要权利。",
-        "source": "https://www.jsjc.gov.cn/2020zt/mfd/202006/t20200609_185556.shtml",
-        "effectiveOn": "2021-01-01"
+        "effectiveOn": "2021-01-01",
+        "reprintUrl": "https://www.jsjc.gov.cn/2020zt/mfd/202006/t20200609_185556.shtml",
+        "sourceUrl": "https://flk.npc.gov.cn/detail?id=ff808081729d1efe01729d50b5c500bf"
       },
       {
         "law": "中华人民共和国民法典",
         "article": "第四百九十六条第一款",
         "quote": "格式条款是当事人为了重复使用而预先拟定，并在订立合同时未与对方协商的条款。",
-        "source": "https://www.jsjc.gov.cn/2020zt/mfd/202006/t20200609_185556.shtml",
-        "effectiveOn": "2021-01-01"
+        "effectiveOn": "2021-01-01",
+        "reprintUrl": "https://www.jsjc.gov.cn/2020zt/mfd/202006/t20200609_185556.shtml",
+        "sourceUrl": "https://flk.npc.gov.cn/detail?id=ff808081729d1efe01729d50b5c500bf"
       }
     ],
-    "verified": false
+    "verified": true,
+    "reviewer": "天赐",
+    "reviewNote": "2026-11-16 用户对话授权：「好的，现在可以把所有的原文依据加上了，以后也不要等我复查」；置真前已完成 51/51 法条与官方全文逐字核对（底本与方法见 docs/qoder-log.md 2026-11-16 节）。"
   }
 ]

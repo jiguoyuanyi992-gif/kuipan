@@ -2,7 +2,7 @@
 
 本文件是冻结策略在仓库内的权威镜像。策略来源：`C:\Users\34516\Documents\q-handoff\02-计划全文.md`（冲突时以策略文件为准）；平台实测约束：`C:\Users\34516\Documents\q-handoff\03-现状与实测.md`。
 
-**执行层权限边界：不得自行修改架构、技术栈、功能范围或排期。** 遇到策略未覆盖或明显不可行的情况，停下来问用户，由策略层决定。执行层只做实现、自查、汇报；每次执行操作结束后告诉用户做了什么。**`verified` 不得自行置 true（硬规则见数据契约）。**
+**执行层权限边界：不得自行修改架构、技术栈、功能范围或排期。** 遇到策略未覆盖或明显不可行的情况，停下来问用户，由策略层决定。执行层只做实现、自查、汇报；每次执行操作结束后告诉用户做了什么。**`verified` 置真按 2026-11-16 用户授权新口径执行：逐字核对完成即可置 true，但必须登记 reviewer/reviewNote 与核对底本（见数据契约）。**
 
 **执行节奏**：按 M0 → M1 → … → M6 连续推进，不逐里程碑等确认。只在两种情况下停：① 策略未覆盖或明显不可行；② 需要下方未预授权的动作（git 之外的删除/覆盖/重置）。prepare_site / publish_site / 改 public、百炼调用均已预授权（见「授权状态」），不再逐次问。
 
@@ -58,7 +58,7 @@ RiskRule {
   askTalk: string         // 签约前问什么
   sourceCase?: string     // 脱敏案例编号
   legalBasis: [{ law, article, quote, source, effectiveOn? }]
-  verified: boolean       // 默认 false；只有用户复核后才能置 true，执行层不得自行置 true；true 才在前端显示法律依据
+  verified: boolean       // 默认 false；2026-11-16 用户授权后：逐字核对完成并登记 reviewer/reviewNote 即可置 true；true 才在前端显示法律依据
   reviewer?, reviewNote?
 }
 
@@ -66,13 +66,13 @@ TrapEntry {               // 陷阱库（P1，含贷款分期条目）
   id, scene, oneLiner, story(脱敏案例), traits[]
   beforeSign: string[]    // 签约前要问什么 → 生成可勾选清单
   afterHit: string[]      // 被坑后怎么办
-  legalBasis[], verified, reviewer?
+  legalBasis[], verified, reviewer?, reviewNote?
 }
 
 ModelFinding { ruleId, blockId, explanation, askTalk, rewrite, aiSuggested: boolean }
 ```
 
-**`verified` 置真权限（硬规则）**：所有规则与陷阱条目入库时 `verified: false`。**只有用户（天赐）本人复核后才能改为 `true`，执行层在任何情况下不得自行置 `true`** —— 包括「查到了权威来源且 quote 一致」这种情况；执行层只能把检索结果与来源链接整理好交给用户判定。抽查不通过时可以把 `true` 改回 `false`，反向不允许。
+**`verified` 置真权限（2026-11-16 用户授权新口径）**：用户原话：「好的，现在可以把所有的原文依据加上了，以后也不要等我复查」。自此日起：执行层完成与官方全文的逐字核对（底本与方法登记进 docs/qoder-log.md）后，可将条目置 `verified: true`，但必须同时登记 `reviewer` 与 `reviewNote`（授权来源 + 核对底本）；未核对或未登记的条目保持 false。用户保留抽查权：抽查不通过可以把 `true` 改回 `false`，反向不允许。历史口径（2026-11-16 之前）：只有用户本人复核后才能置 true，执行层任何情况下不得自行置真；策略文件 02-计划全文.md 中旧表述以本条用户新授权为准。
 
 **脱敏口径（redact）**：
 - **移除**：姓名、身份证号、手机号、住址
@@ -105,7 +105,7 @@ ModelFinding { ruleId, blockId, explanation, askTalk, rewrite, aiSuggested: bool
 | M1 | 11/15 下午–11/17 | src/core 纯函数（types/extract/chunk/regex/redact/llm）+ vitest；5 条假规则 + 3 份编造示例合同；导出 RiskRule/TrapEntry JSON 模板给用户 —— 用户先填 3 条验证格式，确认后再填满 12 条 | m1-core |
 | M2 | 11/18–19 | **视觉方向用户已预先选定 A 卷宗**：直接按 A 写 docs/design-spec.md 并铺开页面（不再出三方向效果图等选）；P0 界面闭环（三种输入 → 概览卡+目录+高亮+详情，正则结果驱动）；编写高命中率专用演示合同（编造，5–6 处已知陷阱，与 3 份常规示例分开存放，**页面同样标注「示例，虚构」**）；首次 public 发布占用 qianqian-yicha 前缀；提醒用户手动异地复制 q-backups | m2-ui |
 | M3 | 11/20–21 | Function + 模型语义匹配主路径 + 结果合并去重 + 缺失性本地判定 + 降级提示 + **尽力限流（实例内存，每 IP 每分钟 N 次）+ 输入长度上限** + 批次并行（总调用 ≤8 次）流式渲染 | m3-llm |
-| M4 | 11/22–26 | 真实规则库与陷阱库落地（用户案例 + 权威依据逐条登记，**verified 全部留 false 等用户复核**）+ 检索/浏览页 + 检查清单 + 双向跳转；提醒用户手动异地复制 q-backups | m4-data |
+| M4 | 11/22–26 | 真实规则库与陷阱库落地（用户案例 + 权威依据逐条登记，**verified 全部留 false 等用户复核**；置真口径已于 2026-11-16 经用户授权变更，见数据契约）+ 检索/浏览页 + 检查清单 + 双向跳转；提醒用户手动异地复制 q-backups | m4-data |
 | M5 | 11/27–28 | 免责声明与措辞规范、移动端适配、控制台 0 报错、空态与错误处理、体验与设计打磨 | m5-polish |
 | M6 | 11/29 | 发布并复验、天池帖（五段 + Qoder 账号）、3 分钟演示脚本、Qoder 使用过程材料汇总；提醒用户手动异地复制 q-backups（最后一次） | m6-shipped |
 
@@ -233,17 +233,17 @@ Key 值始终由用户（天赐）新建并自己在 Sites Settings 界面填，
 
 **硬验收：示例合同从提交到全部结果可见 ≤30 秒；桌面与手机视口控制台 0 error。**
 
-1. 单元（npm test）：3 份样例合同命中/缺失断言；redact 对姓名/身份证/手机号/住址的**移除**断言，以及对金额/期限的**带比例占位符替换**断言（如「押金=月租×3」，且本地已抽取出概览卡所需数值）；畸形模型返回被 schema 拒绝；block_id 定位与条款区间一致不越界；禁用词扫描测试（正例：含「我们保证」的 UI 文本必须构建失败；反例：含「保证金」的规则文案不误报，**含「无效」的 legalBasis.quote 不误报**，AGENTS.md/qoder-log.md 中出现禁用词不误报）；总体风险三档映射断言；**verified 默认 false 且执行层无置真路径**。
+1. 单元（npm test）：3 份样例合同命中/缺失断言；redact 对姓名/身份证/手机号/住址的**移除**断言，以及对金额/期限的**带比例占位符替换**断言（如「押金=月租×3」，且本地已抽取出概览卡所需数值）；畸形模型返回被 schema 拒绝；block_id 定位与条款区间一致不越界；禁用词扫描测试（正例：含「我们保证」的 UI 文本必须构建失败；反例：含「保证金」的规则文案不误报，**含「无效」的 legalBasis.quote 不误报**，AGENTS.md/qoder-log.md 中出现禁用词不误报）；总体风险三档映射断言；**verified 置真的条目必须有 reviewer/reviewNote 登记（2026-11-16 授权口径）**。
 2. 本地：npm run build && npm run preview，浏览器跑完整 golden path（粘贴→结果→上传 PDF→结果→示例一键试用→风险详情→跳同类案例→陷阱库勾选清单），桌面与移动视口控制台 0 error。
 3. 性能：示例合同 ≤30 秒出全部结果；Function 不可用时降级路径可用且有提示。
 4. 线上：无痕窗口 + 真机复验公网链接；get_function_logs 无 5xx；get_site 确认已发布且 public；百炼账单确认调用量在限额内。
-5. 内容：每条 verified:true 抽查能打开 source 且 quote 与原文一致，否则改回 false；**并确认每个 true 都有用户复核记录，无执行层自行置真**。
+5. 内容：每条 verified:true 抽查能打开 reprintUrl/sourceUrl 且 quote 与原文一致，否则改回 false；**并确认每个 true 都有 reviewer/reviewNote 授权登记与逐字核对底本**。
 6. 交付物：天池帖（标题格式正确、五段齐全、含 Qoder 账号与公网链接）+ 3 分钟演示脚本 + Qoder 使用过程截图集。
 
 ## 里程碑自查清单（收尾必过，逐条回报）
 
-通用项：npm test 全绿（有测试时）；npm run build 无阻断 error；桌面+手机视口控制台 0 error；git status 逐一过目（无真实合同/.env*/data/raw 进暂存区）；commit+tag 已建、bundle 已写入且非零（M0 除外）；qoder-log.md 已追加五段；**本次改动未把任何 verified 自行置为 true**；对照交付项逐条勾，未完成项显式写「未完成+原因」，禁止静默跳过。
+通用项：npm test 全绿（有测试时）；npm run build 无阻断 error；桌面+手机视口控制台 0 error；git status 逐一过目（无真实合同/.env*/data/raw 进暂存区）；commit+tag 已建、bundle 已写入且非零（M0 除外）；qoder-log.md 已追加五段；**本次置真的条目均已登记 reviewer/reviewNote 与核对底本**；对照交付项逐条勾，未完成项显式写「未完成+原因」，禁止静默跳过。
 
-各里程碑专项见策略文件「里程碑自查清单」节（M0 六项结论/探针不符已停下报告/删接口复验/Key 作废/无泄漏；M1 模板交付/schema/切块区间/redact 比例占位符；M2 三输入/扫描版提示/分析前明示句/示例标注「示例，虚构」/高亮一致/三档生效/首次发布；M3 ≤30s/降级不白屏/法条全来自规则库/限流 N 已报用户确认且无每日限额无持久化；M4 verified 抽查且全部 true 经用户复核/12 条底线/story 留空隐藏/双向跳转/清单可勾选；M5 禁用词扫描含 legalBasis.quote 排除/原文未扫/免责声明逐字/无学校名/档位无「安全」/模型输出过滤/空态错误态超长输入；M6 无痕+真机复验/天池帖五段/3 分钟演示脚本）。
+各里程碑专项见策略文件「里程碑自查清单」节（M0 六项结论/探针不符已停下报告/删接口复验/Key 作废/无泄漏；M1 模板交付/schema/切块区间/redact 比例占位符；M2 三输入/扫描版提示/分析前明示句/示例标注「示例，虚构」/高亮一致/三档生效/首次发布；M3 ≤30s/降级不白屏/法条全来自规则库/限流 N 已报用户确认且无每日限额无持久化；M4 verified 抽查且全部 true 有授权/复核登记/12 条底线/story 留空隐藏/双向跳转/清单可勾选；M5 禁用词扫描含 legalBasis.quote 排除/原文未扫/免责声明逐字/无学校名/档位无「安全」/模型输出过滤/空态错误态超长输入；M6 无痕+真机复验/天池帖五段/3 分钟演示脚本）。
 
 回报格式：一句话结论 + 未过项清单 + 下一步建议，不贴长日志。

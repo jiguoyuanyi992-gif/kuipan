@@ -1,15 +1,23 @@
-import type { Finding } from "@/src/core/types";
+import type { ContractType, Finding } from "@/src/core/types";
+import { actionsForType } from "@/src/core/fallback/actions";
 import { trapsForRuleId } from "@/src/core/traps";
 import { RiskBadge } from "./RiskBadge";
 
 interface Props {
   finding: Finding;
+  // 无法律依据时的「签前怎么办」按当前分析的合同类型取场景补充。
+  contractType?: ContractType;
   // 双向跳转：风险详情 → 陷阱库同类案例。
   onViewCases?: (trapId: string) => void;
 }
 
-export function FindingDetail({ finding, onViewCases }: Props) {
+export function FindingDetail({
+  finding,
+  contractType = "other",
+  onViewCases,
+}: Props) {
   const weak = finding.aiSuggested;
+  const hasBasis = finding.verified && finding.legalBasis.length > 0;
   const cases = finding.aiSuggested ? [] : trapsForRuleId(finding.ruleId);
   return (
     <div
@@ -17,11 +25,14 @@ export function FindingDetail({ finding, onViewCases }: Props) {
       className="space-y-2 rounded-[var(--site-radius)] border border-border p-3 text-sm"
       style={{
         backgroundColor: weak ? "transparent" : "var(--site-surface)",
+        borderLeft: weak
+          ? "1px dashed var(--site-border)"
+          : "3px solid var(--site-accent)",
         opacity: weak ? 0.85 : 1,
       }}
     >
       <div className="flex flex-wrap items-center gap-2">
-        <span className="font-medium">{finding.title}</span>
+        <span className="font-title text-[15px]">{finding.title}</span>
         {weak ? (
           <span className="text-xs text-muted-foreground">建议留意</span>
         ) : (
@@ -51,24 +62,59 @@ export function FindingDetail({ finding, onViewCases }: Props) {
         </p>
       )}
 
-      {finding.verified && finding.legalBasis.length > 0 && (
+      {hasBasis && (
         <div className="space-y-1 border-t border-border pt-2 text-xs text-muted-foreground">
           <p className="font-medium">法律依据</p>
           {finding.legalBasis.map((lb, i) => (
-            <p key={i}>
-              {lb.law} {lb.article}：{lb.quote}
-            </p>
+            <div key={i} className="space-y-0.5">
+              <p>
+                {lb.law} {lb.article}：{lb.quote}
+              </p>
+              <p className="text-[11px]">
+                {lb.sourceUrl ? (
+                  <a
+                    href={lb.sourceUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="underline hover:text-[var(--site-accent)]"
+                  >
+                    来源：{lb.source}
+                  </a>
+                ) : (
+                  <>来源：{lb.source}</>
+                )}
+              </p>
+              {lb.reprintUrl && (
+                <p className="text-[11px]">
+                  参考转载（不作依据）：
+                  <a
+                    href={lb.reprintUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="underline hover:text-[var(--site-accent)]"
+                  >
+                    {new URL(lb.reprintUrl).hostname}
+                  </a>
+                </p>
+              )}
+            </div>
           ))}
         </div>
       )}
 
-      {!finding.aiSuggested &&
-        !finding.verified &&
-        finding.legalBasis.length > 0 && (
-          <p className="border-t border-border pt-2 text-xs text-muted-foreground">
-            这一项的原文依据正在逐条复核，复核完成后才在这里显示。
-          </p>
-        )}
+      {!hasBasis && (
+        <div className="space-y-1 border-t border-border pt-2 text-xs text-muted-foreground">
+          {!finding.aiSuggested && finding.legalBasis.length > 0 && (
+            <p>这一项的原文依据正在逐条复核，复核完成后才在这里显示。</p>
+          )}
+          <p className="font-medium">签前怎么办</p>
+          <ul className="list-disc space-y-0.5 pl-4">
+            {actionsForType(contractType).map((a, i) => (
+              <li key={i}>{a}</li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {cases.length > 0 && (
         <div className="flex flex-wrap gap-2 pt-1">
@@ -78,6 +124,7 @@ export function FindingDetail({ finding, onViewCases }: Props) {
               type="button"
               onClick={() => onViewCases?.(t.id)}
               className="rounded-[var(--site-radius)] border px-2.5 py-1 text-xs hover:border-[var(--site-accent)]"
+              style={{ borderColor: "var(--site-accent)", color: "var(--site-accent)" }}
             >
               查看同类案例
             </button>

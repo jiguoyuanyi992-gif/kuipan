@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { LEGAL_BASIS_SOURCE } from "../legalSource";
 import { rules } from "../rules";
 import {
   CATEGORY_LABEL,
@@ -19,8 +20,12 @@ describe("陷阱库数据契约", () => {
     expect(traps.length).toBeGreaterThanOrEqual(12);
   });
 
-  it("verified 默认 false，执行层无置真路径", () => {
-    expect(traps.every((t) => t.verified === false)).toBe(true);
+  it("verified 置真必须登记授权/复核记录与核对底本", () => {
+    for (const t of traps) {
+      if (!t.verified) continue;
+      expect(t.reviewer).toBeTruthy();
+      expect(t.reviewNote).toBeTruthy();
+    }
   });
 
   it("每条字段完整：一句话概括、识别特征、签约前要问、被坑后怎么办、依据", () => {
@@ -36,7 +41,12 @@ describe("陷阱库数据契约", () => {
         expect(b.law).toBeTruthy();
         expect(b.article).toBeTruthy();
         expect(b.quote.length).toBeGreaterThan(8);
-        expect(b.source).toMatch(/^https?:\/\/[^/]*gov\.cn/);
+        // 逐字原文：禁省略号；「等」只允许法条枚举用法（等事项/等方式），禁句末省略。
+        expect(b.quote).not.toMatch(/……|…|\.\.\./);
+        expect(b.quote).not.toMatch(/等([。；！？，、]|$)/);
+        expect(b.source).toBe(LEGAL_BASIS_SOURCE);
+        if (b.sourceUrl) expect(b.sourceUrl.startsWith("https://flk.npc.gov.cn/")).toBe(true);
+        expect(b.reprintUrl).toMatch(/^https?:\/\/[^/]*gov\.cn/);
       }
     }
   });

@@ -9,8 +9,13 @@ export interface LegalBasis {
   law: string;
   article: string;
   quote: string;
+  // 加载时从 legalSource.ts 的唯一常量注入，数据文件不手写。
   source: string;
   effectiveOn?: string;
+  // 国家法律法规数据库直达链接：仅在执行层亲自打开确认直达后填写，须以 https://flk.npc.gov.cn/ 开头。
+  sourceUrl?: string;
+  // 旧的地方/部委网站转载页链接，只作参考转载，不作为依据
+  reprintUrl?: string;
 }
 
 export interface DetectSpec {
@@ -33,7 +38,7 @@ export interface RiskRule {
   askTalk: string;
   sourceCase?: string;
   legalBasis: LegalBasis[];
-  // 默认 false；只有用户本人复核后才能置 true，执行层不得自行置 true。
+  // 默认 false；2026-11-16 起用户授权：逐字核对完成并登记 reviewer/reviewNote 后可置 true。
   verified: boolean;
   reviewer?: string;
   reviewNote?: string;
@@ -51,6 +56,7 @@ export interface TrapEntry {
   legalBasis: LegalBasis[];
   verified: boolean;
   reviewer?: string;
+  reviewNote?: string;
 }
 
 export type BlockKind = "clause" | "preamble" | "signature";

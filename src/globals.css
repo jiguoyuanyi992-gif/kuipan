@@ -94,42 +94,6 @@
     "Liberation Mono", "Courier New", monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-    --card: #171717;
-    --card-foreground: #ededed;
-    --popover: #171717;
-    --popover-foreground: #ededed;
-    --primary: #ededed;
-    --primary-foreground: #171717;
-    --secondary: #262626;
-    --secondary-foreground: #ededed;
-    --muted: #262626;
-    --muted-foreground: #a1a1a1;
-    --accent: #262626;
-    --accent-foreground: #ededed;
-    --destructive: #ff6467;
-    --border: #ffffff1a;
-    --input: #ffffff26;
-    --ring: #737373;
-    --chart-1: #8e51ff;
-    --chart-2: #00bc7d;
-    --chart-3: #fe9a00;
-    --chart-4: #ad46ff;
-    --chart-5: #ff2056;
-    --sidebar: #171717;
-    --sidebar-foreground: #ededed;
-    --sidebar-primary: #8e51ff;
-    --sidebar-primary-foreground: #ededed;
-    --sidebar-accent: #262626;
-    --sidebar-accent-foreground: #ededed;
-    --sidebar-border: #ffffff1a;
-    --sidebar-ring: #737373;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
@@ -138,8 +102,9 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* A 卷宗：米白底 + 墨黑正文 + 单一朱红强调（docs/design-spec.md）。
-   设计参数使用工程原有样式管理，工作台只临时覆盖变量。固定浅色文书主题。 */
+/* 馗判：墨黑底 + 宣纸色 + 朱砂红 + 少量金（docs/design-spec.md）。
+   第一版静态：--site-motion=0，不做动画，只保留点击切换。
+   竖排只用于标题与印章（.vertical-rl），正文一律横排。 */
 @font-face {
   font-family: "Noto Serif SC";
   font-style: normal;
@@ -149,34 +114,109 @@ body {
 }
 
 :root {
-  --site-bg: #f7f3ea;
-  --site-fg: #1c1b18;
-  --site-accent: #b3261e;
-  --site-on-accent: #fff7f0;
-  --site-surface: #fcfaf3;
-  --site-muted: #6b675e;
-  --site-border: #e2dcce;
+  --site-bg: #14100c;
+  --site-fg: #efe5d0;
+  --site-accent: #c93a2e;
+  --site-on-accent: #fff6ec;
+  --site-surface: #201a13;
+  --site-muted: #a89b83;
+  --site-border: #3a3125;
+  --site-gold: #c9a24b;
   --site-font: -apple-system, "PingFang SC", "Microsoft YaHei",
     "Source Han Sans SC", "Noto Sans CJK SC", sans-serif;
-  --site-radius: 6px;
+  --site-radius: 4px;
   --site-space: 1;
   --site-type: 1;
-  --site-motion: 1;
+  --site-motion: 0;
+
+  /* 宣纸面板：契约正文、卷轴、输入卡都写在纸上 */
+  --paper: #f2e8d5;
+  --paper-soft: #f7efdf;
+  --paper-fg: #26201a;
+  --paper-muted: #6f6553;
+  --paper-border: #d8cab0;
 
   --font-title: "Noto Serif SC", "Source Han Serif SC", "Songti SC", SimSun,
     serif;
   --risk-high: #b3261e;
-  --risk-high-bg: #f6e3df;
-  --risk-medium: #b26a00;
-  --risk-medium-bg: #f3ead3;
-  --risk-low: #6b675e;
-  --risk-low-bg: #ece7db;
+  --risk-high-bg: #f3ddd6;
+  --risk-medium: #a06000;
+  --risk-medium-bg: #f0e4c8;
+  --risk-low: #6f6553;
+  --risk-low-bg: #e7ddc8;
 }
 
 .font-title {
   font-family: var(--font-title);
   font-weight: 600;
   line-height: 1.3;
+}
+
+.vertical-rl {
+  writing-mode: vertical-rl;
+  letter-spacing: 0.18em;
+}
+
+/* 纸面作用域：内部继续用 bg-background / border-border / text-muted-foreground
+   等既有工具类，变量在纸内换成纸色，逻辑组件无需感知主题。 */
+.paper {
+  --background: var(--paper);
+  --foreground: var(--paper-fg);
+  --card: var(--paper-soft);
+  --card-foreground: var(--paper-fg);
+  --muted: var(--paper-soft);
+  --muted-foreground: var(--paper-muted);
+  --accent: var(--paper-soft);
+  --accent-foreground: var(--paper-fg);
+  --border: var(--paper-border);
+  --input: var(--paper-border);
+  --ring: var(--site-accent);
+  --site-surface: var(--paper-soft);
+  --site-fg: var(--paper-fg);
+  --site-muted: var(--paper-muted);
+  --site-border: var(--paper-border);
+  background-color: var(--paper);
+  color: var(--paper-fg);
+}
+
+/* 印章：朱砂方印，印文竖排 HTML 文字，不画进图片。
+   逐字成行堆叠实现竖排：writing-mode 竖排在 flex 容器里会被 Chrome
+   扣掉约一行行高当作可用高度，小尺寸印章会折成两列。 */
+.seal {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.08em;
+  background-color: var(--site-accent);
+  color: var(--site-on-accent);
+  border-radius: 3px;
+  font-family: var(--font-title);
+  font-weight: 600;
+  line-height: 1;
+}
+.seal > span {
+  line-height: 1;
+}
+
+/* 素材未到位时的占位色块：不发请求、不产生 404 */
+.asset-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--asset-ph, #2a231a);
+  color: var(--site-muted);
+  overflow: hidden;
+}
+
+/* 朱笔圈注：命中句用风险色笔圈勾出，跨行不断圈 */
+.brush-mark {
+  background-color: transparent;
+  border: 2px solid currentColor;
+  border-radius: 0.7em 0.5em 0.8em 0.6em;
+  padding: 0 2px;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
 }
 
 :root {

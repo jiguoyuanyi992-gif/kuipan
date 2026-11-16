@@ -4,6 +4,210 @@
 > 红线：只出现编造或脱敏样例，不得含真实合同内容、真实姓名、身份证、手机号、住址、公司名。
 > 截图由用户用系统截图工具放入 docs/shots/，文件名带里程碑编号；缺图写「（待补：xxx.png）」，不编造截图内容。
 
+## M4 后追加 · 兜底依据三项任务 A：签前怎么办（2026-11-16，不打 tag）
+
+### 做了什么
+
+- 新建 src/core/fallback/actions.ts（纯数据）：通用行动建议 5 条（先别当场签字或付款／请对方书面解释并最好写进合同／原件聊天记录付款凭证拍照留存／消费类纠纷 12315／法律问题 12348 公共法律服务热线）＋场景补充（实习：学校实习指导老师＋12333；租房：12345 政务服务热线），actionsForType 按合同类型取。
+- FindingDetail：无可展示法律依据时（aiSuggested、verified=false、legalBasis 空三者任一）在原法律依据位置显示「签前怎么办」清单；原句「这一项的原文依据正在逐条复核，复核完成后才在这里显示。」保留在区块上方（沿用原出现条件：规则项有依据但未复核）。ResultPage 两处传入 contractType=doc.type。
+- ContractsPage：删整页「整理中」分支；「注意事项（法律依据）」为空改显示通用「签前怎么办」文案；「典例分析」为空仍「整理中」。贷款分期／套餐／考证／保险四类不再整页空白。
+- dev/kuipan-qa.mjs：套餐断言改 contracts-plan-fallback（签前怎么办＋典例分析＋整理中）；粘贴文本加一条纯「其他约定」条款触发 fixture 的 aiSuggested；新增 paste-fallback-actions 断言与 contracts-plan／paste-result 双视口截图。
+
+### 改了哪些文件
+
+src/core/fallback/actions.ts（新）、src/core/__tests__/fallback.test.ts（新）、src/components/FindingDetail.tsx、src/pages/ResultPage.tsx、src/pages/ContractsPage.tsx、dev/kuipan-qa.mjs、docs/qoder-log.md。
+
+### 测试结果
+
+- npm test 89/89（新增 fallback 3 测试：三场景非空、场景补充按类型附加、全文案无禁用词含白名单剔除）。
+- npm run build 通过；node dev/kuipan-qa.mjs 66/66、双视口控制台 0 error。截图目视：结果页 ai 项显示签前怎么办清单（租房场景含 12345），套餐页注意事项=签前怎么办、典例分析=整理中，移动端布局正常。
+- 提交说明：工作区此前留有上一轮已完成但未提交的基线改动（馗判视觉重做、source 常量单点化、flk 43/43 核对与 sourceUrl、verified 授权镜像），其中 TrapLibraryPage 删除已在暂存区；只提交 A 的文件会产生无法构建的中间树，故本次提交将基线与 A 一并入库（提交信息中列明），B／C 各自独立提交。
+
+## M4 后追加 · 法条来源与调取规范指令（2026-11-16，不打 tag）
+
+### 交付概览
+
+按《执行层指令:法条来源统一 + 分析时法条调取规范》六节执行。调取规范五条（分析不联网取法条、依据只按 ruleId 读规则库与陷阱库、模型不生成法条且 prompt 禁令不变、未知 ruleId 丢弃、aiSuggested 依据空数组、页面只渲染 verified=true）记入本节并以测试固定。source 单点常量 src/core/legalSource.ts，rules/traps 加载时注入，JSON 51 处手写 source 删除。rules/traps 测试加三层断言（source 严格等于常量；sourceUrl 若有必以 https://flk.npc.gov.cn/ 开头；quote 禁省略号与「等」句末省略）；llm 加两测试（模型 explanation 夹带「《民法典》第XXX条」字样时法律依据仍只来自规则库；prompt 禁令逐字固定）。flk 亲自打开核对：住房租赁条例 16/16、民法典 14/14、劳动合同法 13/13，共 43/43 与 flk 官方 DOCX 逐字一致，quote 零改动；43 处 sourceUrl 填已确认直达的裸 detail 链接。实习规定 flk 不收录（部门规范性文件），8 处 sourceUrl 留空、现有 verified/reviewer/reviewNote 不动（底本仍为教育部通知附件 1 docx）。未新增后端接口或数据库，静态数据随前端重新发布。
+
+### ① 关键提示词（逐字保留）
+
+1. 「source｜固定为同一个常量 "国家法律法规数据库 flk.npc.gov.cn"，在代码里只定义一次并引用，数据文件里不手写」（指令文件原文）
+2. 「只引用在国家法律法规数据库 flk.npc.gov.cn 搜到并打开过的条文。quote 逐字取自该页面，不改写。」
+3. 「现有条目的 verified、reviewer、reviewNote 不要改，除非该条的法条文字被重新检索替换。」
+
+### ② 报错与解决
+
+1. **flk 详情页正文取不到**：正文在 OFD 阅读器 iframe（canvas 无文本层），innerText 仅 402 字元数据。改走页内官方下载端点 /law-search/download/pc?format=docx&bbbs=…，返回 flk 官方对象存储签名链接，下载 DOCX 后 mammoth 抽全文比对。试错 1 次。
+2. **curl 到 flkoss.obs-bj2.cucloud.cn TLS 握手失败（exit 35）**：--tlsv1.2 仍失败；-k 成功（本机证书链缺中间证书）。内容完整性以 43/43 与此前已核对的政府网全文逐字一致交叉验证。试错 1 次。
+3. **browser-use click 搜索结果 StaticText 报 scrollIntoView 错**：改 evaluate 点击 .title-content 节点。试错 1 次。
+
+### ③ 部署与运行记录
+
+- 检索日期 2026-11-16，检索页面与核对底本（flk 官方 DOCX）：
+  - 住房租赁条例：https://flk.npc.gov.cn/detail?id=ff808181983198da01983f9ff1be5b2c ，DOCX 5913 字，16/16 命中；
+  - 中华人民共和国民法典：https://flk.npc.gov.cn/detail?id=ff808081729d1efe01729d50b5c500bf ，DOCX 113975 字，14/14 命中；
+  - 中华人民共和国劳动合同法（2012 修正）：https://flk.npc.gov.cn/detail?id=2c909fdd678bf17901678bf74d7106b3 ，DOCX 12265 字，13/13 命中；
+  - 职业学校学生实习管理规定：flk 标题检索无收录（命中均为无关地方规定），8 处依据保留教育部官方附件核对底本（见上一节），sourceUrl 留空。
+- 三个裸 detail 链接均亲自导航确认直达对应法规页后才写入 sourceUrl。
+- npm test 86/86；npm run build 通过（bundle index-DPZMi12L.js）；node dev/kuipan-qa.mjs 64/64、双视口控制台 0 error。
+- 已发布（action 26214a98-b9c6-4333-95da-5b38ff8dd6e8，publishOperation 01a1e4d9-4aae-7c39-bbbe-be9941209e92，committed=true）。
+
+### ④ 线上链接与验证方式
+
+- 线上：https://kuipan-odzma4gogrf.qoder.zone ；curl 主 bundle 200，含 flk detail 直达链接与 source 常量（bundle 内各仅 1 处，佐证单点定义）。
+- 截图：docs/shots/kuipan-contracts-desktop.png / kuipan-contracts-mobile.png 本轮刷新，来源小字变为 flk 直达链接。
+
+### ⑤ 迭代对比
+
+- 改之前：source 在 JSON 51 处手写；sourceUrl 全空等用户清单。
+- 我说了什么：「在代码里只定义一次并引用，数据文件里不手写」「只有在你亲自打开、确认能直达该法规页面时才填」。
+- 改之后：常量单点注入；43 处 sourceUrl 为亲自打开确认的 flk 直达链接，8 处（实习规定）如实留空。截图：kuipan-contracts-desktop.png（本轮刷新）。
+
+## M4 后追加 · 用户授权全部原文依据上线（2026-11-16，不打 tag）
+
+### 交付概览
+
+用户在看到 51/51 逐字核对结论后授权：全部原文依据上线，以后不再等用户复查。执行：13 条规则 + 12 条陷阱共 25 个条目 verified 置 true，逐条登记 reviewer=天赐、reviewNote（授权原话 + 核对底本指引）；TrapEntry 类型补 reviewNote 字段；测试旧断言「verified 全 false」改为「置真必须登记授权/复核记录」，llm 合并断言改为「verified 跟随规则库」；AGENTS.md 置真硬规则同步为 2026-11-16 授权新口径（保留用户抽查回退权）。照契「注意事项（法律依据）」与风险详情法律依据块自此全量渲染，含来源小字与参考转载行。
+
+### ① 关键提示词（逐字保留）
+
+1. 「好的，现在可以把所有的原文依据加上了，以后也不要等我复查」
+
+### ② 报错与解决
+
+1. **publish_site 参数校验失败**：沿用旧配方传 confirmPublic=true 被 schema 拒绝（当前 schema 只收 actionId，public 状态由站点既有 access_mode 承载）。去掉该参数重发即成功；试错 1 次。
+2. **旧测试断言与新口径冲突（预判修复）**：llm.test.ts 合并去重用真实规则断言 verified=false，置真后必红；改为 expect(same[0].verified).toBe(target.verified)（断言合并保留规则库取值）。rules/traps 的「全 false」断言改为置真登记断言。同轮修复，npm test 84/84 无红。
+
+### ③ 部署与运行记录
+
+- 置真底本：上一节 51/51 逐字核对（住房租赁条例/民法典/劳动合同法/实习规定官方全文），quote 零改动；reviewNote 逐条登记授权原话与底本指引。
+- npm test 84/84；npm run build 通过（bundle index-BUBJ5Inn.js）；node dev/kuipan-qa.mjs 64/64、双视口控制台 0 error。
+- 已发布（action d1707155-f25b-4936-8f3f-996c98a5dc6a，publishOperation 01a1e4a0-3bb6-7ee3-a019-23134a5a6684，committed=true）。
+
+### ④ 线上链接与验证方式
+
+- 线上：https://kuipan-odzma4gogrf.qoder.zone ；curl 主 bundle 200，内含 25 处 "verified":true 与授权 reviewNote 字符串。
+- 截图：docs/shots/kuipan-contracts-desktop.png / kuipan-contracts-mobile.png 本轮刷新，注意事项列可见法条原文 + 来源 + 参考转载小字。
+
+### ⑤ 迭代对比
+
+- 改之前：照契注意事项列与风险详情法律依据块显示「整理中 / 正在逐条复核」，线上看不到任何法条。
+- 我说了什么：「好的，现在可以把所有的原文依据加上了，以后也不要等我复查」
+- 改之后：13 条规则依据全量渲染（法条原文 + 来源 flk 小字 + 参考转载链接），25 个条目带授权登记。截图：kuipan-contracts-desktop.png（本轮刷新）。
+
+## M4 后追加 · 法条逐字核对 + 来源统一 flk（2026-11-16，不打 tag）
+
+### 交付概览
+
+用户要求：发规则库完整路径与全文；每条法条 source 统一为 flk.npc.gov.cn 条目、旧地方网站链接只作「参考转载」不作依据；条文逐字取自原文不许改写；并答复法条是执行层查的还是站点 API 查的。执行：rules 26 处 + traps 25 处共 51 处 legalBasis 与官方全文逐字比对（空白归一后在对应条内做子串匹配），51/51 命中、quote 零改动；LegalBasis 增 reprintUrl 字段，source 统一「国家法律法规数据库 flk.npc.gov.cn」，旧链接移入 reprintUrl；照契注意事项与风险详情法律依据块均加「参考转载（不作依据）：域名链接」小字行；sourceUrl 留空待用户清单；verified 全程保持 false。
+
+### ① 关键提示词（逐字保留）
+
+1. 「把规则库的完整源文件路径和文件内容发给,每条法条的 source 统一换成 flk.npc.gov.cn 的条目,保留现有地方网站链接只作"参考转载",不作依据。条文必须逐字取自原文,不许改写。你查到的这些法条是你查的，还是站点里面的API查的」
+2. （上一轮延续约束）「不要自己把任何条目的 verified 改成 true。核实由我来做，我会给你一份清单。」
+
+### ② 报错与解决
+
+1. **WebFetch 抓 moe.gov.cn 陷 https→http 302 循环**：工具自动把 http 升级 https，站点又 302 回 http。改 curl 直抓后发现该页正文只是《通知》，《规定》条文在附件 1 docx；再用无头浏览器取附件地址 W020231218539873596108.docx，curl 下载后用项目自带 mammoth 抽纯文本，比对命中。试错 3 次。
+2. **mohrss.gov.cn 反爬 JS 壳**：WebFetch 只返回混淆 JS。改抓上海市发改委官方转载页 fgw.sh.gov.cn（劳动合同法 2012 修正全文），比对命中。试错 1 次。
+3. **比对脚本条界误报**：初版用条号正则全局搜界定条区间，条内交叉引用（如「第二十二条」「第五百零六条」）把区间截断，误报 4 处 MISS；改为「行首条号」界定后误报归零。试错 1 次。
+4. **QA 首跑 502**：preview 把 /functions/v1/app 代理到本地 fixture :8000，fixture 未启动致 502 与控制台 error；起 dev/function-fixture.mjs 后重跑 64/64。试错 1 次。
+
+### ③ 部署与运行记录
+
+- 核对底本：住房租赁条例=惠阳区政府转载中国政府网全文（post_5845034）；民法典=广东省监狱管理局转载中国政府网全文（post_3055825）；劳动合同法=上海市发改委全文页（2012 修正）；实习规定=教育部原文通知附件 1 docx。flk.npc.gov.cn 为 JS 动态站无法直抓全文，故核对用同源官方全文发布页；flk 逐条链接待用户清单填 sourceUrl。
+- npm test 84/84；npm run build 通过；node dev/kuipan-qa.mjs 64/64、双视口控制台 0 error。
+- 已发布（action e6c7bac8-cd5c-41ff-972d-bec8474d45c0）。
+
+### ④ 线上链接与验证方式
+
+- 线上：https://kuipan-odzma4gogrf.qoder.zone ；curl 复验标题与主 bundle 状态码。
+- 核对结论：51/51 逐字命中，明细表与规则库全文在对话交付（src/core/rules/rules.json）。
+- verified 全 false 未动；来源小字与参考转载行线上仍不可见属预期（复核置 true 后才渲染）。
+
+### ⑤ 迭代对比
+
+- 改之前：legalBasis.source 直接存地方转载页链接并作为依据来源，无参考转载层。
+- 我说了什么：「每条法条的 source 统一换成 flk.npc.gov.cn 的条目,保留现有地方网站链接只作"参考转载",不作依据。条文必须逐字取自原文,不许改写。」
+- 改之后：source 统一「国家法律法规数据库 flk.npc.gov.cn」，旧链接降为 reprintUrl 并渲染「参考转载（不作依据）」；51 处条文与官方全文逐字核对零改动。
+- （待补：kuipan-source-mobile.png，用户复核置 true 后的来源小字截图）
+
+## M4 后追加 · 钟馗/饕餮素材装填 + 法条来源标注（2026-11-16，不打 tag）
+
+### 交付概览
+
+用户提供两张画像并下达装填指令：首页钟馗改上半屏横幅（图靠右、object-position 75% center、左侧渐变到纯黑、文案落黑区、手机 45vh、上传区在横幅下）；捉鬼录饕餮进圆镜（object-fit cover、object-position center 30%、不在代码里裁图）；相柳/九尾狐继续占位且占位显示鬼名。照契「注意事项」每条法条后加小字「来源：国家法律法规数据库 flk.npc.gov.cn」，LegalBasis 增可选 sourceUrl 字段（链接用户后续给），仍只渲染 verified=true，执行层未置任何 verified。zhongkui 首屏不加 lazy，其余图默认 lazy。
+
+### ① 关键提示词（逐字保留）
+
+1. 「任务：装上两张图片，并给法条加上来源标注。不改页面结构，不改数据内容。」
+2. 「public/assets/zhongkui.png：首页主视觉。不要铺满全屏。做成上半屏横幅，图片靠右，object-position: 75% center，左侧用渐变过渡到纯黑，标题和「呈上生死簿」放在左侧黑区。手机上横幅高度 45vh，上传区在横幅下方。」
+3. 「public/assets/ghost-taotie.png：捉鬼录饕餮的画像。镜子用圆形遮罩，img 用 object-fit: cover; object-position: center 30%，不要在代码里裁剪图片。」
+4. 「照契「注意事项」里，每条法条后面加小字「来源：国家法律法规数据库 flk.npc.gov.cn」，链到对应法律的页面（链接我后续给你，先留字段 sourceUrl）。」
+5. 「不要自己把任何条目的 verified 改成 true。核实由我来做，我会给你一份清单。」
+
+### ② 报错与解决
+
+1. **钟馗源图 774KB 超 300KB 上限**：按用户预定回退分支转 JPEG——System.Drawing 质量 85 一次命中 242452B（≤300KB），落盘 public/assets/zhongkui.jpg 并改引用（AssetImage name 改 zhongkui.jpg）；未生成超标的 png，无删除动作。饕餮源图 90KB jpg 按指定文件名转 PNG 525951B（该图无体积约束）。试错 0 次。
+2. 本回合无新报错；回归与截图一次通过。
+
+### ③ 部署与运行记录
+
+- `npm test` 84 断言全绿；`npm run build` 通过；dist/assets 含 zhongkui.jpg 与 ghost-taotie.png。
+- 本地 preview + fixture，`node dev/kuipan-qa.mjs` 64/64、控制台 0 error、双视口无横向溢出；临时 CDP 脚本确认两图 complete/naturalWidth>0 后截四张验收图。
+- 已发布（action d598a622-940a-4e3a-b067-313f80f88b19，publish succeeded+committed）；线上 curl 标题与两图均 200，zhongkui.jpg 242452B。
+
+### ④ 线上链接与验证方式
+
+- 线上：https://kuipan-odzma4gogrf.qoder.zone （地址前缀已由用户从 qianqian-yicha 改为 kuipan，执行层沿用未动）。
+- 验证：curl 标题/素材状态码；验收截图 docs/shots/kuipan-home-mobile.png、kuipan-home-desktop.png、kuipan-ghosts-mobile.png、kuipan-ghosts-desktop.png（饕餮选中态）。
+- 来源小字当前线上不可见属预期：13 条规则 verified 全 false，「注意事项」栏仍「整理中」；用户复核置 true 后小字与 sourceUrl 链接才渲染。
+
+### ⑤ 迭代对比
+
+- 改之前：首页主视觉为墨色占位、标题居中；捉鬼录圆镜内是占位色块。
+- 我说了什么：「做成上半屏横幅，图片靠右……标题和「呈上生死簿」放在左侧黑区。」「镜子用圆形遮罩……不要在代码里裁剪图片。」
+- 改之后：首页上半屏横幅左黑区文案、右侧钟馗金目；圆镜内饕餮完整牛角现形。（待补：用户截图；QA 归档图见 ④）
+
+## M4 后追加 · 馗判品牌界面重做（2026-11-16，不打 tag）
+
+### 交付概览
+
+策略层直接下达界面重做指令：品牌改「馗判（Kuí Pàn）」，副标「签字之前，先照一照」，导航三项首页 / 捉鬼录 / 照契；墨黑底 + 宣纸色 + 朱砂红 + 少量金，第一版静态无动画。功能与数据逻辑零新增：四种输入（粘贴 / Word·PDF / 照片≤6 张 / 示例）、分析流程、脱敏口径、后端 `/analyze` 与 `/ocr` 全部未动。原陷阱库页改为「照契」卷轴页（数据迁到 `data/contracts.json`，法条只存 rule_id、仅 verified=true 显示）；新增「捉鬼录」照妖镜页（`data/ghosts.json`，相柳 / 饕餮 / 九尾狐 3 条由用户给定）。结果页「查看同类案例」改跳照契对应类型卷轴；清单勾选沿用 `qqy:checklist:*`。完整免责声明与照片隐私说明收进全局页脚展开区，页脚固定行「AI参考意见，不构成法律意见。」。素材未到位全部占位色块且不发请求（vite 虚拟模块 `virtual:asset-manifest` 扫描 public/assets）。两个执行口径已报用户：13 条规则 verified 全 false → 照契「注意事项」栏按规格显示「整理中」；陷阱 story 全空 → 典例分析用现有 oneLiner/traits/beforeSign/afterHit 与规则 why 组装，不编造案例。
+
+### ① 关键提示词（逐字保留）
+
+1. 「你是资深前端工程师。请在现有项目基础上重做界面：保留现有"合同检查"和"陷阱库"的功能与数据逻辑，不要新增任何功能，不要改后端（包括 /functions/v1/app/analyze 和照片 OCR 函数）。先阅读现有代码再动手，动手前先列出你打算改哪些文件。」
+2. 「【品牌】馗判（Kuí Pàn），副标：签字之前，先照一照。导航三项：首页 / 捉鬼录 / 照契。」
+3. 「【风格】国风、帅、不恐怖。墨黑底、宣纸色、朱砂红，少量金色点缀。所有文字用 HTML 排版，不要画进图片；竖排只用于标题和印章，正文一律横排。竖向滚动。第一版为静态：不做动画，只保留必要的点击切换。」
+4. 「【现状】结果页原来跳转到陷阱库的链接，改为跳转到"照契"对应合同类型的卷轴。」
+5. 「【验收】三个页面在手机（375px）和电脑上都能正常显示；没有新增登录、搜索、排行等功能。【现状】回归检查：粘贴、Word/PDF、照片、示例四种输入都能跑通分析；结果页能跳到照契对应类型；检查清单能勾选。完成后贴三个页面的手机和电脑截图各一张。」
+
+### ② 报错与解决
+
+1. **页头印章印文折成两列（视觉读作「判馗」）**：44px方印里竖排「馗判」变成右「馗」左「判」两列。CDP 实测：竖排 span 35.2×44（两列）、横排同字宽 32px 正常、纯 div 竖排正常 → 定位为 Chrome 对 flex 容器内竖排文本的可用高度误算（约扣掉一行行高，44−17.6=26.4 < 37.76 所需）。试错 3 次：子元素竖排 → 印章自身 writing-mode 竖排（仍折）→ 最终改为逐字成行 column flex 堆叠（不用 writing-mode），单字印不受影响。探针脚本为临时文件，未入仓库。
+2. **结果页 375px 整页横向溢出（scrollWidth=1748）**：条款目录 `overflow-x-auto` 的 ul 放在无显式模板的 grid 里，隐式轨道按 max-content 取宽，把整页撑到 1748px；旧版截图只拍视口未暴露。解法：grid 改 `grid-cols-[minmax(0,1fr)] md:grid-cols-[220px_minmax(0,1fr)]` 并给两个子项加 min-w-0；QA 增加 4 条 `no-h-overflow` 断言（四页双视口 scrollWidth==clientWidth）。试错 1 次。
+3. **编辑误删闭合标签**：改印章 markup 时一次 Edit 把 seal 的 `</span>` 删掉，Read 复核发现后立即补回，未流入构建。试错 1 次。
+
+### ③ 部署与运行记录
+
+- `npm test`：12 文件 84 断言全绿（core 与数据未动）。
+- `npm run build`：tsc --noEmit + vite 通过。
+- 本地 `npm run preview`（4173）+ `node dev/function-fixture.mjs`（8000，编造示例假模型/假 OCR），`node dev/kuipan-qa.mjs` 双视口（375×667 / 1280×900）**64 项断言全过、控制台 0 error、素材 0 个 404**：四种输入、扫描版提示、照片识别填回不自动分析、目录跳转、类型改选、结果→照契→结果回跳、清单勾选与刷新持久化、捉鬼录切换、套餐「整理中」占位。
+- **未发布**：线上仍是旧版签前一查界面；是否发布新品牌等用户指示（发布预授权在，但设计登记工作台工具本会话不可用，先不动线上）。
+
+### ④ 线上链接与验证方式
+
+- 本地验证：`npm run build && npm run preview` + `node dev/function-fixture.mjs`，浏览器开 http://127.0.0.1:4173/ ；回归一键 `node dev/kuipan-qa.mjs`。
+- 截图归档（QA 脚本产出，非用户截图）：docs/shots/kuipan-home-mobile.png、kuipan-home-desktop.png、kuipan-ghosts-mobile.png、kuipan-ghosts-desktop.png、kuipan-contracts-mobile.png、kuipan-contracts-desktop.png。
+- 线上链接不变（旧版），复验方式沿用无痕窗口 + get_site / get_function_logs。
+
+### ⑤ 迭代对比
+
+- 改之前：A 卷宗米白底、两页（合同检查 / 陷阱库），标题「签前一查」。
+- 我说了什么：「【品牌】馗判（Kuí Pàn），副标：签字之前，先照一照。导航三项：首页 / 捉鬼录 / 照契。」「墨黑底、宣纸色、朱砂红，少量金色点缀。」
+- 改之后：墨黑底三页（首页钟馗主视觉 + 呈上生死簿 / 捉鬼录照妖镜 / 照契卷轴），宣纸面板写契约正文，朱笔圈注命中句。（待补：用户截图；QA 归档图见 ④）
+
 ## M4 后追加 · 陷阱库信息结构改版 + 合同照片识别（2026-11-16，不打 tag）
 
 ### 交付概览

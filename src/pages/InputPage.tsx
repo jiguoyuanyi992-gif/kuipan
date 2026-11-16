@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Disclaimer } from "@/src/components/Disclaimer";
+import { AssetImage, assetUrl } from "@/src/components/AssetImage";
 import { extractFile } from "@/src/core/extract";
 import { examples } from "@/src/core/examples";
 import { demoContract } from "@/src/core/examples/demo";
@@ -19,8 +19,7 @@ import type { ContractSource } from "@/src/core/types";
 
 interface Props {
   onAnalyze: (text: string, source: ContractSource, fileName?: string) => void;
-  onOpenTraps: () => void;
-  // 从陷阱库「检查这一项」跳回时的提示，不改动输入流程。
+  // 从照契「检查这一项」跳回时的提示，不改动输入流程。
   checkHint?: string | null;
 }
 
@@ -37,7 +36,7 @@ interface Photo {
   error?: string;
 }
 
-export function InputPage({ onAnalyze, onOpenTraps, checkHint }: Props) {
+export function InputPage({ onAnalyze, checkHint }: Props) {
   const [text, setText] = useState("");
   const [source, setSource] = useState<ContractSource>("paste");
   const [hint, setHint] = useState<string | null>(null);
@@ -180,30 +179,57 @@ export function InputPage({ onAnalyze, onOpenTraps, checkHint }: Props) {
     onAnalyze(text, source);
   }
 
+  const texture = assetUrl("paper-texture.png");
+
   return (
-    <main className="mx-auto flex min-h-dvh w-full max-w-3xl flex-col gap-8 px-5 py-10">
-      <header className="flex flex-wrap items-start justify-between gap-3">
-        <div className="space-y-2">
-          <h1 className="font-title text-4xl tracking-tight">签前一查</h1>
-          <p className="text-base text-muted-foreground">
-            大学生合同防坑助手 · 租房 / 实习兼职
+    <main className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-6 sm:px-5 sm:py-8">
+      {/* 钟馗判官主视觉：上半屏横幅，图靠右、左侧渐变到纯黑，文案落在黑区 */}
+      <section className="relative h-[45vh] min-h-[260px] overflow-hidden bg-black md:h-[50vh]">
+        <AssetImage
+          name="zhongkui.jpg"
+          alt="钟馗判官主视觉"
+          loading="eager"
+          className="absolute inset-y-0 right-0 h-full w-[68%] object-cover md:w-[55%]"
+          style={{ objectPosition: "75% center" }}
+          placeholderColor="#000000"
+          placeholder={
+            <span
+              aria-hidden
+              className="vertical-rl font-title absolute right-5 top-5 text-3xl opacity-25"
+              style={{ color: "var(--site-gold)" }}
+            >
+              钟馗判官
+            </span>
+          }
+        />
+        <div
+          aria-hidden
+          className="absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(to right, #000 0%, #000 34%, rgba(0,0,0,0.82) 50%, rgba(0,0,0,0) 76%)",
+          }}
+        />
+        <div className="relative flex h-full max-w-[86%] flex-col justify-center gap-3 px-5 sm:max-w-[62%] sm:px-8">
+          <p
+            className="text-xs tracking-[0.3em]"
+            style={{ color: "var(--site-gold)" }}
+          >
+            签合同如签生死簿 · 钟馗来判
+          </p>
+          <h1 className="font-title text-4xl sm:text-5xl">呈上生死簿</h1>
+          <p className="max-w-md text-sm text-muted-foreground">
+            租房、实习兼职合同，粘贴、上传或拍照呈上；朱笔圈出风险条款，判词逐条批注。
           </p>
         </div>
-        <button
-          type="button"
-          onClick={onOpenTraps}
-          className="rounded-[var(--site-radius)] border border-border px-3 py-1.5 text-sm hover:border-[var(--site-accent)]"
-        >
-          浏览陷阱库
-        </button>
-      </header>
+      </section>
 
       {checkHint && (
         <p
-          className="-mt-4 rounded-[var(--site-radius)] border px-4 py-2.5 text-sm leading-relaxed"
+          className="rounded-[var(--site-radius)] border px-4 py-2.5 text-sm leading-relaxed"
           style={{
             borderColor: "var(--site-accent)",
-            color: "var(--site-accent)",
+            color: "var(--site-fg)",
             backgroundColor: "var(--site-surface)",
           }}
         >
@@ -212,11 +238,11 @@ export function InputPage({ onAnalyze, onOpenTraps, checkHint }: Props) {
       )}
 
       <section
-        className="space-y-4 rounded-[var(--site-radius)] border border-border p-5"
-        style={{ backgroundColor: "var(--site-surface)" }}
+        className="paper space-y-4 rounded-[var(--site-radius)] border border-border p-4 sm:p-5"
+        style={texture ? { backgroundImage: `url(${texture})` } : undefined}
       >
         <div className="space-y-2">
-          <label htmlFor="contract" className="text-sm font-medium">
+          <label htmlFor="contract" className="font-title text-base">
             粘贴合同文本
           </label>
           <textarea
@@ -228,7 +254,7 @@ export function InputPage({ onAnalyze, onOpenTraps, checkHint }: Props) {
             }}
             rows={10}
             placeholder="把租房或实习兼职合同全文粘贴到这里……"
-            className="w-full resize-y rounded-[var(--site-radius)] border border-border bg-background p-3 text-sm leading-relaxed outline-none focus:border-[var(--site-accent)]"
+            className="w-full resize-y rounded-[var(--site-radius)] border border-border bg-[var(--paper-soft)] p-3 text-sm leading-relaxed outline-none focus:border-[var(--site-accent)]"
           />
           <p className="text-xs text-muted-foreground">
             输入上限约 2 万字。文字合同会先在本地脱敏再发给 AI 分析。照片会发送给 AI
@@ -263,7 +289,7 @@ export function InputPage({ onAnalyze, onOpenTraps, checkHint }: Props) {
         </div>
 
         {photos.length > 0 && (
-          <div className="space-y-2 rounded-[var(--site-radius)] border border-border bg-background p-3">
+          <div className="space-y-2 rounded-[var(--site-radius)] border border-border bg-[var(--paper-soft)] p-3">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <p className="text-sm font-medium">
                 合同照片 {photos.length} 张 · 已识别 {doneCount} 张
@@ -289,7 +315,7 @@ export function InputPage({ onAnalyze, onOpenTraps, checkHint }: Props) {
                     className="h-24 w-[72px] rounded object-cover"
                     style={{
                       border: `1px solid ${
-                        p.status === "error" ? "var(--risk-high)" : "var(--site-border, #d8d2c4)"
+                        p.status === "error" ? "var(--risk-high)" : "var(--paper-border)"
                       }`,
                     }}
                   />
@@ -338,7 +364,7 @@ export function InputPage({ onAnalyze, onOpenTraps, checkHint }: Props) {
               key={ex.id}
               type="button"
               onClick={() => onAnalyze(ex.text, "example")}
-              className="rounded-[var(--site-radius)] border border-border px-4 py-2 text-sm hover:border-[var(--site-accent)]"
+              className="rounded-[var(--site-radius)] border border-border bg-[var(--site-surface)] px-4 py-2 text-sm hover:border-[var(--site-gold)]"
             >
               {ex.label}
             </button>
@@ -349,7 +375,8 @@ export function InputPage({ onAnalyze, onOpenTraps, checkHint }: Props) {
             className="rounded-[var(--site-radius)] border px-4 py-2 text-sm"
             style={{
               borderColor: "var(--site-accent)",
-              color: "var(--site-accent)",
+              color: "var(--site-fg)",
+              backgroundColor: "var(--site-surface)",
             }}
           >
             {demoContract.label}（示例，虚构）
@@ -364,7 +391,7 @@ export function InputPage({ onAnalyze, onOpenTraps, checkHint }: Props) {
         <button
           type="button"
           onClick={start}
-          className="w-full rounded-[var(--site-radius)] px-5 py-3 text-base font-medium sm:w-auto"
+          className="w-full rounded-[var(--site-radius)] px-5 py-3 font-title text-base font-medium sm:w-auto"
           style={{
             backgroundColor: "var(--site-accent)",
             color: "var(--site-on-accent)",
@@ -373,10 +400,6 @@ export function InputPage({ onAnalyze, onOpenTraps, checkHint }: Props) {
           开始分析
         </button>
       </section>
-
-      <footer className="mt-auto border-t border-border pt-4">
-        <Disclaimer />
-      </footer>
     </main>
   );
 }

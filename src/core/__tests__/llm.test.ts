@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { chunk } from "../chunk";
 import { examples } from "../examples";
-import { mergeFindings, parseModelResponse } from "../llm";
+import { buildPrompt, mergeFindings, parseModelResponse } from "../llm";
 import { runRegex } from "../regex";
 import { rules } from "../rules";
 import { rulesForScene } from "../scene";
@@ -126,7 +126,7 @@ describe("llm 合并去重", () => {
     );
     expect(same).toHaveLength(1);
     expect(same[0].explanation).toBe("模型解释");
-    expect(same[0].verified).toBe(false);
+    expect(same[0].verified).toBe(target.verified);
     expect(same[0].legalBasis).toEqual(target.legalBasis);
   });
 
@@ -164,5 +164,36 @@ describe("llm 合并去重", () => {
     // 该规则的命中只能来自本地缺失性判定（blockId 为 null），模型版被丢弃。
     const hits = merged.filter((f) => f.ruleId === "rent-missing-deposit-return");
     expect(hits.every((f) => f.blockId === null)).toBe(true);
+  });
+
+  it("模型 explanation 夹带法条字样 → 法律依据仍只来自规则库", () => {
+    const target = regexFindings.find((f) => f.ruleId === "rent-deposit-forfeit")!;
+    const rule = rules.find((r) => r.id === target.ruleId)!;
+    const mf: ModelFinding[] = [
+      {
+        ruleId: target.ruleId,
+        blockId: target.blockId!,
+        explanation: "依据《民法典》第七百零三条，该押金约定存在风险，建议留意。",
+        askTalk: "x",
+        rewrite: "y",
+        aiSuggested: false,
+      },
+    ];
+    const merged = mergeFindings(regexFindings, mf, rules, doc);
+    const same = merged.find(
+      (f) => f.ruleId === target.ruleId && f.blockId === target.blockId,
+    )!;
+    // 模型文本只进 explanation，legalBasis 与规则库逐字一致，不受模型夹带影响。
+    expect(same.explanation).toContain("民法典");
+    expect(same.legalBasis).toEqual(rule.legalBasis);
+    expect(same.legalBasis.some((b) => b.law.includes("民法典"))).toBe(false);
+  });
+});
+
+describe("法条调取规范（prompt 硬约束固定）", () => {
+  it("prompt 禁止模型引用/罗列/杜撰法条", () => {
+    const p = buildPrompt(doc.blocks.slice(0, 2), rulesForScene(rules, "rent"));
+    expect(p).toContain("禁止引用、罗列或杜撰任何法律条文、法条编号、案例号");
+    expect(p).toContain("法律依据由系统另行提供，与你无关");
   });
 });
