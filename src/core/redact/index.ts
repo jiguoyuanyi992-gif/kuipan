@@ -1,19 +1,30 @@
 import type { AmountTerms, RedactionResult } from "../types";
 
 const NUM = String.raw`([\d,]+(?:\.\d+)?)`;
+// \s* 是必须的：拍照识别出来的文本会在数字两侧插入空格（「人民币 1500 元」「共 12 个月」），
+// 不留余量就会漏抽，概览卡与押金/违约金倍数同时失效。
+const SP = String.raw`\s*`;
 const RENT_RE = new RegExp(
-  String.raw`(?:每月租金|租金每月|月租金|月租)[为是约]?(?:人民币)?${NUM}元`,
+  String.raw`(?:每月租金|租金每月|月租金|月租)[为是约]?${SP}(?:人民币)?${SP}${NUM}${SP}元`,
   "g",
 );
-const DEPOSIT_RE = new RegExp(String.raw`押金[为是约]?(?:人民币)?${NUM}元`, "g");
-const PENALTY_RE = new RegExp(String.raw`违约金[为是约]?(?:人民币)?${NUM}元`, "g");
+const DEPOSIT_RE = new RegExp(
+  String.raw`押金[为是约]?${SP}(?:人民币)?${SP}${NUM}${SP}元`,
+  "g",
+);
+const PENALTY_RE = new RegExp(
+  String.raw`违约金[为是约]?${SP}(?:人民币)?${SP}${NUM}${SP}元`,
+  "g",
+);
 const TERM_RE = new RegExp(
-  String.raw`(?:租期|租赁期限|实习期|合同期限|期限)[为是约]?([\d,]+)个月`,
+  String.raw`(?:租期|租赁期限|实习期|合同期限|期限|共)${SP}[为是约]?${SP}([\d,]+)${SP}个月`,
   "g",
 );
 
 const ID_RE = /\d{17}[\dXx]|\d{15}/g;
-const PHONE_RE = /(?<!\d)1[3-9]\d{9}(?!\d)/g;
+// 手机号常被写成 138-0000-0000 / 138 0000 0000（纸质合同手写分隔符，OCR 原样保留），
+// 只匹配连续 11 位会漏掉，脱敏口径要求移除手机号，所以这里允许分隔符。
+const PHONE_RE = /(?<!\d)1[3-9]\d[\s-]?\d{4}[\s-]?\d{4}(?!\d)/g;
 const NAME_RE =
   /(甲方|乙方|出租方|承租方|承租人|出租人|用人单位|劳动者|实习生|员工|学生|姓名)([（(][^）)\n]{0,10}[）)])?[：:]\s*([一-龥]{2,4})(?=[，,。\s；;（(]|$)/g;
 const ADDR_RE =
