@@ -6,11 +6,13 @@ import { demoContract } from "@/src/core/examples/demo";
 import type { ContractSource } from "@/src/core/types";
 
 interface Props {
-  busy: boolean;
   onAnalyze: (text: string, source: ContractSource, fileName?: string) => void;
 }
 
-export function InputPage({ busy, onAnalyze }: Props) {
+// 输入长度上限（AGENTS.md 限流口径：约 2 万字，尽力而为）。
+const MAX_INPUT_CHARS = 20_000;
+
+export function InputPage({ onAnalyze }: Props) {
   const [text, setText] = useState("");
   const [source, setSource] = useState<ContractSource>("paste");
   const [hint, setHint] = useState<string | null>(null);
@@ -30,6 +32,12 @@ export function InputPage({ busy, onAnalyze }: Props) {
         setHint("没有从文件中提取到文字，请改用粘贴文本。");
         return;
       }
+      if (res.text.length > MAX_INPUT_CHARS) {
+        setError(
+          `提取到的文本约 ${(res.text.length / 10000).toFixed(1)} 万字，超出 2 万字处理上限，请删减无关内容后粘贴。`,
+        );
+        return;
+      }
       setText(res.text);
       setSource(res.source);
       setHint(`已提取「${file.name}」的文字，可点击下方开始分析。`);
@@ -41,6 +49,12 @@ export function InputPage({ busy, onAnalyze }: Props) {
   function start() {
     if (!text.trim()) {
       setError("请先粘贴合同文本，或上传文件，或选择一份示例。");
+      return;
+    }
+    if (text.length > MAX_INPUT_CHARS) {
+      setError(
+        `合同文本约 ${(text.length / 10000).toFixed(1)} 万字，超出 2 万字处理上限，请删减无关内容后重试。`,
+      );
       return;
     }
     onAnalyze(text, source);
@@ -144,15 +158,14 @@ export function InputPage({ busy, onAnalyze }: Props) {
         </p>
         <button
           type="button"
-          disabled={busy}
           onClick={start}
-          className="w-full rounded-[var(--site-radius)] px-5 py-3 text-base font-medium disabled:opacity-50 sm:w-auto"
+          className="w-full rounded-[var(--site-radius)] px-5 py-3 text-base font-medium sm:w-auto"
           style={{
             backgroundColor: "var(--site-accent)",
             color: "var(--site-on-accent)",
           }}
         >
-          {busy ? "分析中……" : "开始分析"}
+          开始分析
         </button>
       </section>
 

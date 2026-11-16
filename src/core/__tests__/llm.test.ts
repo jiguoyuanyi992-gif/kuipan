@@ -148,4 +148,21 @@ describe("llm 合并去重", () => {
     expect(ai!.legalBasis).toEqual([]);
     expect(ai!.title).toBe("其他可疑条款");
   });
+
+  it("缺失性规则（absent-only）不接受模型 exist 命中", () => {
+    const mf: ModelFinding[] = [
+      {
+        ruleId: "rent-missing-deposit-return",
+        blockId: doc.blocks[0].id,
+        explanation: "模型称该块缺失押金退还约定。",
+        askTalk: "x",
+        rewrite: "y",
+        aiSuggested: false,
+      },
+    ];
+    const merged = mergeFindings(regexFindings, mf, rules, doc);
+    // 该规则的命中只能来自本地缺失性判定（blockId 为 null），模型版被丢弃。
+    const hits = merged.filter((f) => f.ruleId === "rent-missing-deposit-return");
+    expect(hits.every((f) => f.blockId === null)).toBe(true);
+  });
 });

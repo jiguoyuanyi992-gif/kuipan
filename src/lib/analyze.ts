@@ -1,8 +1,10 @@
 import { chunk } from "@/src/core/chunk";
-import { extractAmounts } from "@/src/core/redact";
+import { runModelPass } from "@/src/lib/modelPass";
+import { extractAmounts, redactForModel } from "@/src/core/redact";
 import { runRegex } from "@/src/core/regex";
 import { overallRisk } from "@/src/core/risk";
 import { rules } from "@/src/core/rules";
+import { mergeFindings } from "@/src/core/llm/merge";
 import { detectType, rulesForScene } from "@/src/core/scene";
 import type {
   AmountTerms,
@@ -10,18 +12,25 @@ import type {
   ContractSource,
   ContractType,
   Finding,
+  ModelFinding,
   OverallRisk,
   Severity,
 } from "@/src/core/types";
+
+export type ModelStatus = "idle" | "running" | "done" | "unavailable";
 
 export interface Analysis {
   doc: ContractDoc;
   findings: Finding[];
   overall: OverallRisk;
   amounts: AmountTerms;
+  modelStatus: ModelStatus;
+  modelCalls?: { ok: number; total: number };
+  // 模型判定类型（多数票）；与当前类型不同时页面显示小标签，可手动改选重新分析。
+  aiType?: ContractType;
 }
 
-// M2 由正则兜底驱动；M3 接入模型语义匹配主路径并合并去重。
+// 纯正则兜底结果（同步，立即渲染；模型批次到达后再合并）。
 export function analyzeText(
   text: string,
   source: ContractSource,
@@ -42,7 +51,68 @@ export function analyzeText(
     findings,
     overall: overallRisk(findings),
     amounts: extractAmounts(text),
+    modelStatus: "idle",
   };
+}
+
+// 模型主路径：正则结果先出，批次并行、边到边渲染；全批失败降级为只显示正则结果。
+export async function analyzeAll(
+  text: string,
+  source: ContractSource,
+  fileName: string | undefined,
+  typeOverride: ContractType | undefined,
+  onUpdate: (a: Analysis) => void,
+): Promise<Analysis> {
+  const base = analyzeText(text, source, fileName, typeOverride);
+  onUpdate({ ...base, modelStatus: "running" });
+
+  const sceneRules = rulesForScene(rules, base.doc.type);
+  // 进请求体的只有脱敏后的条款块（姓名/证件/电话/住址移除，金额换带比例占位符）。
+  const modelBlocks = base.doc.blocks.map((b) => ({
+    ...b,
+    text: redactForModel(b.text, base.amounts),
+  }));
+
+  const collected: ModelFinding[] = [];
+  const mergeCurrent = () =>
+    mergeFindings(base.findings, collected, rules, base.doc);
+
+  try {
+    const result = await runModelPass(modelBlocks, sceneRules, (partial) => {
+      collected.push(...partial);
+      const findings = mergeCurrent();
+      onUpdate({
+        ...base,
+        findings,
+        overall: overallRisk(findings),
+        modelStatus: "running",
+      });
+    });
+    const findings = mergeCurrent();
+    const final: Analysis = {
+      ...base,
+      findings,
+      overall: overallRisk(findings),
+      modelStatus: "done",
+      modelCalls: { ok: result.okBatches, total: result.totalBatches },
+      aiType: voteType(result.contractTypes),
+    };
+    onUpdate(final);
+    return final;
+  } catch {
+    const degraded: Analysis = { ...base, modelStatus: "unavailable" };
+    onUpdate(degraded);
+    return degraded;
+  }
+}
+
+function voteType(types: string[]): ContractType | undefined {
+  if (types.length === 0) return undefined;
+  const count = new Map<string, number>();
+  for (const t of types) count.set(t, (count.get(t) ?? 0) + 1);
+  const top = [...count.entries()].sort((a, b) => b[1] - a[1])[0][0];
+  if (top === "rent" || top === "internship" || top === "other") return top;
+  return undefined;
 }
 
 const RANK: Record<Severity, number> = { high: 3, medium: 2, low: 1 };

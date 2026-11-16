@@ -45,6 +45,12 @@ export function mergeFindings(
     const rule = ruleMap.get(mf.ruleId);
     if (!rule) continue; // 模型不能凭空创造规则
 
+    // 缺失性规则只能由本地判定，模型不得把「整份缺失」伪造成某块 exist 命中。
+    const existDetectable =
+      (rule.detect.anyRegex?.length ?? 0) + (rule.detect.allKeywords?.length ?? 0) >
+      0;
+    if (!existDetectable) continue;
+
     const k = `${rule.id}|${mf.blockId}`;
     const existing = byKey.get(k);
     let match: { start: number; end: number; matchedText: string } | null = null;

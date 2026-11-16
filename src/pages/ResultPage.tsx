@@ -127,7 +127,28 @@ export function ResultPage({ analysis, onBack, onReanalyze }: Props) {
           <span className="text-sm text-muted-foreground">
             当前：{TYPE_LABEL[doc.type]}
           </span>
+          {analysis.modelStatus === "done" &&
+            analysis.aiType &&
+            analysis.aiType !== doc.type && (
+              <span className="rounded bg-[var(--risk-low-bg)] px-2 py-1 text-xs text-muted-foreground">
+                AI 判定：{TYPE_LABEL[analysis.aiType]}，可在上方改选重新分析
+              </span>
+            )}
         </div>
+
+        {analysis.modelStatus === "running" && (
+          <p className="text-sm text-muted-foreground">
+            智能分析批次返回中，结果将逐条补充。
+          </p>
+        )}
+        {analysis.modelStatus === "unavailable" && (
+          <p
+            className="text-sm"
+            style={{ color: "var(--risk-medium)" }}
+          >
+            智能分析暂不可用，当前显示本地规则检查结果。
+          </p>
+        )}
 
         <p className="text-sm leading-relaxed">{overall.reason}</p>
 

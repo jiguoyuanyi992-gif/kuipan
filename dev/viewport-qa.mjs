@@ -131,6 +131,19 @@ for (const vp of [
   await sleep(600);
   let txt = await bodyText();
   record(vp.name, "demo-result", txt.includes("需重点留意") && txt.includes("缺失的条款"));
+
+  // M3 模型主路径 / 降级路径（QQY_EXPECT=degraded 时无 fixture）
+  await sleep(1500);
+  txt = await bodyText();
+  if ((process.env.QQY_EXPECT ?? "model") === "degraded") {
+    record(vp.name, "demo-model-degraded", txt.includes("智能分析暂不可用"));
+  } else {
+    record(
+      vp.name,
+      "demo-model-merged",
+      txt.includes("AI 生成") && !txt.includes("智能分析暂不可用"),
+    );
+  }
   const marks = await evaluate("document.querySelectorAll('mark').length");
   record(vp.name, "demo-highlights", marks > 0, `marks=${marks}`);
   await shot(`${vp.name}-2-demo-top`);
@@ -199,7 +212,12 @@ for (const vp of [
   record(vp.name, "upload-docx", txt.includes("押金归甲方所有"));
   await shot(`${vp.name}-7-docx`);
 
-  record(vp.name, "console-0-error", consoleErrors.length === 0, consoleErrors.join(" | ").slice(0, 300));
+  // 降级模式下 analyze 端点的 5xx 是「本地没跑 Function」的环境噪音，不算应用错误。
+  const envNoise = (process.env.QQY_EXPECT ?? "model") === "degraded";
+  const appErrors = envNoise
+    ? consoleErrors.filter((e) => !e.includes("/functions/v1/app/analyze"))
+    : consoleErrors;
+  record(vp.name, "console-0-error", appErrors.length === 0, appErrors.join(" | ").slice(0, 300));
 }
 
 writeFileSync(join(outDir, "results.json"), JSON.stringify(results, null, 2));

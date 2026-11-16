@@ -36,11 +36,15 @@ export function buildPrompt(blocks: Block[], rules: RiskRule[]): string {
   ].join("\n");
 }
 
-// 把条款块切成批次（每批 6–10 块），供并行发出。
-export function batchBlocks(blocks: Block[], perBatch = 8): Block[][] {
-  const size = Math.min(10, Math.max(6, perBatch));
+// 把条款块切成批次，供并行发出。每批目标 6–10 块；
+// 与「总调用 ≤8 次」（策略修订，硬约束）冲突时优先保证批数 ≤8，批内大小放宽。
+export function batchBlocks(blocks: Block[], maxBatches = 8): Block[][] {
+  const n = blocks.length;
+  if (n === 0) return [];
+  let size = Math.min(10, Math.max(6, Math.ceil(n / maxBatches)));
+  if (Math.ceil(n / size) > maxBatches) size = Math.ceil(n / maxBatches);
   const out: Block[][] = [];
-  for (let i = 0; i < blocks.length; i += size) {
+  for (let i = 0; i < n; i += size) {
     out.push(blocks.slice(i, i + size));
   }
   return out;

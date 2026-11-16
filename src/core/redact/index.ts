@@ -106,3 +106,10 @@ export function redact(text: string): RedactionResult {
   const redactedText = replaceAmounts(cleaned, amounts);
   return { redactedText, amounts, removed };
 }
+
+// 单条款块进 prompt 前的脱敏：用全文档本地抽取的 amounts 计算比例占位符
+// （块内可能只有「押金6000元」而无月租，比例必须按全文档算）。
+export function redactForModel(blockText: string, amounts: AmountTerms): string {
+  const { text: cleaned } = removeSensitive(blockText);
+  return replaceAmounts(cleaned, amounts);
+}

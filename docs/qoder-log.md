@@ -4,6 +4,48 @@
 > 红线：只出现编造或脱敏样例，不得含真实合同内容、真实姓名、身份证、手机号、住址、公司名。
 > 截图由用户用系统截图工具放入 docs/shots/，文件名带里程碑编号；缺图写「（待补：xxx.png）」，不编造截图内容。
 
+## M3 · Function 主路径 + 流式合并 + 降级（2026-11-16，tag m3-llm）
+
+### 交付概览
+
+模型语义匹配主路径上线：Deno 单函数 `POST /functions/v1/app/analyze` 只做「限流 → 长度校验 → 调百炼 qwen-flash → 回 `{ok,content}`」，prompt 由客户端 `buildPrompt` 单一来源构造；条款块切批（batchBlocks，目标 6–10 块/批、总批数硬上限 8）后 Promise.all 并行发出，边到边渲染；merge 前做三重本地护栏（zod strict 拒 offset 字段、rule/block 白名单、absent-only 规则拒绝模型 exist 命中），法律依据仍只从规则库读取。redactForModel 把块内姓名/手机号等移除、金额换成「押金=月租×N」比例占位符后放入请求体，原文只在浏览器本地用于高亮定位。降级路径：任一批全失败 → modelStatus:"unavailable" + 页面「智能分析暂不可用，当前显示本地规则检查结果」，正则结果完整保留、不白屏。限流为实例内存滑窗每 IP 每分钟 N 次（暂定 N=10，待用户确认），输入上限约 2 万字。第二次 public 发布，线上示例合同实测 4.1 秒出全部结果。
+
+### ① 关键提示词（逐字保留）
+
+1. 「还需要多久？在这里先停一下,明天再继续」
+2. 「m3和m4结束就停下」
+3. 「继续执行」
+4. 「约束4『批次并行发出，总调用 ≤8 次』（上一会话定义，本里程碑实现依据）」
+
+### ② 报错与解决
+
+1. **把带 fetch 的运行器写进了 `src/core/llm/client.ts`**：违反「src/core 平台无关纯函数（无 React、无网络）」架构约束。解法：删除该文件，重写为 `src/lib/modelPass.ts`（界面层），core 只留 prompt/schema/merge 纯函数。试错 1 次。
+2. **`src/App.tsx` 重分析时旧批次回调覆盖新结果**：批次是异步到达的，返回上页再分析会出现结果串台。解法：`runId=useRef(0)` 代次守卫，`++runId` 后丢弃旧 `onUpdate`。试错 1 次。
+3. **单测滑窗期望算错**：初版断言把被拒请求也计入窗口。解法：按实现口径改为「严格大于 cutoff 的记录存活、被拒不计数」，重算 0/1000 allow、1500 deny、61000 allow。试错 1 次。
+4. **`import { createRateLimiter } from "../../../functions/limiter.ts"` 过不了 tsc**：functions 目录被 tsconfig 排除且带 `.ts` 扩展名会报错。解法：写成无扩展名导入（limiter.ts 不使用 Deno API，可被 src 测试直接引用），`npm run check:function` 仍因本机无 Deno 标待验。试错 1 次。
+5. **线上 Function 返回 403**：网关要求请求带 `Origin`（curl 不带即 `sites_gateway_origin_forbidden`），headless Chrome 直接被 `BOT_DETECTED` 拦截。解法：线上验证改用真实浏览器（browser-use）走 golden path，本地双视口自动化继续用 vite preview + `dev/function-fixture.mjs`。试错 2 次。
+6. **模型把缺失性规则当存在命中返回**（线上 probe：`rent-missing-deposit-return` 落在 b7）：违反约束 3。解法：merge 增加 `existDetectable` 守卫，absent-only 规则的命中只能来自本地判定（blockId=null），模型版直接丢弃。试错 1 次。
+
+### ③ 部署与运行记录
+
+- `npm test`：10 文件 62 例全绿（新增批次预算/脱敏占位符/限流滑窗/模型路径流式与降级/probe 序列）。
+- `npm run build`：tsc --noEmit 通过，vite 构建无 error；`functions/*.ts` 本机无 Deno，只做 transpile 语法校验（完整类型校验标待验）。
+- 本地双视口 QA（`node dev/viewport-qa.mjs`，390/1280）：fixture 在 → 22/22 全过，含新项 `demo-model-merged`（改写标「AI 生成，仅供参考」、无降级横幅）；fixture 关（`QQY_EXPECT=degraded`）→ 22/22 全过，含 `demo-model-degraded`，控制台过滤本地代理 5xx 环境噪音后应用级 0 error。
+- 云端：prepare_site(actionId b3e7d219…，functionDirectory=functions，secretNames=[BAILIAN_API_KEY]，descriptorStatus=written) → publish_site(publishOperation 01a1e29c… succeeded) → get_publish_status published=true → update_access_policy(public, confirmPublic=true) 复验 mode=public。
+- 百炼真实调用：开发期编造示例合同 3 次（1 次 prompt probe + 1 次浏览器 golden path + 1 次 curl），`get_function_logs` 最近 1 小时仅 2 条 `POST /app/analyze` 且 status_code 全 200、无 5xx；单次分析批次数 = 2（演示合同 8 块）。
+
+### ④ 线上链接与验证方式
+
+- 线上：https://qianqian-yicha-odzma4gogrf.qoder.zone （public）
+- 验证：真实浏览器打开 → 点「高命中演示合同」→ 1.2 秒出正则结果、4.1 秒出模型补充（阈值 ≤30 秒）；页面出现「（AI 生成，仅供参考）」改写、4 处命中下划线、无「智能分析暂不可用」；控制台 0 条消息。降级态在本地以关掉 fixture 验证（页面不白屏、结果完整）。
+- 截图：（待补：m3-result-desktop.png）（待补：m3-degraded-banner.png）（待补：m3-function-logs.png）
+- 待用户确认：① 限流 N=10/分钟是否合适；② 条款块数 >80 时「批内放宽到 ⌈n/8⌉」以保证总批数 ≤8 的处理方式；③ 正式百炼 Key 需在 Sites Settings 界面填入 `BAILIAN_API_KEY`（M0 临时 Key 仍能出结果，验证后请作废）。
+
+### ⑤ 迭代对比
+
+1. 改之前：M2 结果只有正则命中，模型不参与，页面一次出完。我说了什么：「继续执行」（按 M3 计划实现批次并行主路径）。改之后：正则结果 1.2 秒先出，模型批次并行返回后逐条补充改写建议与「其他可疑条款」，同一屏流式完成。（待补：m3-result-desktop.png）
+2. 改之前：Function 挂了就没有任何提示（M2 无 Function）。我说了什么：（执行层按约束 6 自查）。改之后：全批失败时页面显示「智能分析暂不可用，当前显示本地规则检查结果」，本地结果不受影响、不白屏。（待补：m3-degraded-banner.png）
+
 ## M2 · P0 界面闭环 + A 卷宗视觉 + 首次功能发布（2026-11-15，tag m2-ui）
 
 ### 交付概览
