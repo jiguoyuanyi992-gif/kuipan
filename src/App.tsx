@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { DISCLAIMER } from "@/src/components/Disclaimer";
+import { DISCLAIMER_SUMMARY } from "@/src/components/Disclaimer";
 import { InputPage } from "@/src/pages/InputPage";
 import { ResultPage } from "@/src/pages/ResultPage";
 import { TrapLibraryPage } from "@/src/pages/TrapLibraryPage";
@@ -58,9 +58,9 @@ export default function App() {
 
   return (
     <div className="min-h-dvh bg-background text-foreground">
-      <div className="border-b border-border bg-[var(--site-surface)] px-5 py-2">
-        <p className="mx-auto max-w-[1100px] text-xs leading-relaxed text-muted-foreground">
-          {DISCLAIMER}
+      <div className="border-b border-border bg-[var(--site-surface)] px-5 py-1.5">
+        <p className="mx-auto max-w-[1100px] text-xs text-muted-foreground">
+          {DISCLAIMER_SUMMARY}
         </p>
       </div>
 

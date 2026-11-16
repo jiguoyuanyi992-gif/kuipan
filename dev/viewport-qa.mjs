@@ -111,7 +111,7 @@ async function setFiles(selector, file) {
 }
 
 for (const vp of [
-  { name: "mobile", width: 390, height: 844, mobile: false },
+  { name: "mobile", width: 375, height: 667, mobile: false },
   { name: "desktop", width: 1280, height: 900, mobile: false },
 ]) {
   consoleErrors.length = 0;
@@ -239,26 +239,76 @@ for (const vp of [
     checkedBack && txt.includes("分析结果"),
   );
 
-  // 分类切换 + 关键词检索
+  // 陷阱库新结构：默认折叠 + 手风琴 + 更多陷阱（关键词检索按用户要求移除）
   await clickText("浏览陷阱库");
   await sleep(600);
+  txt = await bodyText();
+  const noSearch = !(await evaluate(
+    `!!document.querySelector('input[aria-label="检索陷阱条目"]')`,
+  ));
+  record(
+    vp.name,
+    "traps-collapsed-default",
+    txt.includes("签约前检查清单") &&
+      txt.includes("最常见的 3 个坑") &&
+      !txt.includes("识别特征") &&
+      noSearch,
+    `noSearch=${noSearch}`,
+  );
+
+  // 折叠态首屏可见卡片数（375px 视口要求 ≥2）
+  const visibleCards = await evaluate(
+    `(() => [...document.querySelectorAll('[data-trap-id]')].filter((e) => { const r = e.getBoundingClientRect(); return r.top >= 0 && r.bottom <= innerHeight; }).length)()`,
+  );
+  record(vp.name, "traps-cards-above-fold", visibleCards >= 2, `visible=${visibleCards}`);
+  await shot(`${vp.name}-9-traps-collapsed`);
+
   await clickText("贷款分期");
   await sleep(300);
   txt = await bodyText();
-  record(vp.name, "traps-loan-category", txt.includes("签约前检查清单") && txt.includes("分期"));
-  await evaluate(
-    `(() => { const i=document.querySelector('input[aria-label="检索陷阱条目"]'); const set=Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype,'value').set; set.call(i,'不存在的关键词'); i.dispatchEvent(new Event('input',{bubbles:true})); return true; })()`,
+  record(
+    vp.name,
+    "traps-loan-category",
+    txt.includes("签约前检查清单") && txt.includes("分期"),
   );
+
+  // 展开一张 → 再展开另一张：只允许一张展开
+  await clickText("租房");
+  await sleep(300);
+  await clickText("押金可能被没收");
   await sleep(300);
   txt = await bodyText();
-  record(vp.name, "traps-search-empty", txt.includes("没有匹配"));
-  await shot(`${vp.name}-9-traps-empty`);
-
-  // 清单勾选 + localStorage 持久化（刷新后仍在）
+  const expandedOnce = txt.includes("识别特征") && txt.includes("签约前要问");
+  const liBefore = await evaluate(
+    `(() => document.querySelectorAll('[data-trap-id="trap-rent-deposit-forfeit"] li').length)()`,
+  );
   await evaluate(
-    `(() => { const i=document.querySelector('input[aria-label="检索陷阱条目"]'); const set=Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype,'value').set; set.call(i,''); i.dispatchEvent(new Event('input',{bubbles:true})); return true; })()`,
+    `(() => { const b=[...document.querySelectorAll('[data-trap-id="trap-rent-deposit-forfeit"] button')].find((x)=>x.textContent.includes('查看全部')); if(!b) return false; b.click(); return true; })()`,
   );
   await sleep(200);
+  const liAfter = await evaluate(
+    `(() => document.querySelectorAll('[data-trap-id="trap-rent-deposit-forfeit"] li').length)()`,
+  );
+  record(
+    vp.name,
+    "traps-view-all",
+    expandedOnce && liAfter > liBefore,
+    `${liBefore}->${liAfter}`,
+  );
+  await clickText("违约金偏高");
+  await sleep(300);
+  const openCount = await evaluate(
+    `(() => [...document.querySelectorAll('[data-trap-id] button[aria-expanded]')].filter((b) => b.getAttribute('aria-expanded') === 'true').length)()`,
+  );
+  record(vp.name, "traps-accordion-single", openCount === 1, `open=${openCount}`);
+  await shot(`${vp.name}-9b-traps-expanded`);
+
+  await clickText("更多陷阱");
+  await sleep(300);
+  txt = await bodyText();
+  record(vp.name, "traps-more-group", txt.includes("非居住空间单独出租"));
+
+  // 清单勾选 + localStorage 持久化（刷新后仍在）
   await clickText("租房");
   await sleep(300);
   const before = await evaluate(
@@ -296,6 +346,9 @@ for (const vp of [
   await sleep(1200);
   await clickText("浏览陷阱库");
   await sleep(600);
+  // 检查按钮只在展开的卡片里出现，先展开一张。
+  await clickText("押金可能被没收");
+  await sleep(300);
   const checkNoAnalysis = await evaluate(
     `(() => { const b=[...document.querySelectorAll('button')].find(x=>x.textContent.includes('粘贴合同，检查这一项')); if(!b) return false; b.click(); return true; })()`,
   );
