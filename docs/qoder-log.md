@@ -4,6 +4,65 @@
 > 红线：只出现编造或脱敏样例，不得含真实合同内容、真实姓名、身份证、手机号、住址、公司名。
 > 截图由用户用系统截图工具放入 docs/shots/，文件名带里程碑编号；缺图写「（待补：xxx.png）」，不编造截图内容。
 
+## M4 · 真实规则库 + 陷阱库 + 检查清单 + 双向跳转（2026-11-16，tag m4-data）
+
+### 交付概览
+
+规则库从 5 条假规则换成 13 条真实规则（租房 6 / 实习兼职 5 / 通用 2），每条 `legalBasis` 的 quote 都与权威 .gov.cn 页面原文逐字自动比对通过（住房租赁条例、民法典、劳动合同法、职业学校学生实习管理规定四部文本，MISMATCH: none）；`verified` 全部保持 false，等用户本人复核。新建陷阱库 12 条（租房 6 / 实习兼职 4 / 贷款分期 2 = 底线量，`story` 全为空串、前端隐藏案例区块，不编造案例）与 3 类签约前检查清单（`qqy:checklist:<category>` localStorage 持久化）。界面层新增「浏览陷阱库」入口 + 分类浏览/关键词检索页 + 双向跳转：风险详情「查看同类案例」→ 陷阱库对应条目并高亮滚动；陷阱条目「用我的合同检查这一项」→ 有结果时回结果页定位到该规则（`data-rule-id` 滚动），无结果时回输入页并给出提示。跳转映射用约定 `trap.id = "trap-" + rule.id`（贷款分期 `trap-loan-*` 不映射规则、不参与检测），不改数据契约、不引入客户端深路由（spa 仍为 false）。
+
+### ① 关键提示词（逐字保留）
+
+1. 「继续执行」
+2. 「m3和m4结束就停下」
+3. 「怎么停了，key我已作废」
+
+### ② 报错与解决
+
+1. **Node 里 `/tmp/...` 被解析成 `C:\tmp\...`**：实习管理规定附件 docx 解压后 5 条引用全部读不到，一度显示 NOSRC。解法：先用 `cygpath -w /tmp/...` 换真实临时目录再读。试错 1 次。
+2. **WebFetch 存下来的劳动合同法页面正文是 `\uXXXX` 转义**：直接 grep 中文全部 MISS，误判「引用对不上」。解法：读取后先把 `\uXXXX` 解码成汉字再做包含性比对，21 条引用全部 OK。试错 1 次。
+3. **民法典全文不在本会话可离线读取的材料里**（此前是用浏览器取的）：无法用脚本比对。解法：在仍打开的 jsjc.gov.cn 页面用 `evaluate_script` 对 `innerText` 做归一化包含性校验，顺带取到陷阱库要用的 680/496 等条文原文。试错 1 次。
+4. **traps/checklists 文案里混进英文词**（「refusing 就改投别处」「替别人 signing」）：中文文案不一致。解法：改成中文表述，并用临时 node 脚本对 rules/traps/新 UI 文本跑一遍禁用词+白名单整词自查（脚本不进仓库）。试错 1 次。
+5. **检查清单换分类时状态串类**：`<Checklist category=…>` 组件复用，`useState` 初始化只跑一次，QA 里看到 `qqy:checklist:loan` 被写入租房项 id。先用一次性探针脚本排除「label 双触发」假设（`input.click()` 与点标签文案各只触发 1 次 click），确认是重挂载问题。解法：`<Checklist key={category} …/>` 强制重挂载，切类重新读该类存储。试错 1 次（另删一次性探针脚本）。
+6. **双视口 QA 的清单断言写死了绝对状态**（`toggled === true`）：headless Chrome 的 user-data-dir 里 localStorage 跨轮次残留，mobile 先跑就把上一轮的 true 点成 false，出现假失败。解法：每轮开始 `localStorage.clear()`，断言改为「翻转」`after === !before` + 刷新后 `persisted === after`。试错 2 次。
+
+### ③ 部署与运行记录
+
+- `npm test`：11 文件 75 例全绿（rules 场景分布 6/5/2 与「来源必须 gov.cn/moe 且 quote 非空」断言；新增 traps 11 例：分类条数 6/4/2、`verified` 全 false、story 只允许空串且不含手机号/身份证格式、贷款分期条目不得映射规则、清单 id 全局唯一且 storageKey 口径、双向跳转两侧各 ≥8 条可跳、检索命中与空结果）。
+- `npm run build`：tsc --noEmit 通过，vite 构建无 error。`functions/` 本机仍无 Deno，`check:function` 标待验（未声称通过）。
+- 本地双视口 QA（390×844 与 1280×900）：fixture 在（model）36/36 全过；fixture 关（`QQY_EXPECT=degraded`）36/36 全过。每视口 18 步、新增 7 步：`traps-jump-from-result`、`traps-jump-to-result`、`traps-loan-category`、`traps-search-empty`、`checklist-toggle`、`checklist-persisted`、`traps-check-to-input`；应用级控制台 0 error。
+- 云端：prepare_site(actionId 33ed593b-71d7-46f7-a0f9-39e72dc9feea，webDirectory=dist，functionDirectory=functions，spa=false，secretNames=[BAILIAN_API_KEY] 只传名称) → publish_site(publishOperation 01a1e2c5-ca07-79f1-98d2-3cf2dff85c42 succeeded, committed=true) → get_publish_status `published: true`、`access_mode: public`（本里程碑未改访问策略）。
+- 百炼调用：用户告知 M0 临时小额度 Key 已作废；线上真实浏览器跑一次演示合同（1 批）后页面出现「（AI 生成，仅供参考）」改写，`get_function_logs` 最近 1 小时 3 条 `POST /app/analyze` 全 status_code 200、无 5xx —— 说明 Secrets 里的现值仍可用，需用户确认那是新建的正式 Key（若当前值就是已作废 Key，模型主路径会整批失败进降级，请重填）。
+- 未完成项：① `/advisory` 子路径未实现——策略只写了它作为同一函数内子路径，没有定义它的功能，P0/P1 也无对应交付项，按「执行层不自扩范围」留待策略层决定；② 检查清单「竖版长图友好」排版优化留到 M5；③ 本节截图待用户用系统截图工具补。
+
+### ④ 线上链接与验证方式
+
+- 线上：https://qianqian-yicha-odzma4gogrf.qoder.zone （public）
+- 验证：真实浏览器打开 → 点「高命中演示合同」→ 概览卡「需重点留意」+ 4 处命中下划线 + 4 个「查看同类案例」；点进陷阱库 → 分类/检索/「签约前检查清单」渲染正常、空 `story` 的案例区块不出现；勾一项 → 点「用我的合同检查这一项」回结果页定位；刷新后勾选仍在；`list_console_messages` 刷新后 0 条 error。headless Chrome 打线上仍被 `BOT_DETECTED` 拦，故线上用真实浏览器。
+
+### ⑤ 迭代对比
+
+1. 改之前什么样：陷阱库和检查清单只有 JSON，页面上看不到，也没有从风险详情进案例的入口。
+   我说了什么：「继续执行」（M4 的 P1 交付项 = 浏览检索页 + 可勾选清单 + 双向跳转）。
+   改之后什么样：顶栏与结果页都有「浏览陷阱库」，风险详情可跳同类案例，陷阱条目可反向驱动合同检查。
+   （待补：m4-traps-desktop.png、m4-traps-jump-mobile.png）
+2. 改之前什么样：切换清单分类后，上一类的勾选状态会被写进新类的存储里。
+   我说了什么：无（自查在双视口 QA 里抓到，探针脚本确认不是 label 双触发）。
+   改之后什么样：清单按分类重挂载，localStorage 键各自独立，QA 断言改为「翻转 + 刷新后仍保持」，两个视口都过。
+   （待补：m4-checklist-persist.png）
+
+### ⑥ 待用户复核（只有你能把 verified 置 true）
+
+执行层未把任何 `verified` 置为 true。四部依据文本与条目分布：
+
+| 依据文本 | source | 用到它的规则 | 用到它的陷阱条目 |
+|---|---|---|---|
+| 住房租赁条例（国务院令第812号，2025-09-15 起施行） | https://wubu.gov.cn/zwgk/fdzdgknr/zcfg/202507/t20250723_2022388.html | rent-deposit-forfeit、rent-missing-deposit-return、rent-non-residential-space、rent-unauthorized-entry、rent-agent-collects-rent | trap-rent-deposit-forfeit、trap-rent-non-residential-space、trap-rent-unauthorized-entry、trap-rent-agent-collects-rent |
+| 中华人民共和国民法典 | https://www.jsjc.gov.cn/2020zt/mfd/202006/t20200609_185556.shtml | rent-penalty-high、rent-unauthorized-entry、common-unilateral-terminate、common-final-interpretation | trap-rent-unauthorized-entry、trap-rent-penalty-high、trap-rent-utility-and-fees、trap-intern-missing-written-agreement、trap-loan-training-loan、trap-loan-installment-fees |
+| 劳动合同法（2012 年修正） | http://www.luoding.gov.cn/yfldrsj/gkmlpt/content/1/1946/mpost_1946064.html | intern-unpaid-probation、intern-collects-money、intern-penalty-clause、intern-night-shift、common-unilateral-terminate | trap-intern-unpaid-probation、trap-intern-collects-money、trap-intern-penalty-clause、trap-intern-missing-written-agreement |
+| 职业学校学生实习管理规定（2021 年修订） | http://www.moe.gov.cn/srcsite/A07/moe_737/s3876_qt/202201/t20220121_595529.html | intern-unpaid-probation、intern-collects-money、intern-missing-school-party、intern-night-shift | trap-intern-unpaid-probation、trap-intern-collects-money、trap-intern-missing-written-agreement |
+
+需要你判定两点：① 实习管理规定这一份 `effectiveOn` 我故意留空（来源页是 2022-01 印发的通知，施行日期与「2021 年修订」口径需你确认）；② 贷款分期两条只引了民法典第六百八十条与第四百九十六条第二款——五部委《关于进一步规范大学生不良网络校园贷的通知》与民间借贷司法解释利率上限都没找到权威全文页面，故未录入，是否接受这个取舍由你定。
+
 ## M3 · Function 主路径 + 流式合并 + 降级（2026-11-16，tag m3-llm）
 
 ### 交付概览

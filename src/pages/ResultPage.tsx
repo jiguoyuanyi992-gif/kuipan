@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 import { Disclaimer } from "@/src/components/Disclaimer";
 import { FindingDetail } from "@/src/components/FindingDetail";
 import { RiskBadge } from "@/src/components/RiskBadge";
@@ -14,6 +14,10 @@ interface Props {
   analysis: Analysis;
   onBack: () => void;
   onReanalyze: (type: ContractType) => void;
+  onViewCases: (trapId: string) => void;
+  onOpenTraps: () => void;
+  // 从陷阱库「用我的合同检查这一项」跳回时定位到对应风险详情。
+  highlightRuleId: string | null;
 }
 
 function money(n?: number): string {
@@ -67,12 +71,27 @@ function Highlighted({
   return <>{nodes}</>;
 }
 
-export function ResultPage({ analysis, onBack, onReanalyze }: Props) {
+export function ResultPage({
+  analysis,
+  onBack,
+  onReanalyze,
+  onViewCases,
+  onOpenTraps,
+  highlightRuleId,
+}: Props) {
   const { doc, findings, overall, amounts } = analysis;
   const isExample = doc.source === "example";
   const absent = findings.filter((f) => f.kind === "absent");
   const overallStyle =
     overall.level === "none" ? NONE_STYLE : RISK_STYLE[overall.level];
+
+  // 从陷阱库跳回时定位到该规则的第一条风险详情。
+  useEffect(() => {
+    if (!highlightRuleId) return;
+    document
+      .querySelector(`[data-rule-id="${highlightRuleId}"]`)
+      ?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, [highlightRuleId, findings.length]);
 
   return (
     <main className="mx-auto w-full max-w-[1100px] px-5 py-8">
@@ -87,17 +106,26 @@ export function ResultPage({ analysis, onBack, onReanalyze }: Props) {
           </button>
           <h1 className="font-title text-2xl">签前一查 · 分析结果</h1>
         </div>
-        {isExample && (
-          <span
-            className="rounded px-2 py-1 text-xs"
-            style={{
-              color: "var(--site-accent)",
-              backgroundColor: "var(--risk-high-bg)",
-            }}
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={onOpenTraps}
+            className="rounded-[var(--site-radius)] border border-border px-3 py-1.5 text-sm hover:border-[var(--site-accent)]"
           >
-            示例，虚构
-          </span>
-        )}
+            浏览陷阱库
+          </button>
+          {isExample && (
+            <span
+              className="rounded px-2 py-1 text-xs"
+              style={{
+                color: "var(--site-accent)",
+                backgroundColor: "var(--risk-high-bg)",
+              }}
+            >
+              示例，虚构
+            </span>
+          )}
+        </div>
       </header>
 
       <section
@@ -185,7 +213,11 @@ export function ResultPage({ analysis, onBack, onReanalyze }: Props) {
         <section className="mb-6 space-y-2">
           <h2 className="font-title text-lg">缺失的条款</h2>
           {absent.map((f, i) => (
-            <FindingDetail key={`absent-${i}`} finding={f} />
+            <FindingDetail
+              key={`absent-${i}`}
+              finding={f}
+              onViewCases={onViewCases}
+            />
           ))}
         </section>
       )}
@@ -248,7 +280,11 @@ export function ResultPage({ analysis, onBack, onReanalyze }: Props) {
                   <Highlighted block={b} findings={blockFindings} />
                 </p>
                 {blockFindings.map((f, i) => (
-                  <FindingDetail key={`${b.id}-${i}`} finding={f} />
+                  <FindingDetail
+                    key={`${b.id}-${i}`}
+                    finding={f}
+                    onViewCases={onViewCases}
+                  />
                 ))}
               </article>
             );

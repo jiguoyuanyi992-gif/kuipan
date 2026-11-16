@@ -123,6 +123,10 @@ for (const vp of [
   });
   await send("Page.navigate", { url: URL_BASE });
   await sleep(1200);
+  // 每次从干净存储开始，避免上一轮/另一视口的勾选干扰断言。
+  await evaluate("localStorage.clear()");
+  await send("Page.navigate", { url: URL_BASE });
+  await sleep(1200);
   await shot(`${vp.name}-1-input`);
   record(vp.name, "input-load", (await bodyText()).includes("签前一查"));
 
@@ -211,6 +215,97 @@ for (const vp of [
   txt = await bodyText();
   record(vp.name, "upload-docx", txt.includes("押金归甲方所有"));
   await shot(`${vp.name}-7-docx`);
+
+  // M4c 陷阱库：结果页 →「查看同类案例」→ 陷阱库 →「用我的合同检查这一项」→ 结果页
+  await clickText("查看同类案例");
+  await sleep(800);
+  txt = await bodyText();
+  record(
+    vp.name,
+    "traps-jump-from-result",
+    txt.includes("签约前检查清单") && txt.includes("被坑后怎么办"),
+    txt.slice(0, 60).replace(/\n/g, " "),
+  );
+  await shot(`${vp.name}-8-traps`);
+
+  const checkedBack = await evaluate(
+    `(() => { const b=[...document.querySelectorAll('button')].find(x=>x.textContent.includes('用我的合同检查这一项')); if(!b) return false; b.click(); return true; })()`,
+  );
+  await sleep(900);
+  txt = await bodyText();
+  record(
+    vp.name,
+    "traps-jump-to-result",
+    checkedBack && txt.includes("分析结果"),
+  );
+
+  // 分类切换 + 关键词检索
+  await clickText("浏览陷阱库");
+  await sleep(600);
+  await clickText("贷款分期");
+  await sleep(300);
+  txt = await bodyText();
+  record(vp.name, "traps-loan-category", txt.includes("签约前检查清单") && txt.includes("分期"));
+  await evaluate(
+    `(() => { const i=document.querySelector('input[aria-label="检索陷阱条目"]'); const set=Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype,'value').set; set.call(i,'不存在的关键词'); i.dispatchEvent(new Event('input',{bubbles:true})); return true; })()`,
+  );
+  await sleep(300);
+  txt = await bodyText();
+  record(vp.name, "traps-search-empty", txt.includes("没有匹配"));
+  await shot(`${vp.name}-9-traps-empty`);
+
+  // 清单勾选 + localStorage 持久化（刷新后仍在）
+  await evaluate(
+    `(() => { const i=document.querySelector('input[aria-label="检索陷阱条目"]'); const set=Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype,'value').set; set.call(i,''); i.dispatchEvent(new Event('input',{bubbles:true})); return true; })()`,
+  );
+  await sleep(200);
+  await clickText("租房");
+  await sleep(300);
+  const before = await evaluate(
+    `(() => { const c=document.querySelector('input[type=checkbox]'); if(!c) return null; return c.checked; })()`,
+  );
+  const clicked = await evaluate(
+    `(() => { const c=document.querySelector('input[type=checkbox]'); if(!c) return null; c.click(); return true; })()`,
+  );
+  await sleep(400);
+  const after = await evaluate(
+    `(() => { const c=document.querySelector('input[type=checkbox]'); return c ? c.checked : null; })()`,
+  );
+  const diag = await evaluate(
+    `(() => JSON.stringify(Object.fromEntries(Object.entries(localStorage).filter(k=>k[0].startsWith('qqy:checklist')))))()`,
+  );
+  record(
+    vp.name,
+    "checklist-toggle",
+    clicked === true && after === !before,
+    `before=${before} after=${after} ls=${diag}`,
+  );
+
+  await send("Page.navigate", { url: URL_BASE });
+  await sleep(1200);
+  await clickText("浏览陷阱库");
+  await sleep(600);
+  const persisted = await evaluate(
+    "(() => { const c=document.querySelector('input[type=checkbox]'); return c ? c.checked : null; })()",
+  );
+  record(vp.name, "checklist-persisted", persisted === after, `persisted=${persisted} after=${after}`);
+  await shot(`${vp.name}-10-traps-checklist`);
+
+  // 无分析时「检查这一项」应回输入页并给出提示
+  await send("Page.navigate", { url: URL_BASE });
+  await sleep(1200);
+  await clickText("浏览陷阱库");
+  await sleep(600);
+  const checkNoAnalysis = await evaluate(
+    `(() => { const b=[...document.querySelectorAll('button')].find(x=>x.textContent.includes('粘贴合同，检查这一项')); if(!b) return false; b.click(); return true; })()`,
+  );
+  await sleep(500);
+  txt = await bodyText();
+  record(
+    vp.name,
+    "traps-check-to-input",
+    checkNoAnalysis && txt.includes("分析结果会检查这一项"),
+  );
 
   // 降级模式下 analyze 端点的 5xx 是「本地没跑 Function」的环境噪音，不算应用错误。
   const envNoise = (process.env.QQY_EXPECT ?? "model") === "degraded";

@@ -1,10 +1,19 @@
 import type { Finding } from "@/src/core/types";
+import { trapsForRuleId } from "@/src/core/traps";
 import { RiskBadge } from "./RiskBadge";
 
-export function FindingDetail({ finding }: { finding: Finding }) {
+interface Props {
+  finding: Finding;
+  // 双向跳转：风险详情 → 陷阱库同类案例。
+  onViewCases?: (trapId: string) => void;
+}
+
+export function FindingDetail({ finding, onViewCases }: Props) {
   const weak = finding.aiSuggested;
+  const cases = finding.aiSuggested ? [] : trapsForRuleId(finding.ruleId);
   return (
     <div
+      data-rule-id={finding.ruleId}
       className="space-y-2 rounded-[var(--site-radius)] border border-border p-3 text-sm"
       style={{
         backgroundColor: weak ? "transparent" : "var(--site-surface)",
@@ -49,6 +58,29 @@ export function FindingDetail({ finding }: { finding: Finding }) {
             <p key={i}>
               {lb.law} {lb.article}：{lb.quote}
             </p>
+          ))}
+        </div>
+      )}
+
+      {!finding.aiSuggested &&
+        !finding.verified &&
+        finding.legalBasis.length > 0 && (
+          <p className="border-t border-border pt-2 text-xs text-muted-foreground">
+            这一项的原文依据正在逐条复核，复核完成后才在这里显示。
+          </p>
+        )}
+
+      {cases.length > 0 && (
+        <div className="flex flex-wrap gap-2 pt-1">
+          {cases.map((t) => (
+            <button
+              key={t.id}
+              type="button"
+              onClick={() => onViewCases?.(t.id)}
+              className="rounded-[var(--site-radius)] border px-2.5 py-1 text-xs hover:border-[var(--site-accent)]"
+            >
+              查看同类案例
+            </button>
           ))}
         </div>
       )}

@@ -7,12 +7,15 @@ import type { ContractSource } from "@/src/core/types";
 
 interface Props {
   onAnalyze: (text: string, source: ContractSource, fileName?: string) => void;
+  onOpenTraps: () => void;
+  // 从陷阱库「检查这一项」跳回时的提示，不改动输入流程。
+  checkHint?: string | null;
 }
 
 // 输入长度上限（AGENTS.md 限流口径：约 2 万字，尽力而为）。
 const MAX_INPUT_CHARS = 20_000;
 
-export function InputPage({ onAnalyze }: Props) {
+export function InputPage({ onAnalyze, onOpenTraps, checkHint }: Props) {
   const [text, setText] = useState("");
   const [source, setSource] = useState<ContractSource>("paste");
   const [hint, setHint] = useState<string | null>(null);
@@ -62,12 +65,34 @@ export function InputPage({ onAnalyze }: Props) {
 
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-3xl flex-col gap-8 px-5 py-10">
-      <header className="space-y-2">
-        <h1 className="font-title text-4xl tracking-tight">签前一查</h1>
-        <p className="text-base text-muted-foreground">
-          大学生合同防坑助手 · 租房 / 实习兼职
-        </p>
+      <header className="flex flex-wrap items-start justify-between gap-3">
+        <div className="space-y-2">
+          <h1 className="font-title text-4xl tracking-tight">签前一查</h1>
+          <p className="text-base text-muted-foreground">
+            大学生合同防坑助手 · 租房 / 实习兼职
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={onOpenTraps}
+          className="rounded-[var(--site-radius)] border border-border px-3 py-1.5 text-sm hover:border-[var(--site-accent)]"
+        >
+          浏览陷阱库
+        </button>
       </header>
+
+      {checkHint && (
+        <p
+          className="-mt-4 rounded-[var(--site-radius)] border px-4 py-2.5 text-sm leading-relaxed"
+          style={{
+            borderColor: "var(--site-accent)",
+            color: "var(--site-accent)",
+            backgroundColor: "var(--site-surface)",
+          }}
+        >
+          {checkHint}
+        </p>
+      )}
 
       <section
         className="space-y-4 rounded-[var(--site-radius)] border border-border p-5"

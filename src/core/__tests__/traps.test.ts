@@ -1,0 +1,111 @@
+import { describe, expect, it } from "vitest";
+import { rules } from "../rules";
+import {
+  CATEGORY_LABEL,
+  checklists,
+  ruleIdForTrap,
+  searchTraps,
+  trapCategory,
+  traps,
+  trapsByCategory,
+  trapsForRuleId,
+} from "../traps";
+
+describe("陷阱库数据契约", () => {
+  it("最低交付量：租房 6 + 实习兼职 4 + 贷款分期 2", () => {
+    expect(trapsByCategory("rent")).toHaveLength(6);
+    expect(trapsByCategory("internship")).toHaveLength(4);
+    expect(trapsByCategory("loan")).toHaveLength(2);
+    expect(traps.length).toBeGreaterThanOrEqual(12);
+  });
+
+  it("verified 默认 false，执行层无置真路径", () => {
+    expect(traps.every((t) => t.verified === false)).toBe(true);
+  });
+
+  it("每条字段完整：一句话概括、识别特征、签约前要问、被坑后怎么办、依据", () => {
+    for (const t of traps) {
+      expect(t.id).toMatch(/^trap-/);
+      expect(["rent", "internship", "common"]).toContain(t.scene);
+      expect(t.oneLiner.length).toBeGreaterThan(6);
+      expect(t.traits.length).toBeGreaterThanOrEqual(2);
+      expect(t.beforeSign.length).toBeGreaterThanOrEqual(2);
+      expect(t.afterHit.length).toBeGreaterThanOrEqual(2);
+      expect(t.legalBasis.length).toBeGreaterThan(0);
+      for (const b of t.legalBasis) {
+        expect(b.law).toBeTruthy();
+        expect(b.article).toBeTruthy();
+        expect(b.quote.length).toBeGreaterThan(8);
+        expect(b.source).toMatch(/^https?:\/\/[^/]*gov\.cn/);
+      }
+    }
+  });
+
+  it("story 为空串时前端隐藏该区块，不得编造案例", () => {
+    for (const t of traps) {
+      expect(typeof t.story).toBe("string");
+      if (t.story === "") continue;
+      // 有案例必须是脱敏写法：不得出现可识别的手机号或身份证格式。
+      expect(t.story).not.toMatch(/1[3-9]\d{9}/);
+      expect(t.story).not.toMatch(/\d{17}[\dXx]/);
+    }
+    expect(traps.every((t) => t.story === "")).toBe(true);
+  });
+
+  it("贷款分期条目不参与合同检测", () => {
+    for (const t of trapsByCategory("loan")) {
+      expect(ruleIdForTrap(t)).toBeUndefined();
+      expect(t.scene).toBe("common");
+    }
+    const loanRuleIds = trapsByCategory("loan").map((t) => t.id.replace(/^trap-/, ""));
+    for (const id of loanRuleIds) expect(rules.some((r) => r.id === id)).toBe(false);
+  });
+
+  it("分类标签齐全", () => {
+    expect(Object.keys(CATEGORY_LABEL)).toEqual(["rent", "internship", "loan"]);
+    expect(trapCategory(traps[0])).toBe("rent");
+  });
+
+  it("检索按自身字段命中", () => {
+    expect(searchTraps("押金").length).toBeGreaterThan(0);
+    expect(searchTraps("不存在的那个词xyz")).toHaveLength(0);
+    expect(searchTraps("", "loan")).toHaveLength(2);
+  });
+});
+
+describe("签约前检查清单", () => {
+  it("三类清单齐全，条目可勾选且 id 唯一", () => {
+    expect(checklists.categories.map((c) => c.id)).toEqual([
+      "rent",
+      "internship",
+      "loan",
+    ]);
+    for (const c of checklists.categories) {
+      expect(c.items.length).toBeGreaterThanOrEqual(8);
+      expect(new Set(c.items.map((i) => i.id)).size).toBe(c.items.length);
+      expect(c.storageKey).toBe(`qqy:checklist:${c.id}`);
+      for (const item of c.items) expect(item.label.length).toBeGreaterThan(6);
+    }
+  });
+
+  it("清单条目 id 在各清单内全局唯一，避免 localStorage 串档", () => {
+    const all = checklists.categories.flatMap((c) => c.items.map((i) => i.id));
+    expect(new Set(all).size).toBe(all.length);
+  });
+});
+
+describe("风险详情与陷阱库双向跳转", () => {
+  it("规则能跳到同类案例", () => {
+    const linked = rules.filter((r) => trapsForRuleId(r.id).length > 0);
+    expect(linked.length).toBeGreaterThanOrEqual(8);
+  });
+
+  it("陷阱条目能回到合同检查项", () => {
+    const checkable = traps.filter((t) => ruleIdForTrap(t));
+    expect(checkable.length).toBeGreaterThanOrEqual(8);
+    for (const t of checkable) {
+      const ruleId = ruleIdForTrap(t)!;
+      expect(rules.some((r) => r.id === ruleId)).toBe(true);
+    }
+  });
+});

@@ -1,0 +1,53 @@
+{
+  "categories": [
+    {
+      "id": "rent",
+      "label": "租房",
+      "storageKey": "qqy:checklist:rent",
+      "items": [
+        { "id": "rent-owner", "label": "签约人的名字和权属材料上的人一致，不一致的有书面授权" },
+        { "id": "rent-livable", "label": "租的是正经房间，不是厨房、阳台、地下室或车库改的" },
+        { "id": "rent-deposit", "label": "押金数额、退还时间、可以扣减的情形都写在合同里" },
+        { "id": "rent-fee", "label": "水、电、燃气、网络、物业各自多少钱、谁承担，写在合同里" },
+        { "id": "rent-meter", "label": "入住当天抄了水表电表燃气表底数，并和对方确认留底" },
+        { "id": "rent-condition", "label": "房屋和家具现状拍过照，损坏情况双方都认过" },
+        { "id": "rent-pay", "label": "租金付给产权人本人账户，付款时写了用途备注" },
+        { "id": "rent-penalty", "label": "违约金按实际损失或一个月租金算，双方解除条件对等" },
+        { "id": "rent-entry", "label": "房东进屋要提前通知、约在本人在场的时间" },
+        { "id": "rent-term", "label": "租期、续租、退租通知期限写清楚，没有留白" }
+      ]
+    },
+    {
+      "id": "internship",
+      "label": "实习兼职",
+      "storageKey": "qqy:checklist:internship",
+      "items": [
+        { "id": "intern-written", "label": "上岗前拿到了书面协议或合同文本，不是只有口头约定" },
+        { "id": "intern-kind", "label": "确认这份实习是学校组织还是自己找的，学校组织的要签三方协议" },
+        { "id": "intern-pay", "label": "报酬数额、计算方式、每月发放日期都写清楚了" },
+        { "id": "intern-probation", "label": "试用期也有工资，标准不低于当地最低工资" },
+        { "id": "intern-nofee", "label": "没有要求交押金、培训费、服装费等各种名目的费用" },
+        { "id": "intern-idcard", "label": "证件原件不被扣押，只给复印件并注明用途" },
+        { "id": "intern-hours", "label": "工作时间、是否夜班和加班、加班怎么算，写在协议里" },
+        { "id": "intern-penalty", "label": "违约金不是只约束我一方，单位违约也有对应责任" },
+        { "id": "intern-content", "label": "岗位内容和工作地点跟面试时说的一致，不是先签再换岗" },
+        { "id": "intern-record", "label": "排班、打卡、聊天与转账记录都能自己留底" }
+      ]
+    },
+    {
+      "id": "loan",
+      "label": "贷款分期",
+      "storageKey": "qqy:checklist:loan",
+      "items": [
+        { "id": "loan-noneed", "label": "没有被要求先办分期或贷款才能入职、报名" },
+        { "id": "loan-paper", "label": "借款合同和服务协议两份文本都拿到了，能带回家看完再签" },
+        { "id": "loan-party", "label": "知道放款方是哪家公司，而不只是招聘或培训的那个名字" },
+        { "id": "loan-total", "label": "算过总还款额：本金加利息、服务费、担保费一共多少" },
+        { "id": "loan-rate", "label": "问清年化利率，而不是只听每天几块钱" },
+        { "id": "loan-quit", "label": "中途退出时剩下的费用和贷款怎么处理，写在纸上" },
+        { "id": "loan-nodouble", "label": "没有用新贷款去还旧贷款，也没有用自己的名义替别人借钱" },
+        { "id": "loan-tell", "label": "已经把这个方案告诉家人或学校的一位老师" }
+      ]
+    }
+  ]
+}
