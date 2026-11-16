@@ -216,6 +216,71 @@ for (const vp of [
   record(vp.name, "upload-docx", txt.includes("押金归甲方所有"));
   await shot(`${vp.name}-7-docx`);
 
+  // 照片 → 识别成文字 → 填回文本框（不自动分析）→ 进入现有分析流程
+  await clickText("返回");
+  await sleep(400);
+  await setFiles('input[type="file"]', fixture("contract-photo.jpg"));
+  await sleep(600);
+  const thumbs = await evaluate(`document.querySelectorAll('img[alt*="合同照片"]').length`);
+  record(vp.name, "photo-thumb", thumbs === 1, `thumbs=${thumbs}`);
+  await shot(`${vp.name}-7b-photo-thumb`);
+
+  await clickText("识别成文字");
+  await sleep(1500);
+  const ocrText = await evaluate(`document.querySelector('#contract').value`);
+  txt = await bodyText();
+  if ((process.env.QQY_OCR ?? "") === "fail") {
+    record(
+      vp.name,
+      "photo-ocr-error-hint",
+      txt.includes("识别") && (txt.includes("模糊") || txt.includes("粘贴")),
+      txt.slice(0, 80).replace(/\n/g, " "),
+    );
+    await shot(`${vp.name}-7c-photo-error`);
+    // 失败后引导粘贴：粘贴仍可正常进入分析
+    await evaluate(
+      `(() => { const ta=document.querySelector('textarea'); const set=Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype,'value').set; set.call(ta, ${JSON.stringify(
+        PASTE,
+      )}); ta.dispatchEvent(new Event('input',{bubbles:true})); return true; })()`,
+    );
+    await clickText("开始分析");
+    await sleep(700);
+    txt = await bodyText();
+    record(vp.name, "photo-fail-paste-fallback", txt.includes("押金可能被没收"));
+  } else {
+    record(
+      vp.name,
+      "photo-ocr-filled",
+      ocrText.includes("第二条 押金人民币 4500 元") && txt.includes("先核对"),
+      `chars=${ocrText.length}`,
+    );
+    record(
+      vp.name,
+      "photo-no-auto-analyze",
+      !txt.includes("总体风险") && !txt.includes("分析结果"),
+    );
+    await shot(`${vp.name}-7c-photo-ocr`);
+
+    const removed = await evaluate(
+      `(() => { const b=document.querySelector('button[aria-label^="删除第"]'); if(!b) return false; b.click(); return true; })()`,
+    );
+    await sleep(300);
+    const thumbsAfter = await evaluate(
+      `document.querySelectorAll('img[alt*="合同照片"]').length`,
+    );
+    record(vp.name, "photo-remove", removed === true && thumbsAfter === 0, `after=${thumbsAfter}`);
+
+    await clickText("开始分析");
+    await sleep(900);
+    txt = await bodyText();
+    record(
+      vp.name,
+      "photo-into-analysis",
+      txt.includes("押金归甲方所有") && txt.includes("需重点留意"),
+    );
+    await shot(`${vp.name}-7d-photo-result`);
+  }
+
   // M4c 陷阱库：结果页 →「查看同类案例」→ 陷阱库 →「用我的合同检查这一项」→ 结果页
   await clickText("查看同类案例");
   await sleep(800);
@@ -361,10 +426,15 @@ for (const vp of [
   );
 
   // 降级模式下 analyze 端点的 5xx 是「本地没跑 Function」的环境噪音，不算应用错误。
-  const envNoise = (process.env.QQY_EXPECT ?? "model") === "degraded";
-  const appErrors = envNoise
-    ? consoleErrors.filter((e) => !e.includes("/functions/v1/app/analyze"))
-    : consoleErrors;
+  // QQY_OCR=fail 时 /ocr 的 5xx 同样是我们故意注入的失败，只核对页面提示，不算应用错误。
+  const noisePaths = [];
+  if ((process.env.QQY_EXPECT ?? "model") === "degraded") {
+    noisePaths.push("/functions/v1/app/analyze");
+  }
+  if ((process.env.QQY_OCR ?? "") === "fail") {
+    noisePaths.push("/functions/v1/app/ocr");
+  }
+  const appErrors = consoleErrors.filter((e) => !noisePaths.some((p) => e.includes(p)));
   record(vp.name, "console-0-error", appErrors.length === 0, appErrors.join(" | ").slice(0, 300));
 }
 

@@ -1,6 +1,7 @@
-// 单 app Edge Function：/functions/v1/app/analyze 子路径。
+// 单 app Edge Function：/functions/v1/app 下只有 /analyze 与 /ocr 两个子路径。
 // 薄代理：只做限流 + 输入上限 + 百炼调用，prompt 由客户端构造（与本地核心同一份 buildPrompt）。
 // 红线：不打印 Key、不回显请求内容、永不落日志。
+import { ocr } from "./ocr.ts";
 import { createRateLimiter, ipFromHeaders } from "./limiter.ts";
 
 const BAILIAN_URL =
@@ -100,7 +101,12 @@ async function analyze(request: Request): Promise<Response> {
 
 export function handler(request: Request): Promise<Response> {
   const path = new URL(request.url).pathname;
-  if (!path.endsWith("/analyze")) {
+  const route = path.endsWith("/analyze")
+    ? (request: Request) => analyze(request)
+    : path.endsWith("/ocr")
+    ? (request: Request) => ocr(request, limiter)
+    : undefined;
+  if (!route) {
     return Promise.resolve(json({ ok: false, error: "not_found" }, 404));
   }
   if (request.method !== "POST") {
@@ -108,5 +114,5 @@ export function handler(request: Request): Promise<Response> {
       json({ ok: false, error: "method_not_allowed" }, 405),
     );
   }
-  return analyze(request);
+  return route(request);
 }

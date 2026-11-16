@@ -66,7 +66,7 @@ export interface Block {
   kind: BlockKind;
 }
 
-export type ContractSource = "paste" | "docx" | "pdf" | "example";
+export type ContractSource = "paste" | "docx" | "pdf" | "photo" | "example";
 
 export interface ContractDoc {
   type: ContractType;
