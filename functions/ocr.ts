@@ -12,7 +12,10 @@ const NO_STORE = { "Cache-Control": "no-store" };
 const IMAGE_MAX_B64_CHARS = 5_000_000;
 // 网关超时约 60s（M0 实测），整体留 45s，多次尝试共用同一截止时间。
 const TOTAL_DEADLINE_MS = 45_000;
-const OCR_PROMPT = "请按原文顺序输出图片中的全部文字，保留条款编号与换行，不要解释、不要翻译、不要补充。";
+// 实测：不加这句时，页面角上的斜置水印章会被当成正文最后一行输出（只吐出半句「示例，虚」）。
+const OCR_PROMPT =
+  "请按原文顺序输出图片中合同正文的全部文字，保留条款编号与换行，不要解释、不要翻译、不要补充。" +
+  "忽略水印、印章、签名章、页眉页脚装饰文字与残缺字迹，只输出合同条款正文。";
 
 function json(body: Record<string, unknown>, status = 200): Response {
   return Response.json(body, { status, headers: NO_STORE });
