@@ -1,6 +1,7 @@
 // 模型主路径运行器（有网络，故不在 src/core）。批次并行发出（总调用 ≤8 次），
 // 每批成功即回调 onPartial 供页面流式合并；全部失败时抛错，由调用方降级为只显示正则结果。
 import { batchBlocks, buildPrompt, parseModelResponse } from "@/src/core/llm";
+import type { ArticleEntry } from "@/src/core/articles";
 import type { Block, ModelFinding, RiskRule } from "@/src/core/types";
 
 const ENDPOINT = "/functions/v1/app/analyze";
@@ -23,9 +24,10 @@ export function stripFences(text: string): string {
 async function runBatch(
   blocks: Block[],
   rules: RiskRule[],
+  articles: ArticleEntry[],
   fetchImpl: typeof fetch,
 ): Promise<{ ok: boolean; findings: ModelFinding[]; contractType?: string }> {
-  const prompt = buildPrompt(blocks, rules);
+  const prompt = buildPrompt(blocks, rules, articles);
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), BATCH_TIMEOUT_MS);
   try {
@@ -59,6 +61,7 @@ export async function runModelPass(
   rules: RiskRule[],
   onPartial: (findings: ModelFinding[]) => void,
   fetchImpl: typeof fetch = fetch,
+  articles: ArticleEntry[] = [],
 ): Promise<ModelPassResult> {
   const batches = batchBlocks(blocks);
   let okBatches = 0;
@@ -66,7 +69,7 @@ export async function runModelPass(
   const contractTypes: string[] = [];
   await Promise.all(
     batches.map(async (batch) => {
-      const result = await runBatch(batch, rules, fetchImpl);
+      const result = await runBatch(batch, rules, articles, fetchImpl);
       if (result.ok) {
         okBatches++;
         if (result.contractType) contractTypes.push(result.contractType);

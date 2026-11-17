@@ -267,6 +267,7 @@ for (const vp of [
   txt = await bodyText();
   record(vp.name, "paste-result", txt.includes("押金可能被没收"));
   record(vp.name, "paste-fallback-actions", txt.includes("签前怎么办") && txt.includes("先别当场签字或付款"));
+  record(vp.name, "paste-possible-basis", txt.includes("可能相关条文（仅供参考）"));
   await shot(`${vp.name}-paste-result`, true);
 
   // 上传 PDF

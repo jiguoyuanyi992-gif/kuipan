@@ -105,6 +105,8 @@ export interface Finding {
   // 永远只从规则库按 ruleId 读取，模型不参与生成。
   legalBasis: LegalBasis[];
   verified: boolean;
+  // 仅 aiSuggested 项：模型从封闭条文清单选出的参考条文，非正式法律依据。
+  possibleBasis?: LegalBasis[];
 }
 
 // 模型原始返回项（硬校验对象）。模型只给 ruleId + blockId，不给字符 offset。
@@ -115,6 +117,7 @@ export interface ModelFinding {
   askTalk: string;
   rewrite: string;
   aiSuggested: boolean;
+  articleIds?: string[];
 }
 
 export type OverallLevel = "high" | "medium" | "low" | "none";

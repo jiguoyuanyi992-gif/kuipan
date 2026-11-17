@@ -1,4 +1,5 @@
-import type { ContractDoc, Finding, ModelFinding, RiskRule } from "../types";
+import type { ContractDoc, Finding, LegalBasis, ModelFinding, RiskRule } from "../types";
+import { articleById, type ArticleEntry } from "../articles";
 import { locateInBlock } from "../chunk";
 
 function keyOf(f: { ruleId: string; blockId: string | null; aiSuggested: boolean }): string {
@@ -26,6 +27,18 @@ export function mergeFindings(
     if (mf.aiSuggested) {
       const k = `ai|${mf.blockId}`;
       if (byKey.has(k)) continue;
+      // 参考条文只认封闭清单内且 verified 的 id；查不到的静默丢弃，不报错。
+      const possibleBasis: LegalBasis[] = (mf.articleIds ?? [])
+        .map((id) => articleById(id))
+        .filter((a): a is ArticleEntry => a !== undefined && a.verified)
+        .map((a) => ({
+          law: a.law,
+          article: a.article,
+          quote: a.quote,
+          source: a.source,
+          effectiveOn: a.effectiveOn,
+          sourceUrl: a.sourceUrl,
+        }));
       byKey.set(k, {
         ruleId: "",
         blockId: mf.blockId,
@@ -38,6 +51,7 @@ export function mergeFindings(
         aiSuggested: true,
         legalBasis: [],
         verified: false,
+        possibleBasis: possibleBasis.length > 0 ? possibleBasis : undefined,
       });
       continue;
     }

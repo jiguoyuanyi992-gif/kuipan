@@ -10,6 +10,7 @@ export const modelFindingSchema = z
     askTalk: z.string(),
     rewrite: z.string(),
     aiSuggested: z.boolean(),
+    articleIds: z.array(z.string()).default([]),
   })
   .strict();
 

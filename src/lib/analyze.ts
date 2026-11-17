@@ -1,4 +1,5 @@
 import { chunk } from "@/src/core/chunk";
+import { articlesForType } from "@/src/core/articles";
 import { runModelPass } from "@/src/lib/modelPass";
 import { extractAmounts, redactForModel } from "@/src/core/redact";
 import { runRegex } from "@/src/core/regex";
@@ -78,16 +79,22 @@ export async function analyzeAll(
     mergeFindings(base.findings, collected, rules, base.doc);
 
   try {
-    const result = await runModelPass(modelBlocks, sceneRules, (partial) => {
-      collected.push(...partial);
-      const findings = mergeCurrent();
-      onUpdate({
-        ...base,
-        findings,
-        overall: overallRisk(findings),
-        modelStatus: "running",
-      });
-    });
+    const result = await runModelPass(
+      modelBlocks,
+      sceneRules,
+      (partial) => {
+        collected.push(...partial);
+        const findings = mergeCurrent();
+        onUpdate({
+          ...base,
+          findings,
+          overall: overallRisk(findings),
+          modelStatus: "running",
+        });
+      },
+      fetch,
+      articlesForType(base.doc.type),
+    );
     const findings = mergeCurrent();
     const final: Analysis = {
       ...base,

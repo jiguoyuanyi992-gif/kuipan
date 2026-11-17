@@ -102,6 +102,36 @@ export function FindingDetail({
         </div>
       )}
 
+      {finding.aiSuggested && (finding.possibleBasis?.length ?? 0) > 0 && (
+        <div
+          className="space-y-1 border-t border-dashed pt-2 text-xs text-muted-foreground"
+          style={{ borderColor: "var(--site-border)" }}
+        >
+          <p className="font-medium">可能相关条文（仅供参考）</p>
+          {finding.possibleBasis!.map((lb, i) => (
+            <div key={i} className="space-y-0.5">
+              <p>
+                {lb.law} {lb.article}：{lb.quote}
+              </p>
+              <p className="text-[11px]">
+                {lb.sourceUrl ? (
+                  <a
+                    href={lb.sourceUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="underline hover:text-[var(--site-accent)]"
+                  >
+                    来源：{lb.source}
+                  </a>
+                ) : (
+                  <>来源：{lb.source}</>
+                )}
+              </p>
+            </div>
+          ))}
+        </div>
+      )}
+
       {!hasBasis && (
         <div className="space-y-1 border-t border-border pt-2 text-xs text-muted-foreground">
           {!finding.aiSuggested && finding.legalBasis.length > 0 && (

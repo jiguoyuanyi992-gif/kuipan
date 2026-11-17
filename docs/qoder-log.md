@@ -4,6 +4,33 @@
 > 红线：只出现编造或脱敏样例，不得含真实合同内容、真实姓名、身份证、手机号、住址、公司名。
 > 截图由用户用系统截图工具放入 docs/shots/，文件名带里程碑编号；缺图写「（待补：xxx.png）」，不编造截图内容。
 
+## M4 后追加 · 兜底依据三项任务 C：可能相关条文封闭清单（2026-11-17，不打 tag）
+
+### 做了什么
+
+- 新建 src/core/articles/articles.json：封闭条文清单 10 条（civil-496/497/498/543/585、consumer-26/53、pipl-14/16、civil-proc-35），字段 id/law/article/quote/summary/scenes/sourceUrl/effectiveOn/verified/reviewer/reviewNote 写全；quote 与任务 B 已逐字核对的字符串完全一致（同底本同日期），summary 为给模型看的一句话白话说明且无禁用词；source 不手写、由加载器注入常量。verified=true、reviewer=「执行层自动引用」、reviewNote 记检索日期 2026-11-16 与 flk 页面标题。
+- 新建 src/core/articles/index.ts：导出 articles（注入 source）、articleById、articlesForType(type)（只返回 verified 且 scenes 含该类型或含 other 的条目，指令原文口径）。scenes 含 other 的条目按通用条文全场景可用——consumer-26/53 的 scenes 含 other 是必须的：贷款/分期合同分析时归 other 类，否则模型选不到预付款退还条文。
+- prompt.ts 只追加不改写：约束列表末尾追加第 6 条（articleIds 只能填清单内 id、没把握留空数组、禁清单外法条）；「规则列表」后追加「条文清单：」段（每行 articleId=…｜一句话说明，仅 articles 非空时出现）；JSON 示例 finding 加 "articleIds":[]；buildPrompt 加第三参 articles（默认空数组，旧两参调用不受影响）。天赐原版其余文字逐字未动，并有测试固定。
+- schema.ts：modelFindingSchema 加 articleIds: z.array(z.string()).default([])，保持 .strict()；不带该字段的旧格式返回仍通过。types.ts：Finding 加 possibleBasis?: LegalBasis[]、ModelFinding 加 articleIds?: string[]。
+- merge.ts：aiSuggested 分支把 articleIds 中查得到且 verified 的条目映射为 possibleBasis（law/article/quote/source/effectiveOn/sourceUrl），查不到的 id 静默丢弃不报错，全丢则字段不设置；非 aiSuggested 分支不处理 articleIds，规则命中法律依据仍只按 ruleId 读规则库。
+- modelPass.ts：runModelPass 加第五参 articles（默认空）、runBatch 同步传给 buildPrompt；analyze.ts 调用处显式传 fetch 与 articlesForType(base.doc.type)。批次大小、并行、总调用 ≤8 次、30s 单批超时均未动。
+- FindingDetail.tsx：aiSuggested 项在「签前怎么办」上方加「可能相关条文（仅供参考）」区块，虚线弱样式（border-dashed＋ muted 小字），展示 quote 与 flk 来源链接，与正式「法律依据」实线区块明显区分；possibleBasis 空不渲染。
+- dev/function-fixture.mjs：aiSuggested 假返回加 articleIds ["civil-496","civil-498"]；dev/kuipan-qa.mjs 新增 paste-possible-basis 断言（双视口）。
+- 试错 1 轮：articles.test 初版断言「rent 不含 consumer-26」与指令口径冲突（scenes 含 other 即通用），改按指令语义断言；merge.ts 的 filter 需显式类型谓词 (a): a is ArticleEntry 才过 tsc。另排查一次 fixture「空返回」假象：Git Bash curl 直传中文被转码导致模式不命中，改用 node fetch 验证 fixture 本身正常，非代码问题。
+
+### flk 检索记录
+
+10 条 quote 的底本、检索日期（2026-11-16）与 flk 页面标题沿用下方任务 B 节登记：民法典（ff808081729d1efe01729d50b5c500bf）、消保法（2c909fdd678bf17901678bf7670606ef）、个保法（ff8081817b6472a3017b656cc2040044）、民诉法 2023 修正（ff8081818a21dc13018b425303b7086d），均亲自搜索打开详情页并下载官方 DOCX 逐字取用；裸 detail 链接均确认直达后填入 sourceUrl。
+
+### 改了哪些文件
+
+src/core/articles/articles.json（新）、src/core/articles/index.ts（新）、src/core/__tests__/articles.test.ts（新）、src/core/types.ts、src/core/llm/schema.ts、src/core/llm/prompt.ts、src/core/llm/merge.ts、src/lib/modelPass.ts、src/lib/analyze.ts、src/components/FindingDetail.tsx、dev/function-fixture.mjs、dev/kuipan-qa.mjs、docs/qoder-log.md。
+
+### 测试结果
+
+- npm test 116/116（新增 articles.test 12 测试：清单 10 条全 verified 有登记、articlesForType 口径、articleById、merge 清单内保留/清单外丢弃/全丢不设置/不带字段不设置/非 ai 不处理、schema 带与不带 articleIds 均过且类型错拒绝、prompt 追加段与原版禁令逐字固定）。
+- npm run build 通过；node dev/kuipan-qa.mjs 68/68、双视口控制台 0 error。截图目视：粘贴结果页「其他可疑条款」项先显示虚线「可能相关条文（仅供参考）」（民法典 496/498 全文＋flk 来源），其下「签前怎么办」清单；规则命中项仍为实线正式「法律依据」。
+
 ## M4 后追加 · 兜底依据三项任务 B：通用兜底规则（2026-11-16，不打 tag）
 
 ### 做了什么

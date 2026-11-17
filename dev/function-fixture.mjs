@@ -86,6 +86,7 @@ const server = createServer(async (req, res) => {
         askTalk: "口头承诺能否写进合同？",
         rewrite: "",
         aiSuggested: true,
+        articleIds: ["civil-496", "civil-498"],
       });
     }
   }
