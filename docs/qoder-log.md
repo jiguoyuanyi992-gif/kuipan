@@ -24,6 +24,12 @@
 - 链接可达性抽查 5 条（beijing.gov.cn / jsj.zs.gov.cn / imaa.edu.cn / sh.189.cn / jtw.beijing.gov.cn）HEAD 均 200。
 - 未完成项：无。
 
+### 部署与线上验证
+
+- 提交 3c3fd8a；prepare_site actionId 20792bd9-3687-46b4-a450-968b2ee94293（首次 descriptorStatus=pending，同 actionId 同输入重试转 written）；publishOperationId 01a1e97c-a8d5-7673-8815-de27fcc427bf，state=succeeded、committed=true、access_mode=public。
+- 线上核对：index.html 引用 index-DpzCU0Xg.js 与本地 dist 同名；服务端 JS 含 26 条 caseSourceUrl 数据、「典例来源」标签存在、「典例配图」0 处。
+- 线上实拍（临时脚本 `%TEMP%/case-link-online-shot.mjs`，端口 9231）：桌面 1280 租房页签渲染 6 条典例来源链接盒、手机 375 正常、控制台 0 error；截图在 `%TEMP%/case-link-online-shots/`。
+
 ## M4 后追加 · 捉鬼录取妖镜镜框＋焚鬼切换动画＋九尾狐图入库（2026-11-17，不打 tag）
 
 ### 做了什么
