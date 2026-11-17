@@ -128,5 +128,31 @@
     "verified": true,
     "reviewer": "执行层自动引用",
     "reviewNote": "检索日期 2026-11-16；flk 页面标题：中华人民共和国民事诉讼法-国家法律法规数据库（2023 修正、2024-01-01 施行）；quote 逐字取自该页官方 DOCX 全文。"
+  },
+  {
+    "id": "civil-670",
+    "law": "中华人民共和国民法典",
+    "article": "第六百七十条",
+    "quote": "借款的利息不得预先在本金中扣除。利息预先在本金中扣除的，应当按照实际借款数额返还借款并计算利息。",
+    "summary": "借款利息不得预先从本金扣除；已预扣的按实际借款数额返还并计息",
+    "scenes": ["loan"],
+    "sourceUrl": "https://flk.npc.gov.cn/detail?id=ff808081729d1efe01729d50b5c500bf",
+    "effectiveOn": "2021-01-01",
+    "verified": true,
+    "reviewer": "执行层自动引用",
+    "reviewNote": "检索日期 2026-11-17；flk 详情页正文标题：中华人民共和国民法典；quote 逐字取自该页官方 DOCX 全文。"
+  },
+  {
+    "id": "civil-680",
+    "law": "中华人民共和国民法典",
+    "article": "第六百八十条第一款",
+    "quote": "禁止高利放贷，借款的利率不得违反国家有关规定。",
+    "summary": "禁止高利放贷，借款利率不得违反国家有关规定",
+    "scenes": ["loan"],
+    "sourceUrl": "https://flk.npc.gov.cn/detail?id=ff808081729d1efe01729d50b5c500bf",
+    "effectiveOn": "2021-01-01",
+    "verified": true,
+    "reviewer": "执行层自动引用",
+    "reviewNote": "检索日期 2026-11-17；flk 详情页正文标题：中华人民共和国民法典；quote 逐字取自该页官方 DOCX 全文。"
   }
 ]

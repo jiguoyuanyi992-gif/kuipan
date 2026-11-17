@@ -61,7 +61,11 @@
       "label": "贷款分期",
       "checklist": "loan",
       "ruleIds": [
-        "common-auto-renew",
+        "loan-required-loan",
+        "loan-upfront-interest",
+        "loan-hidden-rate",
+        "loan-prepay-penalty",
+        "loan-refund-loan-survives",
         "common-prepaid-no-refund",
         "common-exempt-liability",
         "common-penalty-excessive",
@@ -69,7 +73,12 @@
         "common-jurisdiction",
         "common-personal-info"
       ],
-      "trapIds": ["trap-loan-training-loan", "trap-loan-installment-fees"]
+      "trapIds": [
+        "trap-loan-training-loan",
+        "trap-loan-installment-fees",
+        "trap-loan-required-loan",
+        "trap-loan-upfront-interest"
+      ]
     },
     {
       "id": "plan",

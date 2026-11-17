@@ -76,9 +76,36 @@ const clean = `技术服务协议（示例，虚构）
 乙方（签字）：赵六
 `;
 
+const loan = `培训分期借款合同（示例，虚构）
+
+甲方（出借人）：示例金融信息服务公司
+乙方（借款人）：钱七
+身份证号：110101199805066621
+联系电话：13700137000
+
+第一条 借款用途与金额
+乙方为参加甲方合作机构的职业技能培训，向甲方借款20000元，专项用于支付培训费。乙方报名入学须先办理本借款，未办理的不予推荐入职。
+
+第二条 放款与扣费
+甲方放款时预先扣除服务费1200元、首期利息400元，实际到账18400元，乙方仍按本金20000元偿还。
+
+第三条 利率与还款
+借款分24期偿还，日息低至0.03%，年化利率以平台页面展示为准。
+
+第四条 提前还款
+乙方提前结清的，按剩余本金的百分之五支付违约金。
+
+第五条 退费处理
+乙方与培训机构的培训协议解除或退费的，本借款合同继续有效，还款义务不免除。
+
+甲方（盖章）：示例金融信息服务公司
+乙方（签字）：钱七
+`;
+
 export const examples: ExampleContract[] = [
   { id: "ex-rent", label: "租房合同示例", type: "rent", fabricated: true, text: rent },
   { id: "ex-intern", label: "实习协议示例", type: "internship", fabricated: true, text: intern },
+  { id: "ex-loan", label: "培训分期借款示例", type: "loan", fabricated: true, text: loan },
   { id: "ex-clean", label: "通用协议示例", type: "other", fabricated: true, text: clean },
 ];
 

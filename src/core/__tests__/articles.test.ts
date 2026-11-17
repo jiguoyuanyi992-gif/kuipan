@@ -26,8 +26,8 @@ function aiFinding(articleIds?: string[]): ModelFinding {
 }
 
 describe("封闭条文清单", () => {
-  it("清单共 10 条，全部 verified 且有 reviewer/reviewNote 登记", () => {
-    expect(articles).toHaveLength(10);
+  it("清单共 12 条，全部 verified 且有 reviewer/reviewNote 登记", () => {
+    expect(articles).toHaveLength(12);
     for (const a of articles) {
       expect(a.verified).toBe(true);
       expect(a.reviewer).toBe("执行层自动引用");
@@ -48,6 +48,9 @@ describe("封闭条文清单", () => {
     const plan = articlesForType("plan").map((a) => a.id);
     expect(plan).toContain("consumer-26");
     expect(plan).toContain("consumer-53");
+    const loan = articlesForType("loan").map((a) => a.id);
+    expect(loan).toContain("civil-670");
+    expect(loan).toContain("civil-680");
     const other = articlesForType("other").map((a) => a.id);
     expect(other).toContain("consumer-26");
     expect(other).toContain("consumer-53");

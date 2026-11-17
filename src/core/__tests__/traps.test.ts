@@ -13,11 +13,11 @@ import {
 } from "../traps";
 
 describe("陷阱库数据契约", () => {
-  it("最低交付量：租房 6 + 实习兼职 4 + 贷款分期 2", () => {
+  it("最低交付量：租房 6 + 实习兼职 4 + 贷款分期 4", () => {
     expect(trapsByCategory("rent")).toHaveLength(6);
     expect(trapsByCategory("internship")).toHaveLength(4);
-    expect(trapsByCategory("loan")).toHaveLength(2);
-    expect(traps.length).toBeGreaterThanOrEqual(12);
+    expect(trapsByCategory("loan")).toHaveLength(4);
+    expect(traps.length).toBeGreaterThanOrEqual(14);
   });
 
   it("verified 置真必须登记授权/复核记录与核对底本", () => {
@@ -31,7 +31,7 @@ describe("陷阱库数据契约", () => {
   it("每条字段完整：一句话概括、识别特征、签约前要问、被坑后怎么办、依据", () => {
     for (const t of traps) {
       expect(t.id).toMatch(/^trap-/);
-      expect(["rent", "internship", "common"]).toContain(t.scene);
+      expect(["rent", "internship", "loan", "common"]).toContain(t.scene);
       expect(t.oneLiner.length).toBeGreaterThan(6);
       expect(t.traits.length).toBeGreaterThanOrEqual(2);
       expect(t.beforeSign.length).toBeGreaterThanOrEqual(2);
@@ -62,13 +62,20 @@ describe("陷阱库数据契约", () => {
     expect(traps.every((t) => t.story === "")).toBe(true);
   });
 
-  it("贷款分期条目不参与合同检测", () => {
-    for (const t of trapsByCategory("loan")) {
-      expect(ruleIdForTrap(t)).toBeUndefined();
+  it("贷款分期：旧 2 条仅浏览不挂规则，新 2 条与专属规则双向关联", () => {
+    const browseOnly = ["trap-loan-training-loan", "trap-loan-installment-fees"];
+    for (const id of browseOnly) {
+      const t = traps.find((x) => x.id === id)!;
       expect(t.scene).toBe("common");
+      expect(ruleIdForTrap(t)).toBeUndefined();
     }
-    const loanRuleIds = trapsByCategory("loan").map((t) => t.id.replace(/^trap-/, ""));
-    for (const id of loanRuleIds) expect(rules.some((r) => r.id === id)).toBe(false);
+    const linked = ["trap-loan-required-loan", "trap-loan-upfront-interest"];
+    for (const id of linked) {
+      const t = traps.find((x) => x.id === id)!;
+      expect(t.scene).toBe("loan");
+      const ruleId = ruleIdForTrap(t)!;
+      expect(rules.some((r) => r.id === ruleId && r.scene === "loan")).toBe(true);
+    }
   });
 
   it("分类标签齐全", () => {
@@ -89,7 +96,7 @@ describe("陷阱库数据契约", () => {
   it("检索按自身字段命中", () => {
     expect(searchTraps("押金").length).toBeGreaterThan(0);
     expect(searchTraps("不存在的那个词xyz")).toHaveLength(0);
-    expect(searchTraps("", "loan")).toHaveLength(2);
+    expect(searchTraps("", "loan")).toHaveLength(4);
   });
 });
 
