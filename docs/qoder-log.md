@@ -26,6 +26,13 @@
 - `node dev/kuipan-qa.mjs` 76/76 全过（双视口、控制台 0 error）。
 - 未完成项：无。
 
+### 部署与线上验证
+
+- 提交 8c9ae46；prepare_site actionId 7d2f1a64-3c58-4b9e-9a0f-2e6c8d4b5a11（首次 publish 请求 sites_request_failed，查 get_publish_status 确认未发布、canPublish=true，同 actionId 重试成功）；publishOperationId 01a1e914-821b-7cd7-acee-c6c6a75bf2de，state=succeeded、committed=true、access_mode=public。
+- 线上核对：index.html 引用 index-wotvgchx.js 与本地 dist 同名；服务端 bundle 内含 ghost-mirror/ghost-jiuweihu/burn-cap；`/assets/ghost-jiuweihu.png` 与本地逐字节一致（md5 6a3f4301…）。
+- 线上实拍（临时脚本 `%TEMP%/ghost-online-shot.mjs`，端口 9227）：桌面 1280 与手机 375 捉鬼录均为照妖镜新镜框、九尾狐缩略图为实图非占位、焚鬼中帧火边正常、控制台 0 error；截图在 `%TEMP%/ghost-online-shots/`。
+- 插曲：`dev/online-verify.mjs` 当前版本不覆盖捉鬼录页，其输出目录里 13:07 的捉鬼录旧截图差点误判为「线上未更新」；以 results.json 步骤清单与 curl 内容比对澄清。
+
 ## M4 后追加 · 照契卷轴视觉与清单重点标签（2026-11-17，不打 tag）
 
 ### 做了什么
