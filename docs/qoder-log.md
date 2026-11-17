@@ -22,6 +22,7 @@
 - 4 项未过均指向同一事实：线上缺少模型独立建议项。rent-fallback-actions / rent-possible-basis / other-fallback-actions / other-possible-basis 失败，因为生产 qwen-flash 在 5 轮编造验证文本（押金没收＋随时解除＋笼统其他约定／放弃询问异议权／搭售指定保险／援引内部手册等，共 10 次调用）中把全部可疑条款语义归入现有规则，findings 全为 aiSuggested=false，线上不存在「无依据项／模型独立建议项」可供显示。规则库 20 条全部 verified=true 且有依据，故无依据项只能来自 aiSuggested。
 - 该显示路径本身已由本地 fixture 确定性验证：kuipan-qa 68/68 含 paste-possible-basis 双视口断言，截图确认虚线「可能相关条文（仅供参考）」＋「签前怎么办」渲染正确（desktop-paste-result.png）。
 - 结论：代码与数据无缺陷；是指令的线上验证预设（模型会产出 aiSuggested 项）与生产模型行为不符。加强 prompt 约束 4 的措辞超出任务 C「只追加第 6 条」的授权范围，属策略层决策，故停下报告。
+- 处置（2026-11-17 用户决定）：接受现状收尾。模型独立建议项的显示路径以本地 fixture 68/68 与截图为验证依据；线上模型零 aiSuggested 的行为如实记录于本节，供答辩说明。不改 prompt、不再发布。4 项未过按此口径关闭。
 
 ### 改了哪些文件
 
