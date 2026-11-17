@@ -4,6 +4,30 @@
 > 红线：只出现编造或脱敏样例，不得含真实合同内容、真实姓名、身份证、手机号、住址、公司名。
 > 截图由用户用系统截图工具放入 docs/shots/，文件名带里程碑编号；缺图写「（待补：xxx.png）」，不编造截图内容。
 
+## M4 后追加 · 捉鬼录镜框改扁平国风图片框（2026-11-17，不打 tag）
+
+### 做了什么
+
+- 按天赐指令「把这个铜镜的边框换成这个就行了，微小改动」，附件 `C:\Users\34516\WorkBuddy\2026-11-17-20-48-08\gen_mirror.py`：捉鬼录镜框由内联 SVG 青铜八卦镜（镜缘＋八卦纹＋回纹＋镜钮＋丝绦）整体替换为脚本生成的扁平国风镜框图（外圈素边＋连珠纹＋回纹带，两色扁平）。只换镜框，镜面尺寸、焚鬼动画、sheen、缩略图、文案/数据/路由全部不动。
+- 素材：取 `out/flat_frame_v3_01.png`（1024px；v3_02 带渐变、不够扁平，弃用），按 §5 压图配方量化为 `public/assets/mirror-frame.png`（640px、164KB≤300KB）。
+- 几何：临时脚本 `%TEMP%/measure-frame.mjs`（CDP 端口 9233）在浏览器里逐像素扫描实测内孔半径 280、外圆半径 426（1024px 图）→ `--hole: 0.547`、外圆/内孔半径比 1.532；`.ghost-mirror` 边长 = `--face / --hole`，`.ghost-face` 用 `inset: calc((100% - var(--face)) / 2)` 居中，镜心圆正好嵌进内孔。
+- 实现：`GhostsPage.tsx` 删除 `MirrorFrameSvg`/`BAGUA`/`Trigram`/`Huifen`，`FireFilterDefs` 只留两个焚纸湍流滤镜；镜盒末尾加 `<AssetImage name="mirror-frame.png" className="ghost-frame">`；`globals.css` 删除 `::before` 古铜环与 `.ghost-rim`/`.ghost-knob`，新增 `.ghost-frame`（铺满镜盒＋`radial-gradient` 环带 mask 只留圆环，四角透明，`z-index:3`、`pointer-events:none`）。手机端 `--face: min(13rem, (100vw - 2rem) × --hole)` 防横向溢出。
+- 设计登记：design-spec §9.1 整体改写为图片框＋环带 mask 方案。
+
+### 报错与解决
+
+- 首测扫描从右向左找内孔边缘返回圆心：内孔填充色与页面背景同为 (61,40,27) 无法区分 → 改为自圆心向右扫描，测得 holeR=280/outerR=426。
+- 768px 版镜框图 622KB 超 300KB 预算 → 640px／48 色／bayer 重量化至 164KB。
+- 试错次数：2。
+
+### 验收结果
+
+- `npm run build` 通过（tsCheck 无错）；`npm test` 213/213。
+- `%TEMP%/ghost-fire-frames.mjs` 25/25 PASS：0/125/250/375/500ms 五帧、卡片 250ms 换、无缝、连点 5 只、中断坐实、reduced-motion、mobile-mirror-round（镜盒 343×343、镜面 187.6＝0.547 比例精确）、375px 无横向溢出、双视口控制台 0 error。
+- `node dev/kuipan-qa.mjs` 76/76。
+- 实拍：桌面 1280 镜框环带与镜心严丝合缝、无棕色方角残留；手机 375 焚烧动画中段帧正常（`%TEMP%/ghost-fire-frames/`）。
+- 未完成项：无。
+
 ## M4 后追加 · 照契典例配图占位改典例来源链接（2026-11-17，不打 tag）
 
 ### 做了什么

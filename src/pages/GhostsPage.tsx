@@ -33,125 +33,41 @@ interface EngineState {
   cardSwapped: boolean;
 }
 
-// 八卦卦象（自下而上三条爻，1=阳爻连，0=阴爻断），先天八卦序
-const BAGUA: number[][] = [
-  [1, 1, 1], // 乾
-  [0, 1, 1], // 巽
-  [0, 1, 0], // 坎
-  [1, 1, 0], // 兑
-  [0, 0, 0], // 坤
-  [1, 0, 0], // 震
-  [0, 0, 1], // 艮
-  [1, 0, 1], // 离
-];
-
-// 单卦三爻：横画沿切向排布、由镜缘外圈向内圈读（上爻在外）
-function Trigram({ lines }: { lines: number[] }) {
+// 烧纸火边所需湍流滤镜（供 CSS filter: url(#id) 引用，本身不渲染图形）
+function FireFilterDefs() {
   return (
-    <>
-      {[2, 1, 0].map((i) => {
-        const y = 2.4 + (2 - i) * 2.2;
-        return lines[i] === 1 ? (
-          <rect key={i} x={57} y={y} width={8} height={1.3} rx={0.3} />
-        ) : (
-          <g key={i}>
-            <rect x={57} y={y} width={3.3} height={1.3} rx={0.3} />
-            <rect x={61.7} y={y} width={3.3} height={1.3} rx={0.3} />
-          </g>
-        );
-      })}
-    </>
-  );
-}
-
-// 卦间回纹：方形螺旋细线，克制点缀
-function Huifen() {
-  return (
-    <path
-      transform="translate(61 5.5)"
-      d="M-2.4 2.4 H2.4 V-2.4 H-0.8 V0.9 H1"
-      fill="none"
-      strokeWidth={0.9}
-    />
-  );
-}
-
-function MirrorFrameSvg() {
-  return (
-    <>
-      <svg className="ghost-rim" viewBox="0 0 122 122" aria-hidden="true" focusable="false">
-        <defs>
-          {/* 火绒线扰动：不规则炭火线 */}
-          <filter
-            id="ghost-fire-jag"
-            x="-30%"
-            y="-260%"
-            width="160%"
-            height="620%"
-            colorInterpolationFilters="sRGB"
-          >
-            <feTurbulence type="fractalNoise" baseFrequency="0.05 0.14" numOctaves="2" seed="7" result="noise">
-              <animate attributeName="seed" values="7;3;11;5;7" dur="0.32s" calcMode="discrete" repeatCount="indefinite" />
-            </feTurbulence>
-            <feDisplacementMap in="SourceGraphic" in2="noise" scale="7" xChannelSelector="R" yChannelSelector="G" />
-          </filter>
-          {/* 火舌扰动：更强的不规则起伏 + 种子跳变动效，烧纸火苗感 */}
-          <filter
-            id="ghost-flame-jag"
-            x="-40%"
-            y="-60%"
-            width="180%"
-            height="220%"
-            colorInterpolationFilters="sRGB"
-          >
-            <feTurbulence type="fractalNoise" baseFrequency="0.035 0.09" numOctaves="3" seed="3" result="noise">
-              <animate attributeName="seed" values="3;11;5;13;7;3" dur="0.42s" calcMode="discrete" repeatCount="indefinite" />
-            </feTurbulence>
-            <feDisplacementMap in="SourceGraphic" in2="noise" scale="16" xChannelSelector="R" yChannelSelector="G" />
-          </filter>
-          <radialGradient id="ghost-knob-grad" cx="35%" cy="30%" r="80%">
-            <stop offset="0%" stopColor="#8a6f42" />
-            <stop offset="60%" stopColor="#5c4a28" />
-            <stop offset="100%" stopColor="#332814" />
-          </radialGradient>
-        </defs>
-        <g fill="#b08c46" opacity="0.85">
-          {BAGUA.map((lines, k) => (
-            <g key={k} transform={`rotate(${k * 45 + 22.5} 61 61)`}>
-              <Trigram lines={lines} />
-            </g>
-          ))}
-        </g>
-        <g stroke="#8f7338" opacity="0.6">
-          {BAGUA.map((_, k) => (
-            <g key={k} transform={`rotate(${k * 45} 61 61)`}>
-              <Huifen />
-            </g>
-          ))}
-        </g>
-      </svg>
-      {/* 镜钮 + 朱砂丝绦：绦从钮系出，沿镜缘外侧垂下一小段 */}
-      <svg className="ghost-knob" viewBox="0 0 122 122" aria-hidden="true" focusable="false">
-        <path
-          d="M61 7 A58.5 58.5 0 0 1 93.2 11"
-          fill="none"
-          stroke="var(--site-accent)"
-          strokeWidth={1.6}
-          strokeLinecap="round"
-        />
-        <circle cx="93.2" cy="11" r="1.6" fill="#a5302a" />
-        <path d="M93.2 12.6 L90.7 18.2 H95.7 Z" fill="var(--site-accent)" />
-        <path
-          d="M91.7 18.2 v2.1 M93.2 18.2 v2.5 M94.7 18.2 v2.1"
-          stroke="var(--site-accent)"
-          strokeWidth={0.9}
-          strokeLinecap="round"
-          fill="none"
-        />
-        <circle cx="61" cy="4" r="4.2" fill="url(#ghost-knob-grad)" stroke="#241a0d" strokeWidth={0.8} />
-        <circle cx="61" cy="4" r="1.4" fill="#241a0d" />
-      </svg>
-    </>
+    <svg width="0" height="0" className="absolute" aria-hidden="true" focusable="false">
+      <defs>
+        {/* 火绒线扰动：不规则炭火线 */}
+        <filter
+          id="ghost-fire-jag"
+          x="-30%"
+          y="-260%"
+          width="160%"
+          height="620%"
+          colorInterpolationFilters="sRGB"
+        >
+          <feTurbulence type="fractalNoise" baseFrequency="0.05 0.14" numOctaves="2" seed="7" result="noise">
+            <animate attributeName="seed" values="7;3;11;5;7" dur="0.32s" calcMode="discrete" repeatCount="indefinite" />
+          </feTurbulence>
+          <feDisplacementMap in="SourceGraphic" in2="noise" scale="7" xChannelSelector="R" yChannelSelector="G" />
+        </filter>
+        {/* 火舌扰动：更强的不规则起伏 + 种子跳变动效，烧纸火苗感 */}
+        <filter
+          id="ghost-flame-jag"
+          x="-40%"
+          y="-60%"
+          width="180%"
+          height="220%"
+          colorInterpolationFilters="sRGB"
+        >
+          <feTurbulence type="fractalNoise" baseFrequency="0.035 0.09" numOctaves="3" seed="3" result="noise">
+            <animate attributeName="seed" values="3;11;5;13;7;3" dur="0.42s" calcMode="discrete" repeatCount="indefinite" />
+          </feTurbulence>
+          <feDisplacementMap in="SourceGraphic" in2="noise" scale="16" xChannelSelector="R" yChannelSelector="G" />
+        </filter>
+      </defs>
+    </svg>
   );
 }
 
@@ -257,9 +173,9 @@ export function GhostsPage() {
         <p className="text-sm text-muted-foreground">整理中</p>
       ) : (
         <>
-          {/* 圆形青铜照妖镜：镜缘八卦纹 + 镜钮丝绦，镜中一次火边扫过、烧旧露新 */}
+          {/* 扁平国风镜框（素边＋连珠＋回纹）：整图铺满镜盒，mask 只留环带，镜心透出圆面 */}
           <div className="ghost-mirror">
-            <MirrorFrameSvg />
+            <FireFilterDefs />
             <div className="ghost-face" data-phase={phase} ref={faceRef}>
               <div className="ghost-layer ghost-old">
                 <AssetImage
@@ -298,6 +214,13 @@ export function GhostsPage() {
               </div>
               <div className="ghost-sheen" aria-hidden="true" />
             </div>
+            <AssetImage
+              name="mirror-frame.png"
+              alt=""
+              className="ghost-frame"
+              placeholderColor="#3b2b20"
+              loading="eager"
+            />
           </div>
 
           {/* 信息卡：鬼名 / 比喻 / 常出没 / 应对策略（火边扫到中线处换内容，150ms 淡入） */}
