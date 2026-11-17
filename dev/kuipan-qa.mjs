@@ -153,7 +153,7 @@ for (const vp of [
   txt = await bodyText();
   record(vp.name, "ghosts-default", txt.includes("相柳") && txt.includes("名目繁多的收费"));
   await clickText("饕餮");
-  await sleep(300);
+  await sleep(650); // 等焚鬼切换动画（500ms）结束再断言与截图
   txt = await bodyText();
   record(vp.name, "ghosts-switch", txt.includes("隐藏收费与自动续费") && txt.includes("应对策略"));
   await shot(`${vp.name}-ghosts`, true);

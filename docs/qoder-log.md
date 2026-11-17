@@ -4,6 +4,28 @@
 > 红线：只出现编造或脱敏样例，不得含真实合同内容、真实姓名、身份证、手机号、住址、公司名。
 > 截图由用户用系统截图工具放入 docs/shots/，文件名带里程碑编号；缺图写「（待补：xxx.png）」，不编造截图内容。
 
+## M4 后追加 · 捉鬼录取妖镜镜框＋焚鬼切换动画＋九尾狐图入库（2026-11-17，不打 tag）
+
+### 做了什么
+
+- 按天赐指令只改样式与动效，文案、数据（`data/ghosts.json`）、路由未动。
+- 九尾狐素材：天赐提供 2048×2048 原图，按 §5 压图配方（ffmpeg lanczos 640×640 + 256 色 bayer 抖动）装入 `public/assets/ghost-jiuweihu.png`（267KB≤300KB、不裁剪），13 只鬼全部有图、占位清零。
+- 镜框（`src/pages/GhostsPage.tsx` + `src/globals.css` `.ghost-*` 段）：圆形徽章式金边改为古代青铜照妖镜形制——古铜厚镜缘 + 内联 SVG 先天八卦纹 8 组与回纹点缀、顶部镜钮 + 朱砂丝绦沿镜缘外垂穗、镜面凸面冷白微光 + 边缘暗角 + 双层内沿厚度；全 CSS/内联 SVG，无外部图片与字体，镜面直径 13rem/16rem 断点不变。
+- 焚鬼切换动画（总 500ms）：`@property` 注册 `--burn`/`--burn-cap` 驱动两层鬼像 mask 与火边位置，只动 mask/opacity/transform；火边高 10% 镜面、`feTurbulence+feDisplacementMap` 锯齿扰动、亮黄→橙→深红带辉光，限制在镜面内；0~250ms 烧尽旧鬼、250ms 处信息卡同步换内容并 150ms 淡入、250~500ms 烧出新鬼；鬼像预加载；动画中再点以当前画面为旧鬼续新一轮（cap 机制）、点当前鬼不触发；`prefers-reduced-motion` 关闭火焰改 150ms 淡入淡出。
+- 设计登记：docs/design-spec.md 新增第 9 节。
+- `dev/kuipan-qa.mjs` 捉鬼录切换断言等待 300ms→650ms（等动画结束再断言与截图，判定逻辑不变）。
+
+### 报错与解决
+
+- 无新报错。一次自查修正：组件接口误写 `strategies?: never` 冗余字段，构建前删除。
+
+### 验收结果
+
+- `npm test` 213/213 全绿；`npm run build` 通过。
+- 临时脚本 `%TEMP%/ghost-fire-frames.mjs`（CDP 冻结时钟定格）19/19 PASS：0ms 完整旧鬼+火边在底、125ms 下半已烧掉（burn=0.5）、250ms 镜面为空且卡片已换新鬼、375ms 新鬼下半已现形、500ms 完整新鬼回 idle；连点 5 只鬼后无残影（新层 opacity=0、火边隐藏、内容为最后一只）；点已选中鬼不触发动画；reduced-motion 下无火边、走 fade；桌面 1280 与手机 375 镜框正圆等比、无横向溢出、控制台 0 error。截图在 `%TEMP%/ghost-fire-frames/`（待天赐挑图入 docs/shots/）。
+- `node dev/kuipan-qa.mjs` 76/76 全过（双视口、控制台 0 error）。
+- 未完成项：无。
+
 ## M4 后追加 · 照契卷轴视觉与清单重点标签（2026-11-17，不打 tag）
 
 ### 做了什么
