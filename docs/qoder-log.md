@@ -4,6 +4,29 @@
 > 红线：只出现编造或脱敏样例，不得含真实合同内容、真实姓名、身份证、手机号、住址、公司名。
 > 截图由用户用系统截图工具放入 docs/shots/，文件名带里程碑编号；缺图写「（待补：xxx.png）」，不编造截图内容。
 
+## M4 后追加 · 三项任务完成后发布与线上复验（2026-11-17，不打 tag）
+
+### 部署与运行记录
+
+- prepare_site/publish_site 各一次（预授权）：actionId 7c1e9a42-5b8d-4f63-9a2e-1d4c7b8e5f01，publishOperationId 01a1e7af-c0b2-7cad-93f1-672c153119a9；get_publish_status published=true、committed=true、access_mode=public；线上 bundle 已换为 C 构建 index-Cofn5YK9.js（curl 首页核对）。
+- 新建 dev/online-verify.mjs（headless Chrome＋普通 UA）：租房与培训服务（other）两份编造合同走真实模型主路径，另复查照契四类页签。结果 12/16：租房/other 规则命中均显示正式「法律依据」＋flk 来源链接、模型解释与改写合并渲染且带「AI 生成，仅供参考」、类型标签正确、无降级横幅、双合同控制台 0 error、照契贷款分期/套餐/考证/保险四类注意事项均不再整页整理中（典例分析仍整理中，符合任务 A 口径）。截图：online-rent.png、online-plan.png、online-contracts-insurance.png（%TEMP%/kuipan-online/）。
+
+### 报错与解决
+
+- 线上 analyze 首跑 403：响应头 x-blocked-reason=Bot detected、x-blocked-user-agent 含 HeadlessChrome——平台网关按 UA 拦 headless 验证浏览器，真实用户浏览器不受影响；验证脚本加 --user-agent 普通 Chrome UA 后解除。试错 1 轮（先误判为 Origin 问题）。
+- 网关另校验 Origin：curl 不带 Origin 得 403 sites_gateway_origin_forbidden，带 Origin 即 200；浏览器同源 POST 实际携带 Origin（Network.requestWillBeSentExtraInfo 捕获确认），非产品问题。
+- Git Bash curl 直传中文会被转码导致 fixture/模型收到乱码（假象：fixture 空返回、模型回「无法识别语言」）；探针改用 node fetch 或文件载荷后正常。
+
+### 未过项（停下报告，待策略层决定）
+
+- 4 项未过均指向同一事实：线上缺少模型独立建议项。rent-fallback-actions / rent-possible-basis / other-fallback-actions / other-possible-basis 失败，因为生产 qwen-flash 在 5 轮编造验证文本（押金没收＋随时解除＋笼统其他约定／放弃询问异议权／搭售指定保险／援引内部手册等，共 10 次调用）中把全部可疑条款语义归入现有规则，findings 全为 aiSuggested=false，线上不存在「无依据项／模型独立建议项」可供显示。规则库 20 条全部 verified=true 且有依据，故无依据项只能来自 aiSuggested。
+- 该显示路径本身已由本地 fixture 确定性验证：kuipan-qa 68/68 含 paste-possible-basis 双视口断言，截图确认虚线「可能相关条文（仅供参考）」＋「签前怎么办」渲染正确（desktop-paste-result.png）。
+- 结论：代码与数据无缺陷；是指令的线上验证预设（模型会产出 aiSuggested 项）与生产模型行为不符。加强 prompt 约束 4 的措辞超出任务 C「只追加第 6 条」的授权范围，属策略层决策，故停下报告。
+
+### 改了哪些文件
+
+dev/online-verify.mjs（新）、docs/qoder-log.md。
+
 ## M4 后追加 · 兜底依据三项任务 C：可能相关条文封闭清单（2026-11-17，不打 tag）
 
 ### 做了什么
