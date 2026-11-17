@@ -33,6 +33,13 @@
 - 线上实拍（临时脚本 `%TEMP%/ghost-online-shot.mjs`，端口 9227）：桌面 1280 与手机 375 捉鬼录均为照妖镜新镜框、九尾狐缩略图为实图非占位、焚鬼中帧火边正常、控制台 0 error；截图在 `%TEMP%/ghost-online-shots/`。
 - 插曲：`dev/online-verify.mjs` 当前版本不覆盖捉鬼录页，其输出目录里 13:07 的捉鬼录旧截图差点误判为「线上未更新」；以 results.json 步骤清单与 curl 内容比对澄清。
 
+### 修订 · 单次焚烧＋烧纸特效（同日天赐二次指令）
+
+- 天赐反馈：两段式「烧完旧的才烧新的」改为只烧一次——两张图叠放，上面烧掉多少下面就露出多少，要无缝；火边要烧纸质感，不要均匀亮条的「激光」感。
+- 实现：删 `--burn-cap` 与 out/in 两相位，`--burn` 0→1 单帧同驱两层互补 mask（旧鬼上可见、新鬼下可见，1px 切缝由炭边/余烬线/灰烬/火舌四层遮住）；火边改为 `.ghost-char/.ghost-emberline/.ghost-flames/.ghost-ash/.ghost-fire-glow` 复合层，两个湍流滤镜（`#ghost-fire-jag` 弱扰动余烬线、`#ghost-flame-jag` 强扰动火舌 + screen 混合）内 SMIL discrete 跳变 seed 做闪动；中断规则改为「把已烧出的目标鬼坐实为旧鬼、重新起烧完整 500ms」，任一时刻画面只有一张完整鬼像。卡片仍 250ms 换、reduced-motion 仍 150ms 淡入淡出，均不变。
+- 复验：`npm test` 213/213；`npm run build` 通过；`%TEMP%/ghost-fire-frames.mjs` 冻结时钟断言改至单次模型后 25/25 PASS（0/125/250/375/500ms burn=0/0.25/0.5/0.75/1.0、两层 mask 同帧互补、卡片 250ms 换、连点 5 只无残影、中断坐实、reduced-motion、双视口 0 error）；`dev/kuipan-qa.mjs` 76/76。design-spec §9.2 已改写为单次焚烧口径。
+- 自查插曲：临时脚本 mask 判定 `!!getComputedStyle().maskImage` 误把字符串 `"none"` 当有 mask，3 项假 FAIL；改为 `!== 'none'` 后全过。组件与样式本身无错。
+
 ## M4 后追加 · 照契卷轴视觉与清单重点标签（2026-11-17，不打 tag）
 
 ### 做了什么

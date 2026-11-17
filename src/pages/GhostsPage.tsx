@@ -20,19 +20,17 @@ function ghostName(id: string): string {
   return ghosts.find((g) => g.id === id)?.name ?? "";
 }
 
-const OUT_MS = 250;
-const IN_MS = 250;
+const BURN_MS = 500;
+const CARD_AT = 0.5;
 
-type Phase = "idle" | "out" | "in" | "fade";
+type Phase = "idle" | "burn" | "fade";
 
 interface EngineState {
   raf: number;
   t0: number;
-  from: number;
-  to: number;
   dur: number;
-  phase: "out" | "in";
   target: string;
+  cardSwapped: boolean;
 }
 
 // 八卦卦象（自下而上三条爻，1=阳爻连，0=阴爻断），先天八卦序
@@ -83,16 +81,33 @@ function MirrorFrameSvg() {
     <>
       <svg className="ghost-rim" viewBox="0 0 122 122" aria-hidden="true" focusable="false">
         <defs>
+          {/* 火绒线扰动：不规则炭火线 */}
           <filter
             id="ghost-fire-jag"
             x="-30%"
-            y="-160%"
+            y="-260%"
             width="160%"
-            height="420%"
+            height="620%"
             colorInterpolationFilters="sRGB"
           >
-            <feTurbulence type="fractalNoise" baseFrequency="0.055 0.12" numOctaves="2" seed="7" result="noise" />
-            <feDisplacementMap in="SourceGraphic" in2="noise" scale="9" xChannelSelector="R" yChannelSelector="G" />
+            <feTurbulence type="fractalNoise" baseFrequency="0.05 0.14" numOctaves="2" seed="7" result="noise">
+              <animate attributeName="seed" values="7;3;11;5;7" dur="0.32s" calcMode="discrete" repeatCount="indefinite" />
+            </feTurbulence>
+            <feDisplacementMap in="SourceGraphic" in2="noise" scale="7" xChannelSelector="R" yChannelSelector="G" />
+          </filter>
+          {/* 火舌扰动：更强的不规则起伏 + 种子跳变动效，烧纸火苗感 */}
+          <filter
+            id="ghost-flame-jag"
+            x="-40%"
+            y="-60%"
+            width="180%"
+            height="220%"
+            colorInterpolationFilters="sRGB"
+          >
+            <feTurbulence type="fractalNoise" baseFrequency="0.035 0.09" numOctaves="3" seed="3" result="noise">
+              <animate attributeName="seed" values="3;11;5;13;7;3" dur="0.42s" calcMode="discrete" repeatCount="indefinite" />
+            </feTurbulence>
+            <feDisplacementMap in="SourceGraphic" in2="noise" scale="16" xChannelSelector="R" yChannelSelector="G" />
           </filter>
           <radialGradient id="ghost-knob-grad" cx="35%" cy="30%" r="80%">
             <stop offset="0%" stopColor="#8a6f42" />
@@ -150,7 +165,6 @@ export function GhostsPage() {
 
   const faceRef = useRef<HTMLDivElement>(null);
   const engineRef = useRef<EngineState | null>(null);
-  const burnRef = useRef(0);
   const fadeTimerRef = useRef<number | null>(null);
 
   // 预加载全部鬼像，切换动画途中不出现空白
@@ -166,46 +180,35 @@ export function GhostsPage() {
   }, []);
 
   const setBurnVar = (v: number) => faceRef.current?.style.setProperty("--burn", String(v));
-  const setCapVar = (v: number) => faceRef.current?.style.setProperty("--burn-cap", String(v));
 
   const tick = () => {
     const st = engineRef.current;
     if (!st) return;
     const t = Math.min(1, (performance.now() - st.t0) / st.dur);
-    const v = st.from + (st.to - st.from) * t;
-    burnRef.current = v;
-    setBurnVar(v);
+    setBurnVar(t);
+    if (!st.cardSwapped && t >= CARD_AT) {
+      // 火边扫到镜面中线：文字卡同步换成新鬼（150ms 淡入）
+      st.cardSwapped = true;
+      setShownId(st.target);
+    }
     if (t < 1) {
       st.raf = requestAnimationFrame(tick);
       return;
     }
-    if (st.phase === "out") {
-      // 旧鬼烧尽：文字卡在 250ms 处同步换成新鬼
-      setShownId(st.target);
-      setNewId(st.target);
-      setPhase("in");
-      const ins: EngineState = {
-        raf: 0,
-        t0: performance.now(),
-        from: 0,
-        to: 1,
-        dur: IN_MS,
-        phase: "in",
-        target: st.target,
-      };
-      engineRef.current = ins;
-      burnRef.current = 0;
-      setBurnVar(0);
-      ins.raf = requestAnimationFrame(tick);
-    } else {
-      engineRef.current = null;
-      burnRef.current = 0;
-      setBurnVar(0);
-      setCapVar(1);
-      setOldId(st.target);
-      setShownId(st.target);
-      setPhase("idle");
-    }
+    engineRef.current = null;
+    setBurnVar(0);
+    setOldId(st.target);
+    setShownId(st.target);
+    setPhase("idle");
+  };
+
+  const startBurn = (target: string, fromId: string) => {
+    setOldId(fromId);
+    setNewId(target);
+    setBurnVar(0);
+    setPhase("burn");
+    engineRef.current = { raf: 0, t0: performance.now(), dur: BURN_MS, target, cardSwapped: false };
+    engineRef.current.raf = requestAnimationFrame(tick);
   };
 
   const selectGhost = (id: string) => {
@@ -219,12 +222,10 @@ export function GhostsPage() {
 
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       // 减弱动效：关闭火焰，150ms 淡入淡出
-      if (engineRef.current) cancelAnimationFrame(engineRef.current.raf);
-      const cur = st ? (st.phase === "in" ? st.target : oldId) : shownId;
+      if (st) cancelAnimationFrame(st.raf);
+      const cur = st ? st.target : shownId;
       engineRef.current = null;
-      burnRef.current = 0;
       setBurnVar(0);
-      setCapVar(1);
       setOldId(cur);
       setNewId(id);
       setShownId(id);
@@ -237,40 +238,8 @@ export function GhostsPage() {
       return;
     }
 
-    if (!st) {
-      setOldId(shownId);
-      setNewId(id);
-      setCapVar(1);
-      burnRef.current = 0;
-      setBurnVar(0);
-      setPhase("out");
-      engineRef.current = { raf: 0, t0: performance.now(), from: 0, to: 1, dur: OUT_MS, phase: "out", target: id };
-      engineRef.current.raf = requestAnimationFrame(tick);
-    } else if (st.phase === "out") {
-      // 旧鬼还在烧：继续当前火边，只把待烧入的新鬼换掉
-      st.target = id;
-      setNewId(id);
-    } else {
-      // 新鬼烧到一半：以当前画面为旧鬼，火边从底部把它烧尽，再烧入新目标
-      const b = Math.max(0.05, burnRef.current);
-      cancelAnimationFrame(st.raf);
-      setOldId(st.target);
-      setNewId(id);
-      setCapVar(b);
-      burnRef.current = 0;
-      setBurnVar(0);
-      setPhase("out");
-      engineRef.current = {
-        raf: 0,
-        t0: performance.now(),
-        from: 0,
-        to: b,
-        dur: Math.max(80, OUT_MS * b),
-        phase: "out",
-        target: id,
-      };
-      engineRef.current.raf = requestAnimationFrame(tick);
-    }
+    // 动画中再点：立刻结束当前焚烧，以已显形的鬼为旧鬼重新起烧，不排队、无残影
+    startBurn(id, st ? st.target : shownId);
   };
 
   const ghost = ghosts.find((g) => g.id === shownId) ?? ghosts[0];
@@ -288,7 +257,7 @@ export function GhostsPage() {
         <p className="text-sm text-muted-foreground">整理中</p>
       ) : (
         <>
-          {/* 圆形青铜照妖镜：镜缘八卦纹 + 镜钮丝绦，镜中焚鬼切换当前鬼画像 */}
+          {/* 圆形青铜照妖镜：镜缘八卦纹 + 镜钮丝绦，镜中一次火边扫过、烧旧露新 */}
           <div className="ghost-mirror">
             <MirrorFrameSvg />
             <div className="ghost-face" data-phase={phase} ref={faceRef}>
@@ -305,7 +274,6 @@ export function GhostsPage() {
                     </span>
                   }
                 />
-                <div className="ghost-ember" aria-hidden="true" />
               </div>
               <div className="ghost-layer ghost-new" aria-hidden="true">
                 <AssetImage
@@ -320,17 +288,19 @@ export function GhostsPage() {
                     </span>
                   }
                 />
-                <div className="ghost-ember" aria-hidden="true" />
               </div>
               <div className="ghost-fire" aria-hidden="true">
                 <div className="ghost-fire-glow" />
-                <div className="ghost-fire-core" />
+                <div className="ghost-char" />
+                <div className="ghost-ash" />
+                <div className="ghost-flames" />
+                <div className="ghost-emberline" />
               </div>
               <div className="ghost-sheen" aria-hidden="true" />
             </div>
           </div>
 
-          {/* 信息卡：鬼名 / 比喻 / 常出没 / 应对策略（切换动画 250ms 处换内容，150ms 淡入） */}
+          {/* 信息卡：鬼名 / 比喻 / 常出没 / 应对策略（火边扫到中线处换内容，150ms 淡入） */}
           <section
             key={shownId}
             className="ghost-card-swap paper w-full space-y-3 rounded-[var(--site-radius)] border border-border p-4 sm:p-5"
