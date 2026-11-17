@@ -131,15 +131,17 @@
       "id": "prepaid",
       "label": "预付卡",
       "ruleIds": [
+        "prepaid-no-refund",
+        "prepaid-shop-closure",
+        "prepaid-gift-expire",
+        "prepaid-transfer-restrict",
+        "prepaid-term-unclear",
         "common-auto-renew",
-        "common-prepaid-no-refund",
         "common-exempt-liability",
-        "common-penalty-excessive",
-        "common-unilateral-change",
-        "common-jurisdiction",
-        "common-personal-info"
+        "common-unilateral-change"
       ],
-      "trapIds": []
+      "trapIds": ["trap-prepaid-no-refund", "trap-prepaid-shop-closure"],
+      "checklist": "prepaid"
     },
     {
       "id": "carrental",

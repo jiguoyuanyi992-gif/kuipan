@@ -185,6 +185,10 @@ for (const vp of [
   await sleep(300);
   txt = await bodyText();
   record(vp.name, "contracts-insurance", txt.includes("已核对 0 / 7") && txt.includes("免责条款未作显著提示或说明") && txt.includes("典例分析") && txt.includes("签约前检查清单"));
+  await clickText("预付卡");
+  await sleep(300);
+  txt = await bodyText();
+  record(vp.name, "contracts-prepaid", txt.includes("已核对 0 / 7") && txt.includes("退卡扣高额手续费或概不退卡") && txt.includes("典例分析") && txt.includes("签约前检查清单"));
   await clickText("租房");
   await sleep(300);
 

@@ -90,6 +90,20 @@
         { "id": "ins-bundle", "label": "投保是自己勾选的，没有被默认搭售，保费金额单独列明" },
         { "id": "ins-party", "label": "保险公司名称、产品名称与宣传核对过，缴费凭证留底" }
       ]
+    },
+    {
+      "id": "prepaid",
+      "label": "预付卡",
+      "storageKey": "qqy:checklist:prepaid",
+      "items": [
+        { "id": "pp-refund", "label": "退卡条件、扣费标准问清了，写在合同里" },
+        { "id": "pp-shop", "label": "门店停业、转让时余额怎么处理，写进合同" },
+        { "id": "pp-gift", "label": "赠送课时、项目的有效期与到期处理，确认过" },
+        { "id": "pp-term", "label": "课时数量、有效期、过期处理逐项写清，没有留白" },
+        { "id": "pp-transfer", "label": "卡能否转让、转让是否收费，问清了" },
+        { "id": "pp-amount", "label": "充值金额量力而行，没有一次性充大额" },
+        { "id": "pp-proof", "label": "合同、付款凭证、宣传页都留底了" }
+      ]
     }
   ]
 }

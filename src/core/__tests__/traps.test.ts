@@ -13,14 +13,15 @@ import {
 } from "../traps";
 
 describe("陷阱库数据契约", () => {
-  it("最低交付量：租房 6 + 实习兼职 4 + 贷款分期 4 + 套餐 2 + 考证 2 + 保险 2", () => {
+  it("最低交付量：租房 6 + 实习兼职 4 + 贷款分期 4 + 套餐 2 + 考证 2 + 保险 2 + 预付卡 2", () => {
     expect(trapsByCategory("rent")).toHaveLength(6);
     expect(trapsByCategory("internship")).toHaveLength(4);
     expect(trapsByCategory("loan")).toHaveLength(4);
     expect(trapsByCategory("plan")).toHaveLength(2);
     expect(trapsByCategory("cert")).toHaveLength(2);
     expect(trapsByCategory("insurance")).toHaveLength(2);
-    expect(traps.length).toBeGreaterThanOrEqual(20);
+    expect(trapsByCategory("prepaid")).toHaveLength(2);
+    expect(traps.length).toBeGreaterThanOrEqual(22);
   });
 
   it("verified 置真必须登记授权/复核记录与核对底本", () => {
@@ -34,7 +35,7 @@ describe("陷阱库数据契约", () => {
   it("每条字段完整：一句话概括、识别特征、签约前要问、被坑后怎么办、依据", () => {
     for (const t of traps) {
       expect(t.id).toMatch(/^trap-/);
-      expect(["rent", "internship", "loan", "plan", "cert", "insurance", "common"]).toContain(t.scene);
+      expect(["rent", "internship", "loan", "plan", "cert", "insurance", "prepaid", "common"]).toContain(t.scene);
       expect(t.oneLiner.length).toBeGreaterThan(6);
       expect(t.traits.length).toBeGreaterThanOrEqual(2);
       expect(t.beforeSign.length).toBeGreaterThanOrEqual(2);
@@ -103,6 +104,7 @@ describe("陷阱库数据契约", () => {
     expect(searchTraps("", "plan")).toHaveLength(2);
     expect(searchTraps("", "cert")).toHaveLength(2);
     expect(searchTraps("", "insurance")).toHaveLength(2);
+    expect(searchTraps("", "prepaid")).toHaveLength(2);
   });
 });
 
@@ -115,6 +117,7 @@ describe("签约前检查清单", () => {
       "plan",
       "cert",
       "insurance",
+      "prepaid",
     ]);
     for (const c of checklists.categories) {
       expect(c.items.length).toBeGreaterThanOrEqual(6);

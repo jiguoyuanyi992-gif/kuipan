@@ -177,6 +177,31 @@ const insurance = `人身保险合同（示例，虚构）
 投保人（签字）：吴十
 `;
 
+const prepaid = `健身会所会员协议（示例，虚构）
+
+甲方（会所）：示例健身会所
+乙方（会员）：郑十
+联系电话：13300133000
+
+第一条 会籍与充值
+乙方办理健身年卡，充值5000元，赠送私教课时10节。赠送课时到期作废。
+
+第二条 退卡
+会员卡一经售出，概不退还。乙方坚持退卡的，扣除百分之三十手续费。
+
+第三条 门店变动
+甲方有权随时停业或转让门店，卡内余额不予退还。
+
+第四条 课时使用
+私教课时有效期以甲方系统记录为准，课时过期作废，费用不退。
+
+第五条 转让
+本卡不得转让，转卡须经甲方同意并收取手续费。
+
+甲方（盖章）：示例健身会所
+乙方（签字）：郑十
+`;
+
 export const examples: ExampleContract[] = [
   { id: "ex-rent", label: "租房合同示例", type: "rent", fabricated: true, text: rent },
   { id: "ex-intern", label: "实习协议示例", type: "internship", fabricated: true, text: intern },
@@ -184,6 +209,7 @@ export const examples: ExampleContract[] = [
   { id: "ex-plan", label: "通信套餐示例", type: "plan", fabricated: true, text: plan },
   { id: "ex-cert", label: "考研培训示例", type: "cert", fabricated: true, text: cert },
   { id: "ex-insurance", label: "人身保险示例", type: "insurance", fabricated: true, text: insurance },
+  { id: "ex-prepaid", label: "健身办卡示例", type: "prepaid", fabricated: true, text: prepaid },
   { id: "ex-clean", label: "通用协议示例", type: "other", fabricated: true, text: clean },
 ];
 
