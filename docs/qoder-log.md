@@ -39,6 +39,7 @@
 - 实现：删 `--burn-cap` 与 out/in 两相位，`--burn` 0→1 单帧同驱两层互补 mask（旧鬼上可见、新鬼下可见，1px 切缝由炭边/余烬线/灰烬/火舌四层遮住）；火边改为 `.ghost-char/.ghost-emberline/.ghost-flames/.ghost-ash/.ghost-fire-glow` 复合层，两个湍流滤镜（`#ghost-fire-jag` 弱扰动余烬线、`#ghost-flame-jag` 强扰动火舌 + screen 混合）内 SMIL discrete 跳变 seed 做闪动；中断规则改为「把已烧出的目标鬼坐实为旧鬼、重新起烧完整 500ms」，任一时刻画面只有一张完整鬼像。卡片仍 250ms 换、reduced-motion 仍 150ms 淡入淡出，均不变。
 - 复验：`npm test` 213/213；`npm run build` 通过；`%TEMP%/ghost-fire-frames.mjs` 冻结时钟断言改至单次模型后 25/25 PASS（0/125/250/375/500ms burn=0/0.25/0.5/0.75/1.0、两层 mask 同帧互补、卡片 250ms 换、连点 5 只无残影、中断坐实、reduced-motion、双视口 0 error）；`dev/kuipan-qa.mjs` 76/76。design-spec §9.2 已改写为单次焚烧口径。
 - 自查插曲：临时脚本 mask 判定 `!!getComputedStyle().maskImage` 误把字符串 `"none"` 当有 mask，3 项假 FAIL；改为 `!== 'none'` 后全过。组件与样式本身无错。
+- 复发布：提交 2061625；prepare_site 新 actionId ea005504-d23c-4545-a21e-9ec4b27be8dc（首次 descriptorStatus=pending，同 actionId 同输入重试转 written）；publishOperationId 01a1e976-168f-7cd8-a2e9-11d7115496d6，state=succeeded、committed=true、access_mode=public。线上核对：index.html 引用 index-BaJu_O9-.js / index-BBICaDdC.css 与本地 dist 同名，服务端 JS 内 `burn-cap` 0 处、`ghost-flame-jag` 存在；`%TEMP%/ghost-online-shot.mjs` 实拍桌面焚烧中帧为单次火边扫过新效果、控制台 0 error。
 
 ## M4 后追加 · 照契卷轴视觉与清单重点标签（2026-11-17，不打 tag）
 
