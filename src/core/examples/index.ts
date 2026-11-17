@@ -102,10 +102,36 @@ const loan = `培训分期借款合同（示例，虚构）
 乙方（签字）：钱七
 `;
 
+const plan = `移动通信套餐服务协议（示例，虚构）
+
+甲方（运营商）：示例通信公司
+乙方（用户）：孙八
+联系电话：13600136000
+
+第一条 套餐内容
+乙方订购甲方「畅享不限量套餐」，月费39元，首月优惠价9元，优惠结束后自动恢复至原价39元。套餐宣传不限量流量，超出20GB后限速至1Mbps。
+
+第二条 合约期限
+合约期24个月。合约期内乙方不得降档或销户，提前销户的，按三个月月费支付违约金。
+
+第三条 赠送业务
+开通即赠送视频会员3个月，到期自动转为收费订阅，每月15元。
+
+第四条 增值业务
+开通即视为乙方同意默认开通彩铃增值业务，月费5元。
+
+第五条 资费调整
+甲方有权根据经营情况单方调整套餐资费。
+
+甲方（盖章）：示例通信公司
+乙方（签字）：孙八
+`;
+
 export const examples: ExampleContract[] = [
   { id: "ex-rent", label: "租房合同示例", type: "rent", fabricated: true, text: rent },
   { id: "ex-intern", label: "实习协议示例", type: "internship", fabricated: true, text: intern },
   { id: "ex-loan", label: "培训分期借款示例", type: "loan", fabricated: true, text: loan },
+  { id: "ex-plan", label: "通信套餐示例", type: "plan", fabricated: true, text: plan },
   { id: "ex-clean", label: "通用协议示例", type: "other", fabricated: true, text: clean },
 ];
 

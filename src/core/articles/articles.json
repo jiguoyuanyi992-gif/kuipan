@@ -154,5 +154,70 @@
     "verified": true,
     "reviewer": "执行层自动引用",
     "reviewNote": "检索日期 2026-11-17；flk 详情页正文标题：中华人民共和国民法典；quote 逐字取自该页官方 DOCX 全文。"
+  },
+  {
+    "id": "consumer-20",
+    "law": "中华人民共和国消费者权益保护法",
+    "article": "第二十条",
+    "quote": "经营者向消费者提供有关商品或者服务的质量、性能、用途、有效期限等信息，应当真实、全面，不得作虚假或者引人误解的宣传。经营者对消费者就其提供的商品或者服务的质量和使用方法等问题提出的询问，应当作出真实、明确的答复。经营者提供商品或者服务应当明码标价。",
+    "summary": "经营者提供信息应真实全面，不得虚假或引人误解宣传，并应明码标价",
+    "scenes": ["plan", "cert", "prepaid", "driving"],
+    "sourceUrl": "https://flk.npc.gov.cn/detail?id=2c909fdd678bf17901678bf7670606ef",
+    "effectiveOn": "2014-03-15",
+    "verified": true,
+    "reviewer": "执行层自动引用",
+    "reviewNote": "检索日期 2026-11-17；flk 详情页正文标题：中华人民共和国消费者权益保护法；quote 逐字取自该页官方 DOCX 全文。"
+  },
+  {
+    "id": "consumer-9",
+    "law": "中华人民共和国消费者权益保护法",
+    "article": "第九条",
+    "quote": "消费者享有自主选择商品或者服务的权利。消费者有权自主选择提供商品或者服务的经营者，自主选择商品品种或者服务方式，自主决定购买或者不购买任何一种商品、接受或者不接受任何一项服务。消费者在自主选择商品或者服务时，有权进行比较、鉴别和挑选。",
+    "summary": "消费者享有自主选择商品或服务的权利",
+    "scenes": ["plan", "cert", "prepaid"],
+    "sourceUrl": "https://flk.npc.gov.cn/detail?id=2c909fdd678bf17901678bf7670606ef",
+    "effectiveOn": "2014-03-15",
+    "verified": true,
+    "reviewer": "执行层自动引用",
+    "reviewNote": "检索日期 2026-11-17；flk 详情页正文标题：中华人民共和国消费者权益保护法；quote 逐字取自该页官方 DOCX 全文。"
+  },
+  {
+    "id": "consumer-impl-10",
+    "law": "中华人民共和国消费者权益保护法实施条例",
+    "article": "第十条第二款",
+    "quote": "经营者采取自动展期、自动续费等方式提供服务的，应当在消费者接受服务前和自动展期、自动续费等日期前，以显著方式提请消费者注意。",
+    "summary": "自动展期、自动续费应在接受服务前和续期日前以显著方式提请消费者注意",
+    "scenes": ["plan"],
+    "sourceUrl": "https://flk.npc.gov.cn/detail?id=ff808181927f09310192c2f4cd777281",
+    "effectiveOn": "2024-07-01",
+    "verified": true,
+    "reviewer": "执行层自动引用",
+    "reviewNote": "检索日期 2026-11-17；flk 详情页正文标题：中华人民共和国消费者权益保护法实施条例；quote 逐字取自该页官方 DOCX 全文。"
+  },
+  {
+    "id": "consumer-impl-11",
+    "law": "中华人民共和国消费者权益保护法实施条例",
+    "article": "第十一条第二款",
+    "quote": "经营者通过搭配、组合等方式提供商品或者服务的，应当以显著方式提请消费者注意。",
+    "summary": "搭配、组合方式提供商品或服务应以显著方式提请消费者注意",
+    "scenes": ["plan"],
+    "sourceUrl": "https://flk.npc.gov.cn/detail?id=ff808181927f09310192c2f4cd777281",
+    "effectiveOn": "2024-07-01",
+    "verified": true,
+    "reviewer": "执行层自动引用",
+    "reviewNote": "检索日期 2026-11-17；flk 详情页正文标题：中华人民共和国消费者权益保护法实施条例；quote 逐字取自该页官方 DOCX 全文。"
+  },
+  {
+    "id": "ecommerce-19",
+    "law": "中华人民共和国电子商务法",
+    "article": "第十九条",
+    "quote": "电子商务经营者搭售商品或者服务，应当以显著方式提请消费者注意，不得将搭售商品或者服务作为默认同意的选项。",
+    "summary": "搭售商品或服务应显著提示，不得作为默认同意的选项",
+    "scenes": ["plan"],
+    "sourceUrl": "https://flk.npc.gov.cn/detail?id=2c909fdd678bf17901678bf8af050b81",
+    "effectiveOn": "2019-01-01",
+    "verified": true,
+    "reviewer": "执行层自动引用",
+    "reviewNote": "检索日期 2026-11-17；flk 详情页正文标题：中华人民共和国电子商务法；quote 逐字取自该页官方 DOCX 全文。"
   }
 ]

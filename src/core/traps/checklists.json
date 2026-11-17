@@ -48,6 +48,20 @@
         { "id": "loan-nodouble", "label": "没有用新贷款去还旧贷款，也没有用自己的名义替别人借钱" },
         { "id": "loan-tell", "label": "已经把这个方案告诉家人或学校的一位老师" }
       ]
+    },
+    {
+      "id": "plan",
+      "label": "套餐",
+      "storageKey": "qqy:checklist:plan",
+      "items": [
+        { "id": "plan-price", "label": "问清了优惠结束后的价格和优惠时长，不是只看首月低价" },
+        { "id": "plan-term", "label": "合约期多长、期内能不能降档销户、费用怎么算，写在协议里" },
+        { "id": "plan-gift", "label": "赠送或免费的内容到期会不会转收费、转之前会不会提醒" },
+        { "id": "plan-throttle", "label": "「不限量」有没有限速阈值，限速后是多少网速" },
+        { "id": "plan-addon", "label": "办理时逐项核对了增值业务清单，不需要的没有勾选" },
+        { "id": "plan-change", "label": "资费或内容调整要不要双方协商一致，怎么通知我" },
+        { "id": "plan-proof", "label": "宣传页、办理记录和账单都截图留底了" }
+      ]
     }
   ]
 }

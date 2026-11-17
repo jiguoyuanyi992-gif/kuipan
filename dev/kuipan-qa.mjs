@@ -175,7 +175,7 @@ for (const vp of [
   await clickText("套餐");
   await sleep(300);
   txt = await bodyText();
-  record(vp.name, "contracts-plan-basis", txt.includes("自动续费或自动续约") && txt.includes("典例分析") && txt.includes("整理中"));
+  record(vp.name, "contracts-plan-basis", txt.includes("自动续费或自动续约") && txt.includes("典例分析") && txt.includes("低价体验到期") && txt.includes("签约前检查清单"));
   await shot(`${vp.name}-contracts-plan`, true);
   await clickText("贷款分期");
   await sleep(300);
