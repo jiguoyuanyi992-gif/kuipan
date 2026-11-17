@@ -9,7 +9,7 @@ describe("规则库与场景", () => {
     expect(rules.length).toBeGreaterThanOrEqual(12);
   });
 
-  it("场景分布满足租房 6 / 实习兼职 5 / 贷款分期 5 / 套餐 5 / 考证 5 / 保险 5 / 预付卡 5 / 通用 9", () => {
+  it("场景分布满足租房 6 / 实习兼职 5 / 贷款分期 5 / 套餐 5 / 考证 5 / 保险 5 / 预付卡 5 / 租车 5 / 通用 9", () => {
     const count = (scene: string) => rules.filter((r) => r.scene === scene).length;
     expect(count("rent")).toBe(6);
     expect(count("internship")).toBe(5);
@@ -18,6 +18,7 @@ describe("规则库与场景", () => {
     expect(count("cert")).toBe(5);
     expect(count("insurance")).toBe(5);
     expect(count("prepaid")).toBe(5);
+    expect(count("carrental")).toBe(5);
     expect(count("common")).toBe(9);
   });
 
@@ -75,6 +76,7 @@ describe("规则库与场景", () => {
     expect(detectType(examples.find((e) => e.id === "ex-cert")!.text)).toBe("cert");
     expect(detectType(examples.find((e) => e.id === "ex-insurance")!.text)).toBe("insurance");
     expect(detectType(examples.find((e) => e.id === "ex-prepaid")!.text)).toBe("prepaid");
+    expect(detectType(examples.find((e) => e.id === "ex-carrental")!.text)).toBe("carrental");
     expect(detectType(examples.find((e) => e.id === "ex-clean")!.text)).toBe("other");
   });
 });

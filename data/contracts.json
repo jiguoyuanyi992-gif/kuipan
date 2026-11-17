@@ -147,15 +147,18 @@
       "id": "carrental",
       "label": "租车",
       "ruleIds": [
-        "common-auto-renew",
-        "common-prepaid-no-refund",
-        "common-exempt-liability",
+        "carrental-check-dispute",
+        "carrental-loss-fee",
+        "carrental-deposit-missing",
+        "carrental-insurance-gap",
+        "carrental-fee-unclear",
         "common-penalty-excessive",
         "common-unilateral-change",
         "common-jurisdiction",
         "common-personal-info"
       ],
-      "trapIds": []
+      "trapIds": ["trap-carrental-check-dispute", "trap-carrental-loss-fee"],
+      "checklist": "carrental"
     },
     {
       "id": "driving",

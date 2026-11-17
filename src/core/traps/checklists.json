@@ -104,6 +104,20 @@
         { "id": "pp-amount", "label": "充值金额量力而行，没有一次性充大额" },
         { "id": "pp-proof", "label": "合同、付款凭证、宣传页都留底了" }
       ]
+    },
+    {
+      "id": "carrental",
+      "label": "租车",
+      "storageKey": "qqy:checklist:carrental",
+      "items": [
+        { "id": "cr-check", "label": "取车时双方验车拍照，已有划痕写进交接单" },
+        { "id": "cr-loss", "label": "事故后停运损失、折旧费怎么算、有没有上限，问清了" },
+        { "id": "cr-deposit", "label": "押金与违章押金的退还时间、扣减情形写进合同" },
+        { "id": "cr-insurance", "label": "车辆投保险种与免赔额确认过，理赔不足部分怎么分担写清了" },
+        { "id": "cr-fees", "label": "超时、超里程、异地还车收费标准逐项列明" },
+        { "id": "cr-party", "label": "租车公司资质与门店核对过，合同抬头一致" },
+        { "id": "cr-proof", "label": "交接单、付款凭证、车况照片都留底了" }
+      ]
     }
   ]
 }

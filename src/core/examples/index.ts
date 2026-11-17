@@ -202,6 +202,31 @@ const prepaid = `健身会所会员协议（示例，虚构）
 乙方（签字）：郑十
 `;
 
+const carrental = `汽车租赁合同（示例，虚构）
+
+甲方（出租方）：示例汽车租赁公司
+乙方（承租方）：陈十一
+联系电话：13200132000
+
+第一条 车辆与租期
+乙方向甲方租用轿车一辆，租期3天，租金每日300元，取车时缴纳押金5000元、违章押金2000元。
+
+第二条 验车与车损
+车辆状况以甲方门店验车记录为准。乙方取车时未拍照留存的，视为认可车辆完好。还车时发现的划痕、损伤由乙方赔偿。
+
+第三条 事故处理
+车辆维修期间产生的停运损失、折旧费由乙方承担。维修定损以甲方指定的维修厂评估为准。
+
+第四条 保险
+本车仅投保交强险，车损免赔额为2000元，保险理赔不足部分由乙方自行承担。
+
+第五条 其他费用
+超时、超里程、异地还车费用另计，按甲方门店标准收取。
+
+甲方（盖章）：示例汽车租赁公司
+乙方（签字）：陈十一
+`;
+
 export const examples: ExampleContract[] = [
   { id: "ex-rent", label: "租房合同示例", type: "rent", fabricated: true, text: rent },
   { id: "ex-intern", label: "实习协议示例", type: "internship", fabricated: true, text: intern },
@@ -210,6 +235,7 @@ export const examples: ExampleContract[] = [
   { id: "ex-cert", label: "考研培训示例", type: "cert", fabricated: true, text: cert },
   { id: "ex-insurance", label: "人身保险示例", type: "insurance", fabricated: true, text: insurance },
   { id: "ex-prepaid", label: "健身办卡示例", type: "prepaid", fabricated: true, text: prepaid },
+  { id: "ex-carrental", label: "租车合同示例", type: "carrental", fabricated: true, text: carrental },
   { id: "ex-clean", label: "通用协议示例", type: "other", fabricated: true, text: clean },
 ];
 
