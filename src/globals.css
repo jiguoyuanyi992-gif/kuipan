@@ -414,9 +414,9 @@ body {
   opacity: 0.62;
 }
 
-/* ========== 捉鬼录 · 扁平国风镜框与焚鬼切换（2026-11-17 天赐指令；镜框同日改为素材图） ==========
-   镜框 = public/assets/mirror-frame.png（素边＋连珠纹＋回纹三段同心环带，扁平两色），
-   mask 只留环带、镜心透明透出圆面；镜盒总径 --mirror 封顶 20rem，镜面 --face 随内孔占比反推。
+/* ========== 捉鬼录 · 实物铜镜镜框与焚鬼切换（2026-11-17 天赐指令；镜框同日三次换为实物镜图，鬼像置于镜面内） ==========
+   镜框 = public/assets/mirror-frame.png（抛光镜面＋云纹/绦绳窄装饰边，黑色背景），
+   mask 只留环带、镜心透明透出圆面；镜盒总径 --mirror 封顶 19rem，鬼像放镜面内、内沿留金色斜面感。
    切换动画总时长 500ms：一次火边自底向顶扫过，--burn 同时驱动两层 mask——
    旧鬼烧掉多少、新鬼就露出多少，无缝衔接；烧纸质感（焦黑炭边＋不规则火线＋上窜火舌）。
    只动 mask / opacity / transform；prefers-reduced-motion 时关闭火焰改 150ms 淡入淡出。 */
@@ -428,10 +428,9 @@ body {
 }
 
 .ghost-mirror {
-  /* 实测 flat_frame 图：内孔直径/图宽 ≈ 0.547，外圆/图宽 ≈ 0.838 */
-  --hole: 0.547;
-  /* 2026-11-17 天赐反馈框体偏大：镜盒总径封顶 20rem（约 320px），镜面随比例缩至约 11rem */
-  --mirror: min(20rem, calc(100vw - 2.5rem));
+  /* 实测实物铜镜图（1024px）：镜面内沿 r≈400-422 不规则，取 r=400 → holeD/W=0.78；外缘 r≈494 → 外圆/内孔半径比 1.235 */
+  --hole: 0.78;
+  --mirror: min(19rem, calc(100vw - 2.5rem));
   --face: calc(var(--mirror) * var(--hole));
   position: relative;
   width: var(--mirror);
@@ -450,15 +449,15 @@ body {
     circle at 50% 50%,
     transparent calc(var(--face) / 2 - 1px),
     #000 calc(var(--face) / 2 + 1px),
-    #000 calc(var(--face) / 2 * 1.532 - 1px),
-    transparent calc(var(--face) / 2 * 1.532 + 1px)
+    #000 calc(var(--face) / 2 * 1.235 - 1px),
+    transparent calc(var(--face) / 2 * 1.235 + 1px)
   );
   mask-image: radial-gradient(
     circle at 50% 50%,
     transparent calc(var(--face) / 2 - 1px),
     #000 calc(var(--face) / 2 + 1px),
-    #000 calc(var(--face) / 2 * 1.532 - 1px),
-    transparent calc(var(--face) / 2 * 1.532 + 1px)
+    #000 calc(var(--face) / 2 * 1.235 - 1px),
+    transparent calc(var(--face) / 2 * 1.235 + 1px)
   );
 }
 

@@ -173,7 +173,7 @@ export function GhostsPage() {
         <p className="text-sm text-muted-foreground">整理中</p>
       ) : (
         <>
-          {/* 扁平国风镜框（素边＋连珠＋回纹）：整图铺满镜盒，mask 只留环带，镜心透出圆面 */}
+          {/* 实物铜镜镜框（抛光镜面＋云纹绦绳窄边）：整图铺满镜盒，mask 只留环带，镜心透出鬼像 */}
           <div className="ghost-mirror">
             <FireFilterDefs />
             <div className="ghost-face" data-phase={phase} ref={faceRef}>
@@ -218,7 +218,7 @@ export function GhostsPage() {
               name="mirror-frame.png"
               alt=""
               className="ghost-frame"
-              placeholderColor="#3b2b20"
+              placeholderColor="#11100c"
               loading="eager"
             />
           </div>
