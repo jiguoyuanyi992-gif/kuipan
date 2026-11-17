@@ -4,13 +4,14 @@ import { AssetImage, assetUrl } from "@/src/components/AssetImage";
 import { Checklist } from "@/src/components/Checklist";
 import { ruleById } from "@/src/core/rules";
 import { actionsForType } from "@/src/core/fallback/actions";
-import { ruleIdForTrap, trapById } from "@/src/core/traps";
+import { ruleIdForTrap, trapById, type TrapCategory } from "@/src/core/traps";
+import { CONTRACT_TYPES } from "@/src/core/types";
 import type { ContractType, RiskRule, TrapEntry } from "@/src/core/types";
 
 interface ContractTypeEntry {
   id: string;
   label: string;
-  checklist?: "rent" | "internship" | "loan";
+  checklist?: TrapCategory;
   // 法条只存 rule_id，原文永远从规则库读取，不复制进本文件。
   ruleIds: string[];
   trapIds: string[];
@@ -220,8 +221,9 @@ export function ContractsPage({ focusTrapId, hasAnalysis, onBack, onCheckRule }:
   );
 
   if (!type) return null;
-  const scene: ContractType =
-    type.id === "rent" ? "rent" : type.id === "internship" ? "internship" : "other";
+  const scene: ContractType = (CONTRACT_TYPES as readonly string[]).includes(type.id)
+    ? (type.id as ContractType)
+    : "other";
   const texture = assetUrl("paper-texture.png");
 
   return (

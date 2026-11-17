@@ -9,13 +9,12 @@ export const GENERAL_ACTIONS: string[] = [
   "法律问题可拨 12348 公共法律服务热线。",
 ];
 
-export const SCENE_EXTRA_ACTIONS: Record<"rent" | "internship", string[]> = {
+export const SCENE_EXTRA_ACTIONS: Partial<Record<ContractType, string[]>> = {
   rent: ["可以咨询当地 12345 政务服务热线。"],
   internship: ["可以先问学校实习指导老师。", "劳动权益问题可拨 12333。"],
 };
 
 export function actionsForType(type: ContractType): string[] {
-  const extra =
-    type === "rent" || type === "internship" ? SCENE_EXTRA_ACTIONS[type] : [];
+  const extra = SCENE_EXTRA_ACTIONS[type] ?? [];
   return [...GENERAL_ACTIONS, ...extra];
 }

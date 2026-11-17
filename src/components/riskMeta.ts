@@ -1,4 +1,4 @@
-import type { Severity } from "@/src/core/types";
+import type { ContractType, Severity } from "@/src/core/types";
 
 export interface RiskStyle {
   color: string;
@@ -34,8 +34,15 @@ export const NONE_STYLE = {
   label: "暂未发现明显风险",
 };
 
-export const TYPE_LABEL: Record<string, string> = {
+export const TYPE_LABEL: Record<ContractType, string> = {
   rent: "租房",
   internship: "实习兼职",
+  loan: "贷款分期",
+  plan: "套餐",
+  cert: "考证",
+  insurance: "保险",
+  prepaid: "预付卡",
+  carrental: "租车",
+  driving: "驾校",
   other: "其他",
 };

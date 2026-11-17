@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { CONTRACT_TYPES } from "../types";
 
 // 模型只允许返回 ruleId + blockId + 文本建议。
 // .strict() 拒绝任何额外字段（尤其字符 offset/start/end —— 模型给的 offset 会幻觉，一律不采信）。
@@ -16,7 +17,7 @@ export const modelFindingSchema = z
 
 export const modelResponseSchema = z
   .object({
-    contractType: z.enum(["rent", "internship", "other"]),
+    contractType: z.enum(CONTRACT_TYPES),
     findings: z.array(modelFindingSchema),
   })
   .strict();

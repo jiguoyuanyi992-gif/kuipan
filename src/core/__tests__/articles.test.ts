@@ -3,6 +3,7 @@ import { articleById, articles, articlesForType } from "../articles";
 import { chunk } from "../chunk";
 import { buildPrompt, mergeFindings, parseModelResponse } from "../llm";
 import { rules } from "../rules";
+import { CONTRACT_TYPES } from "../types";
 import type { ContractDoc, ModelFinding } from "../types";
 
 const doc: ContractDoc = {
@@ -39,7 +40,7 @@ describe("封闭条文清单", () => {
     // 指令口径：scenes 包含该类型（或包含 other）即返回。
     // consumer-26/53 的 scenes 含 other（贷款/分期分析时归 other 类，必须可用），
     // 因此按通用条文处理，rent 场景同样返回。
-    for (const t of ["rent", "internship", "other"]) {
+    for (const t of CONTRACT_TYPES) {
       const list = articlesForType(t);
       expect(list.every((a) => a.verified)).toBe(true);
       expect(list.map((a) => a.id)).toContain("civil-496");

@@ -196,4 +196,17 @@ describe("法条调取规范（prompt 硬约束固定）", () => {
     expect(p).toContain("禁止引用、罗列或杜撰任何法律条文、法条编号、案例号");
     expect(p).toContain("法律依据由系统另行提供，与你无关");
   });
+
+  it("扩类只在约束末尾追加第 7 条，原 JSON 示例行不动", () => {
+    const p = buildPrompt(doc.blocks.slice(0, 2), rulesForScene(rules, "rent"));
+    expect(p).toContain(
+      "7. contractType 除 rent、internship、other 外，还可以取 loan（贷款分期）、plan（话费宽带会员等订阅套餐）、cert（考证培训）、insurance（保险）、prepaid（健身美容等办卡充值）、carrental（租车）、driving（驾校）；拿不准就填 other。",
+    );
+    expect(p).toContain('{"contractType":"rent|internship|other"');
+    // 第 7 条在第 6 条之后、JSON 示例之前
+    expect(p.indexOf("6. 返回里可以带 articleIds")).toBeLessThan(
+      p.indexOf("7. contractType"),
+    );
+    expect(p.indexOf("7. contractType")).toBeLessThan(p.indexOf("只输出 JSON"));
+  });
 });

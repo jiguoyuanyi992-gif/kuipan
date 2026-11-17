@@ -7,6 +7,7 @@ import { overallRisk } from "@/src/core/risk";
 import { rules } from "@/src/core/rules";
 import { mergeFindings } from "@/src/core/llm/merge";
 import { detectType, rulesForScene } from "@/src/core/scene";
+import { CONTRACT_TYPES } from "@/src/core/types";
 import type {
   AmountTerms,
   ContractDoc,
@@ -118,7 +119,7 @@ function voteType(types: string[]): ContractType | undefined {
   const count = new Map<string, number>();
   for (const t of types) count.set(t, (count.get(t) ?? 0) + 1);
   const top = [...count.entries()].sort((a, b) => b[1] - a[1])[0][0];
-  if (top === "rent" || top === "internship" || top === "other") return top;
+  if ((CONTRACT_TYPES as readonly string[]).includes(top)) return top as ContractType;
   return undefined;
 }
 

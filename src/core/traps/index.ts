@@ -4,7 +4,7 @@ import trapsJson from "./traps.json";
 import { rules } from "../rules";
 import type { RuleScene, TrapEntry } from "../types";
 
-export type TrapCategory = "rent" | "internship" | "loan";
+export type TrapCategory = Exclude<RuleScene, "common">;
 
 export interface ChecklistItem {
   id: string;
@@ -30,12 +30,19 @@ export const CATEGORY_LABEL: Record<TrapCategory, string> = {
   rent: "租房",
   internship: "实习兼职",
   loan: "贷款分期",
+  plan: "套餐",
+  cert: "考证",
+  insurance: "保险",
+  prepaid: "预付卡",
+  carrental: "租车",
+  driving: "驾校",
 };
 
-// 贷款分期条目只做浏览与学习，不参与合同检测，因此按 id 前缀归类。
+// 历史贷款分期条目 scene=common、只做浏览学习，按 id 前缀归类；其余按 scene 归类。
 export function trapCategory(trap: TrapEntry): TrapCategory {
+  if (trap.scene !== "common") return trap.scene;
   if (trap.id.startsWith("trap-loan-")) return "loan";
-  return trap.scene === "rent" ? "rent" : "internship";
+  return "internship";
 }
 
 export function trapsByCategory(category: TrapCategory): TrapEntry[] {

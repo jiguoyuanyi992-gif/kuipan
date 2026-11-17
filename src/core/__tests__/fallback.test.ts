@@ -4,6 +4,7 @@ import {
   GENERAL_ACTIONS,
   SCENE_EXTRA_ACTIONS,
 } from "../fallback/actions";
+import { CONTRACT_TYPES } from "../types";
 
 const BANNED = [
   "违法",
@@ -27,8 +28,8 @@ function bannedHits(text: string): string[] {
 }
 
 describe("签前怎么办兜底文案", () => {
-  it("三种场景都能取到非空文案，且含通用行动建议", () => {
-    for (const type of ["rent", "internship", "other"] as const) {
+  it("所有类型都能取到非空文案，且含通用行动建议", () => {
+    for (const type of CONTRACT_TYPES) {
       const actions = actionsForType(type);
       expect(actions.length).toBeGreaterThan(0);
       expect(actions).toEqual(expect.arrayContaining(GENERAL_ACTIONS));
@@ -38,11 +39,11 @@ describe("签前怎么办兜底文案", () => {
   it("场景补充只加在对应类型上", () => {
     expect(actionsForType("rent")).toEqual([
       ...GENERAL_ACTIONS,
-      ...SCENE_EXTRA_ACTIONS.rent,
+      ...(SCENE_EXTRA_ACTIONS.rent ?? []),
     ]);
     expect(actionsForType("internship")).toEqual([
       ...GENERAL_ACTIONS,
-      ...SCENE_EXTRA_ACTIONS.internship,
+      ...(SCENE_EXTRA_ACTIONS.internship ?? []),
     ]);
     expect(actionsForType("other")).toEqual(GENERAL_ACTIONS);
     expect(actionsForType("rent").join("")).toContain("12345");
@@ -51,7 +52,7 @@ describe("签前怎么办兜底文案", () => {
   });
 
   it("全部文案不含禁用词", () => {
-    for (const type of ["rent", "internship", "other"] as const) {
+    for (const type of CONTRACT_TYPES) {
       expect(bannedHits(actionsForType(type).join(""))).toEqual([]);
     }
   });

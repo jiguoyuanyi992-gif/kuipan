@@ -1,8 +1,21 @@
 // 平台无关核心类型。无 React、无网络、无 Node API。
 // 数据契约权威来源：AGENTS.md「数据契约」节。
 
-export type RuleScene = "rent" | "internship" | "common";
-export type ContractType = "rent" | "internship" | "other";
+// 合同类型唯一来源：schema、voteType、结果页下拉、照契映射都从这里取。
+export const CONTRACT_TYPES = [
+  "rent",
+  "internship",
+  "loan",
+  "plan",
+  "cert",
+  "insurance",
+  "prepaid",
+  "carrental",
+  "driving",
+  "other",
+] as const;
+export type ContractType = (typeof CONTRACT_TYPES)[number];
+export type RuleScene = Exclude<ContractType, "other"> | "common";
 export type Severity = "high" | "medium" | "low";
 
 export interface LegalBasis {

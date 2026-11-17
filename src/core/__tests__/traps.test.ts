@@ -72,7 +72,17 @@ describe("陷阱库数据契约", () => {
   });
 
   it("分类标签齐全", () => {
-    expect(Object.keys(CATEGORY_LABEL)).toEqual(["rent", "internship", "loan"]);
+    expect(Object.keys(CATEGORY_LABEL)).toEqual([
+      "rent",
+      "internship",
+      "loan",
+      "plan",
+      "cert",
+      "insurance",
+      "prepaid",
+      "carrental",
+      "driving",
+    ]);
     expect(trapCategory(traps[0])).toBe("rent");
   });
 

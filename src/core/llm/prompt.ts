@@ -34,6 +34,7 @@ export function buildPrompt(
     "4. 未命中任何规则但你认为可疑的条款，aiSuggested=true、ruleId 留空字符串，措辞「建议留意」。",
     "5. rewrite 为条款改写建议，仅供参考；askTalk 为签约前可以问对方的话。",
     "6. 返回里可以带 articleIds 数组；只能填写下方条文清单里出现过的 id，没有把握就留空数组；禁止引用、罗列或杜撰清单之外的任何法律条文。",
+    "7. contractType 除 rent、internship、other 外，还可以取 loan（贷款分期）、plan（话费宽带会员等订阅套餐）、cert（考证培训）、insurance（保险）、prepaid（健身美容等办卡充值）、carrental（租车）、driving（驾校）；拿不准就填 other。",
     "",
     "只输出 JSON，格式：",
     '{"contractType":"rent|internship|other","findings":[{"ruleId":"","blockId":"b1","explanation":"","askTalk":"","rewrite":"","aiSuggested":false,"articleIds":[]}]}',

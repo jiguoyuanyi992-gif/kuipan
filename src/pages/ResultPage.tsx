@@ -8,6 +8,7 @@ import {
 } from "@/src/components/riskMeta";
 import { blockSeverity, type Analysis } from "@/src/lib/analyze";
 import type { Block, ContractType, Finding } from "@/src/core/types";
+import { CONTRACT_TYPES } from "@/src/core/types";
 
 interface Props {
   analysis: Analysis;
@@ -140,9 +141,11 @@ export function ResultPage({
               onChange={(e) => onReanalyze(e.target.value as ContractType)}
               className="rounded border border-border bg-[var(--paper-soft)] px-2 py-1 text-sm text-foreground"
             >
-              <option value="rent">租房</option>
-              <option value="internship">实习兼职</option>
-              <option value="other">其他</option>
+              {CONTRACT_TYPES.map((t) => (
+                <option key={t} value={t}>
+                  {TYPE_LABEL[t]}
+                </option>
+              ))}
             </select>
           </label>
           <span className="text-sm text-muted-foreground">

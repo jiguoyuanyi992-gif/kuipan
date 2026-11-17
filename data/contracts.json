@@ -112,6 +112,48 @@
         "common-personal-info"
       ],
       "trapIds": []
+    },
+    {
+      "id": "prepaid",
+      "label": "预付卡",
+      "ruleIds": [
+        "common-auto-renew",
+        "common-prepaid-no-refund",
+        "common-exempt-liability",
+        "common-penalty-excessive",
+        "common-unilateral-change",
+        "common-jurisdiction",
+        "common-personal-info"
+      ],
+      "trapIds": []
+    },
+    {
+      "id": "carrental",
+      "label": "租车",
+      "ruleIds": [
+        "common-auto-renew",
+        "common-prepaid-no-refund",
+        "common-exempt-liability",
+        "common-penalty-excessive",
+        "common-unilateral-change",
+        "common-jurisdiction",
+        "common-personal-info"
+      ],
+      "trapIds": []
+    },
+    {
+      "id": "driving",
+      "label": "驾校",
+      "ruleIds": [
+        "common-auto-renew",
+        "common-prepaid-no-refund",
+        "common-exempt-liability",
+        "common-penalty-excessive",
+        "common-unilateral-change",
+        "common-jurisdiction",
+        "common-personal-info"
+      ],
+      "trapIds": []
     }
   ]
 }
