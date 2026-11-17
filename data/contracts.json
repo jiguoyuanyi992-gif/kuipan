@@ -100,15 +100,16 @@
       "id": "cert",
       "label": "考证",
       "ruleIds": [
-        "common-auto-renew",
+        "cert-pass-guarantee",
+        "cert-narrow-refund",
+        "cert-hidden-fees",
+        "cert-unilateral-change",
+        "cert-pay-waive-refund",
         "common-prepaid-no-refund",
-        "common-exempt-liability",
-        "common-penalty-excessive",
-        "common-unilateral-change",
-        "common-jurisdiction",
-        "common-personal-info"
+        "common-penalty-excessive"
       ],
-      "trapIds": []
+      "trapIds": ["trap-cert-pass-guarantee", "trap-cert-narrow-refund"],
+      "checklist": "cert"
     },
     {
       "id": "insurance",

@@ -62,6 +62,20 @@
         { "id": "plan-change", "label": "资费或内容调整要不要双方协商一致，怎么通知我" },
         { "id": "plan-proof", "label": "宣传页、办理记录和账单都截图留底了" }
       ]
+    },
+    {
+      "id": "cert",
+      "label": "考证",
+      "storageKey": "qqy:checklist:cert",
+      "items": [
+        { "id": "cert-pass", "label": "「包过」「不过全退」的具体退费条件问清了，写在合同里" },
+        { "id": "cert-refund", "label": "中途退课怎么算退费、课时按什么单价折算、扣哪些费用，写在纸上" },
+        { "id": "cert-fees", "label": "报名费、教材费、考试费是否包含在学费里，逐项列明了" },
+        { "id": "cert-teacher", "label": "授课老师与课表写进合同，换老师改课表要先协商一致" },
+        { "id": "cert-term", "label": "课时数量、上课安排与有效期写清楚，没有留白" },
+        { "id": "cert-party", "label": "合同抬头机构与宣传、收款方是同一家，核对过" },
+        { "id": "cert-proof", "label": "宣传截图、聊天记录和缴费凭证都留底了" }
+      ]
     }
   ]
 }

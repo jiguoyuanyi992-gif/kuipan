@@ -26,8 +26,8 @@ function aiFinding(articleIds?: string[]): ModelFinding {
 }
 
 describe("封闭条文清单", () => {
-  it("清单共 17 条，全部 verified 且有 reviewer/reviewNote 登记", () => {
-    expect(articles).toHaveLength(17);
+  it("清单共 18 条，全部 verified 且有 reviewer/reviewNote 登记", () => {
+    expect(articles).toHaveLength(18);
     for (const a of articles) {
       expect(a.verified).toBe(true);
       expect(a.reviewer).toBe("执行层自动引用");

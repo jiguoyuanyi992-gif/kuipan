@@ -127,11 +127,37 @@ const plan = `移动通信套餐服务协议（示例，虚构）
 乙方（签字）：孙八
 `;
 
+const cert = `考研培训服务协议（示例，虚构）
+
+甲方（培训机构）：示例教育咨询公司
+乙方（学员）：周九
+联系电话：13500135000
+
+第一条 培训内容
+甲方为乙方提供考研辅导课程，共120课时，宣传包过，不过全退。
+
+第二条 费用
+学费19800元，报名费200元、教材费500元，考试费另计。
+
+第三条 退费约定
+乙方缴费后要求退课的，已上课时按每小时300元折算扣除，另扣学费百分之二十的服务费。不过退费仅限出勤率百分之九十五以上且完成全部模拟考试的学员。
+
+第四条 师资与课表
+甲方有权根据教学安排单方更换教师、调整课表，恕不另行通知。
+
+第五条 生效
+本协议自乙方缴费时生效，缴费视为放弃退费权利。
+
+甲方（盖章）：示例教育咨询公司
+乙方（签字）：周九
+`;
+
 export const examples: ExampleContract[] = [
   { id: "ex-rent", label: "租房合同示例", type: "rent", fabricated: true, text: rent },
   { id: "ex-intern", label: "实习协议示例", type: "internship", fabricated: true, text: intern },
   { id: "ex-loan", label: "培训分期借款示例", type: "loan", fabricated: true, text: loan },
   { id: "ex-plan", label: "通信套餐示例", type: "plan", fabricated: true, text: plan },
+  { id: "ex-cert", label: "考研培训示例", type: "cert", fabricated: true, text: cert },
   { id: "ex-clean", label: "通用协议示例", type: "other", fabricated: true, text: clean },
 ];
 

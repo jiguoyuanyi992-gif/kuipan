@@ -219,5 +219,18 @@
     "verified": true,
     "reviewer": "执行层自动引用",
     "reviewNote": "检索日期 2026-11-17；flk 详情页正文标题：中华人民共和国电子商务法；quote 逐字取自该页官方 DOCX 全文。"
+  },
+  {
+    "id": "consumer-impl-10-1",
+    "law": "中华人民共和国消费者权益保护法实施条例",
+    "article": "第十条第一款",
+    "quote": "经营者应当按照国家有关规定，以显著方式标明商品的品名、价格和计价单位或者服务的项目、内容、价格和计价方法等信息，做到价签价目齐全、内容真实准确、标识清晰醒目。",
+    "summary": "经营者应以显著方式标明服务项目、内容、价格与计价方法，价签价目齐全、明码标价",
+    "scenes": ["cert", "prepaid", "driving"],
+    "sourceUrl": "https://flk.npc.gov.cn/detail?id=ff808181927f09310192c2f4cd777281",
+    "effectiveOn": "2024-07-01",
+    "verified": true,
+    "reviewer": "执行层自动引用",
+    "reviewNote": "检索日期 2026-11-17；flk 详情页正文标题：中华人民共和国消费者权益保护法实施条例；quote 逐字取自该页官方 DOCX 全文。"
   }
 ]
