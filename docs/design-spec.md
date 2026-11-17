@@ -55,11 +55,11 @@
 - **首页**：钟馗判官主视觉（zhongkui.png，未到位用墨色占位）+ 中央「呈上生死簿」上传入口；四种输入（粘贴 / Word·PDF / 照片≤6张 / 示例）流程与提示文案不变；示例标注「示例，虚构」。
 - **结果页**：判词批注风——概览卡与条款写在宣纸上，朱笔圈注命中句，风险详情为朱砂左批线卡片；「查看同类案例」跳照契对应类型卷轴。
 - **捉鬼录**：圆形青铜照妖镜（mirror 位）+ 当前鬼画像（ghost-*.png）；信息卡字段：鬼名 / 比喻 / 常出没 / 应对策略；下方缩略图点击切换。数据 `data/ghosts.json`。
-- **照契**：先选合同类型，再展开卷轴（CSS 渐变绘制上下木轴 + 两端圆形轴头 + 左右细窄裱边 + 宣纸色纸面，纸纹用 CSS 渐变，不引用外部图片；见第 8 节）；检查清单在卷轴上方（勾选沿用 `qqy:checklist:*`），每条前置 2~4 字「重点标签」小色块（5 类固定色，见第 8 节）；卷轴两栏：注意事项（法律依据，只按 rule_id 读规则库且仅 verified=true，否则「整理中」）/ 典例分析（左配图右标题概要，下方整宽分析，重要词变红）。数据 `data/contracts.json`，法条不复制原文。套餐 / 考证 / 保险无数据，整卷「整理中」。
+- **照契**：先选合同类型，再展开卷轴（CSS 渐变绘制上下木轴 + 两端圆形轴头 + 左右细窄裱边 + 宣纸色纸面，纸纹用 CSS 渐变，不引用外部图片；见第 8 节）；检查清单在卷轴上方（勾选沿用 `qqy:checklist:*`），每条前置 2~4 字「重点标签」小色块（5 类固定色，见第 8 节）；卷轴两栏：注意事项（法律依据，只按 rule_id 读规则库且仅 verified=true，否则「整理中」）/ 典例分析（左「典例来源」链接盒右标题概要，下方整宽分析，重要词变红；见第 10 节）。数据 `data/contracts.json`，法条不复制原文。套餐 / 考证 / 保险无数据，整卷「整理中」。
 
 ## 7. 素材约定
 
-- 图片放 `public/assets/`（Vite 产物也输出 /assets，素材必须在 public 下）：zhongkui.png、mirror.png、seal-red.png、ghost-xiangliu.png、ghost-taotie.png、ghost-jiuweihu.png、case-<ruleId>.png。scroll-top.png / scroll-bottom.png / paper-texture.png 自 2026-11-17 起不再使用，照契卷轴全部 CSS 绘制（见第 8 节）。
+- 图片放 `public/assets/`（Vite 产物也输出 /assets，素材必须在 public 下）：zhongkui.png、mirror.png、seal-red.png、ghost-xiangliu.png、ghost-taotie.png、ghost-jiuweihu.png。case-<ruleId>.png 弃用（从未有实图，2026-11-17 起典例位改渲染来源链接，见第 10 节）；scroll-top.png / scroll-bottom.png / paper-texture.png 自 2026-11-17 起不再使用，照契卷轴全部 CSS 绘制（见第 8 节）。
 - 构建/启动时扫描 public/assets 生成清单（vite 虚拟模块 `virtual:asset-manifest`）；AssetImage 对缺失素材渲染占位色块、**不发请求**，避免 404 控制台错误。放入图片后重启 dev 或重新 build 即生效。
 
 ## 8. 照契卷轴主题与清单重点标签（2026-11-17 天赐指令）
@@ -118,3 +118,7 @@
 - 中断规则：动画中点另一只鬼，立即把当前已烧出的目标鬼整体坐实为旧鬼（分界线归零），对它重新起烧完整 500ms——任一时刻画面只有一张完整鬼像，不排队、无残影；点当前已选中的鬼不触发。
 - `prefers-reduced-motion: reduce`：关闭火焰与 mask，改 150ms 淡入淡出。
 - 火边限制在圆形镜面内（镜面 overflow hidden），各火部件尺寸随 `--face` 按比例缩放，手机端自动等比。
+
+## 10. 照契 · 典例来源链接（2026-11-17 天赐指令）
+
+典例分析左位的「典例配图」占位盒整体废弃，改为可点的「典例来源」链接盒：朱红竖排四字＋纸色底（`#e3d6bc`）＋细边框，尺寸与原占位盒一致（h-24 w-20），`target="_blank" rel="noreferrer"`。链接来自 `TrapEntry.caseSourceUrl`（types.ts 新增可选字段），数据落在 `src/core/traps/traps.json` 26 条（租房 6／实习兼职 4／贷款分期 4／套餐 2／考证 2／保险 2／预付卡 2／租车 2／驾校 2），逐条对应天赐提供的《照契 · 全板块典例来源总表》：官方示范文本/公告 PDF 直链，PDF 带 `#page=N` 页码锚点；对应关系按 trap id 与总表占位文件名（`case-<id去前缀>.png`）逐一核对，抽查 5 条 HEAD 均 200。实现见 `src/pages/ContractsPage.tsx` `CaseStudy`。

@@ -3,6 +3,7 @@
     "id": "trap-rent-deposit-forfeit",
     "scene": "rent",
     "oneLiner": "押金怎么退全靠口头说，退租时被逐项扣光",
+    "caseSourceUrl": "http://jsj.zs.gov.cn/attachment/0/369/369024/1852618.pdf#page=11",
     "story": "",
     "traits": [
       "合同只写「押金不予退还」或「押金归甲方所有」，不写扣减依据",
@@ -46,6 +47,7 @@
     "id": "trap-rent-non-residential-space",
     "scene": "rent",
     "oneLiner": "便宜隔断间、地下室或车库改的床位，住进去才知隐患",
+    "caseSourceUrl": "https://zfcxjst.gd.gov.cn/attachment/0/371/371273/2577029.pdf#page=7",
     "story": "",
     "traits": [
       "房间在房产证上是厨房、阳台、储藏室或车库",
@@ -88,6 +90,7 @@
     "id": "trap-rent-unauthorized-entry",
     "scene": "rent",
     "oneLiner": "房东留着一把钥匙随时进门，东西少了说不清",
+    "caseSourceUrl": "https://fgj.sh.gov.cn/cmsres/1d/1da73600f7d64d2cb7c4fa52ef2404f6/04a59feb01bf70b32a078832b4fbaf7a.pdf#page=8",
     "story": "",
     "traits": [
       "合同写着出租方有权随时进入查看房屋",
@@ -130,6 +133,7 @@
     "id": "trap-rent-agent-collects-rent",
     "scene": "rent",
     "oneLiner": "一年租金交给中介或二房东，对方失联后房东来敲门",
+    "caseSourceUrl": "https://www.beijing.gov.cn/fwcj/attachments/67c01d9f41ecec12898c8d96.pdf#page=4",
     "story": "",
     "traits": [
       "收款方是中介公司、二房东或个人账户，而不是产权人",
@@ -181,6 +185,7 @@
     "id": "trap-rent-penalty-high",
     "scene": "rent",
     "oneLiner": "提前退租要赔几个月租金，还不许你找人接手",
+    "caseSourceUrl": "http://jsj.zs.gov.cn/attachment/0/369/369024/1852618.pdf#page=15",
     "story": "",
     "traits": [
       "违约金写成两个月以上租金或固定高额数字",
@@ -215,6 +220,7 @@
     "id": "trap-rent-utility-and-fees",
     "scene": "rent",
     "oneLiner": "入住前的欠费和各种杂费，退租时都算到你头上",
+    "caseSourceUrl": "https://zfcxjst.gd.gov.cn/attachment/0/371/371273/2577029.pdf#page=6",
     "story": "",
     "traits": [
       "合同不写水电燃气网络物业费由谁承担",
@@ -257,6 +263,7 @@
     "id": "trap-intern-unpaid-probation",
     "scene": "internship",
     "oneLiner": "头几个月叫培训或考察，一分钱不给，用完就说你不合适",
+    "caseSourceUrl": "https://www.bzvtc.edu.cn/attachment/sites/item/2024_05/13_14/e2c2d2e12313f450.pdf#page=9",
     "story": "",
     "traits": [
       "试用期、培训期、学习期不付钱",
@@ -297,6 +304,7 @@
     "id": "trap-intern-collects-money",
     "scene": "internship",
     "oneLiner": "还没入职先交钱：服装费、体检费、押金，证件还被扣下",
+    "caseSourceUrl": "https://www.bzvtc.edu.cn/attachment/sites/item/2024_05/13_14/e2c2d2e12313f450.pdf#page=17",
     "story": "",
     "traits": [
       "以任何名义在入职前收取费用，且不开发票或收据",
@@ -345,6 +353,7 @@
     "id": "trap-intern-penalty-clause",
     "scene": "internship",
     "oneLiner": "协议里只有你要赔违约金，单位随时可以让你走",
+    "caseSourceUrl": "https://www.imaa.edu.cn/info/1363/7464.htm",
     "story": "",
     "traits": [
       "提前离职要赔固定金额，单位解约却没有任何代价",
@@ -387,6 +396,7 @@
     "id": "trap-intern-missing-written-agreement",
     "scene": "internship",
     "oneLiner": "说好先干起来再说，工资、工时和保险全凭对方一句话",
+    "caseSourceUrl": "https://www.imaa.edu.cn/info/1363/7464.htm",
     "story": "",
     "traits": [
       "只有口头约定，或只有一张录用通知",
@@ -435,6 +445,7 @@
     "id": "trap-loan-training-loan",
     "scene": "common",
     "oneLiner": "说好包就业先培训，签下来的却是分期借款合同",
+    "caseSourceUrl": "http://jyj.liuzhou.gov.cn/zwgk/fdzdgknr/tzgg_58717/202112/P020211201408904845944.pdf#page=5",
     "story": "",
     "traits": [
       "入职或报名培训时被引导在手机上办「分期」",
@@ -478,6 +489,7 @@
     "id": "trap-loan-installment-fees",
     "scene": "common",
     "oneLiner": "利率写着很低，服务费、担保费和续期费叠上去还不清",
+    "caseSourceUrl": "https://www.youcash.com/smartc/upload/file/20261102/1793585981901027004.pdf#page=2",
     "story": "",
     "traits": [
       "只强调「日息几块钱」，不写年化利率和总还款额",
@@ -513,6 +525,7 @@
     "id": "trap-loan-required-loan",
     "scene": "loan",
     "oneLiner": "不办分期就不让入职，岗位变成了贷款入口",
+    "caseSourceUrl": "https://www.boccfc.cn/xinwen/gonggao/202502/W020250822651723353559.pdf#page=1",
     "story": "",
     "traits": [
       "招聘或招生时把办理贷款分期说成入职、报名的必经步骤",
@@ -548,6 +561,7 @@
     "id": "trap-loan-upfront-interest",
     "scene": "loan",
     "oneLiner": "借两万先扣三千，到手少了还款却按全额",
+    "caseSourceUrl": "https://zt.zyqfy.gov.cn/article/detail/2024/02/id/7821955.shtml",
     "story": "",
     "traits": [
       "放款前先扣利息、服务费、担保费，实际到账少于合同金额",
@@ -582,6 +596,7 @@
     "id": "trap-plan-auto-restore-price",
     "scene": "plan",
     "oneLiner": "低价体验到期，悄悄恢复原价扣费",
+    "caseSourceUrl": "https://sh.189.cn/pdf/ywfwxy.pdf#page=6",
     "story": "",
     "traits": [
       "办理时只强调首月几块钱，原价金额与恢复时间一笔带过",
@@ -616,6 +631,7 @@
     "id": "trap-plan-lock-downgrade",
     "scene": "plan",
     "oneLiner": "想销户被告知合约期没到，违约金好几百",
+    "caseSourceUrl": "https://sh.189.cn/pdf/ywfwxy.pdf#page=12",
     "story": "",
     "traits": [
       "办理时送礼品或返话费，换来的是两年起的合约期",
@@ -650,6 +666,7 @@
     "id": "trap-cert-pass-guarantee",
     "scene": "cert",
     "oneLiner": "报名时喊包过，真没考过又说退费条件不达标",
+    "caseSourceUrl": "http://jyj.liuzhou.gov.cn/zwgk/fdzdgknr/tzgg_58717/202112/P020211201408904845944.pdf#page=14",
     "story": "",
     "traits": [
       "招生时口头承诺包过、不过全退，合同里却附加大量退费前提",
@@ -684,6 +701,7 @@
     "id": "trap-cert-narrow-refund",
     "scene": "cert",
     "oneLiner": "退课折算课时，交两万退回两千",
+    "caseSourceUrl": "http://jyj.liuzhou.gov.cn/zwgk/fdzdgknr/tzgg_58717/202112/P020211201408904845944.pdf#page=13",
     "story": "",
     "traits": [
       "退课时已上课时按远高于报名单价的价格折算",
@@ -718,6 +736,7 @@
     "id": "trap-insurance-exempt-hidden",
     "scene": "insurance",
     "oneLiner": "投保时没人讲免责，理赔时才说这也不赔那也不赔",
+    "caseSourceUrl": "https://www.iachina.cn/module/download/downfile.jsp?classid=0&filename=b5177d860ab04959b2f5c8fd60271da8.pdf#page=2",
     "story": "",
     "traits": [
       "免责条款混在几十页条款里，没有加粗或单独提示",
@@ -752,6 +771,7 @@
     "id": "trap-insurance-default-bundled",
     "scene": "insurance",
     "oneLiner": "办贷款顺手「被投保」，保费藏在月供里",
+    "caseSourceUrl": "https://www.4008000000.com/app_upload/file/property/gerenjiekuanbaozhengtuankuan20200618.pdf#page=2",
     "story": "",
     "traits": [
       "借款、办卡页面保险默认勾选，不取消就一起买了",
@@ -786,6 +806,7 @@
     "id": "trap-prepaid-no-refund",
     "scene": "prepaid",
     "oneLiner": "充值时笑脸相迎，退卡时扣完手续费只剩零头",
+    "caseSourceUrl": "https://www.beijing.gov.cn/fwcj/attachments/67c0160041ecec12898c8d1c.pdf#page=1",
     "story": "",
     "traits": [
       "办卡时只说优惠，不提退卡要扣高额手续费",
@@ -820,6 +841,7 @@
     "id": "trap-prepaid-shop-closure",
     "scene": "prepaid",
     "oneLiner": "健身房一夜关门，卡里几千块只剩一张纸",
+    "caseSourceUrl": "https://www.beijing.gov.cn/fwcj/attachments/67c0160041ecec12898c8d1c.pdf#page=2",
     "story": "",
     "traits": [
       "门店突然停业或转让，会员群解散，负责人失联",
@@ -854,6 +876,7 @@
     "id": "trap-carrental-check-dispute",
     "scene": "carrental",
     "oneLiner": "取车不一起验车，还车时旧划痕全算租车人头上",
+    "caseSourceUrl": "https://www.beijing.gov.cn/fwcj/attachments/67c0110141ecec12898c8c91.pdf#page=5",
     "story": "",
     "traits": [
       "取车时门店不一起验车拍照，车况只凭门店记录",
@@ -888,6 +911,7 @@
     "id": "trap-carrental-loss-fee",
     "scene": "carrental",
     "oneLiner": "修车费之外再收停运损失和折旧费，定损门店说了算",
+    "caseSourceUrl": "https://www.beijing.gov.cn/fwcj/attachments/67c0110141ecec12898c8c91.pdf#page=6",
     "story": "",
     "traits": [
       "事故后除维修费外，另收停运损失、折旧费、贬值费",
@@ -922,6 +946,7 @@
     "id": "trap-driving-hidden-fees",
     "scene": "driving",
     "oneLiner": "报名喊着一费制，补考费模拟费接连冒出来",
+    "caseSourceUrl": "https://jtw.beijing.gov.cn/xxgk/2024zcwj/qtzcwj/202407/W020240725777262560882.pdf#page=5",
     "story": "",
     "traits": [
       "招生宣传一费制全包，合同里补考费、模拟费、陪练费另收",
@@ -956,6 +981,7 @@
     "id": "trap-driving-narrow-refund",
     "scene": "driving",
     "oneLiner": "退学先扣三成管理费，没练车也退不回全款",
+    "caseSourceUrl": "https://jtw.beijing.gov.cn/xxgk/2024zcwj/qtzcwj/202407/W020240725777262560882.pdf#page=5",
     "story": "",
     "traits": [
       "退学先扣管理费、建档费，再按已培训学时折算",

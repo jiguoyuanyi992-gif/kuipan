@@ -4,6 +4,26 @@
 > 红线：只出现编造或脱敏样例，不得含真实合同内容、真实姓名、身份证、手机号、住址、公司名。
 > 截图由用户用系统截图工具放入 docs/shots/，文件名带里程碑编号；缺图写「（待补：xxx.png）」，不编造截图内容。
 
+## M4 后追加 · 照契典例配图占位改典例来源链接（2026-11-17，不打 tag）
+
+### 做了什么
+
+- 按天赐指令：照契 9 板块 26 处「典例配图」占位盒全部删去，换成总表里逐条对应的来源链接（官方示范文本/公告 PDF，带 `#page=N` 页码锚点）；其余字段与文案不动。
+- 数据：`src/core/types.ts` TrapEntry 新增可选 `caseSourceUrl`；`src/core/traps/traps.json` 26 条按 id↔总表占位文件名逐一写入链接（临时脚本 `%TEMP%/add-case-source.mjs`，映射不齐即报错，实跑 26/26）。
+- 渲染：`src/pages/ContractsPage.tsx` `CaseStudy` 左位改 `<a target="_blank" rel="noreferrer">` 纸色小盒，朱红竖排「典例来源」，尺寸与原占位盒一致；`AssetImage` 引用移除。
+- 设计登记：design-spec 新增第 10 节；§6/§7 中 case-*.png 标记弃用。
+
+### 报错与解决
+
+- 无新报错。一次自查修正：删 `AssetImage` import 时首次 Edit 只多插了空行未删行，二次 Edit 修正。
+
+### 验收结果
+
+- `npm test` 213/213；`npm run build` 通过；`node dev/kuipan-qa.mjs` 76/76（典例分析标题断言不受影响）。
+- 临时脚本 `%TEMP%/case-link-check.mjs` 20/20 PASS：9 板块链接数 6/4/4/2/2/2/2/2/2 共 26、href 与总表逐条一致、均 `_blank`+`noreferrer`、页面不再出现「典例配图」、控制台 0 error；截图 `%TEMP%/case-link-check/contracts-rent-links.png`。
+- 链接可达性抽查 5 条（beijing.gov.cn / jsj.zs.gov.cn / imaa.edu.cn / sh.189.cn / jtw.beijing.gov.cn）HEAD 均 200。
+- 未完成项：无。
+
 ## M4 后追加 · 捉鬼录取妖镜镜框＋焚鬼切换动画＋九尾狐图入库（2026-11-17，不打 tag）
 
 ### 做了什么

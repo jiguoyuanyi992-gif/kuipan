@@ -61,6 +61,8 @@ export interface TrapEntry {
   id: string;
   scene: RuleScene;
   oneLiner: string;
+  // 典例来源链接（官方示范文本/公告，可带 #page=N 页码锚点），前端渲染为可点链接。
+  caseSourceUrl?: string;
   // 脱敏案例；无真实案例时留空字符串，前端隐藏该区块，不得编造。
   story: string;
   traits: string[];

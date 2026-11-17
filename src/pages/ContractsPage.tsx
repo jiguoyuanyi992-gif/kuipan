@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import contractsJson from "../../data/contracts.json";
-import { AssetImage } from "@/src/components/AssetImage";
 import { Checklist } from "@/src/components/Checklist";
 import { ruleById } from "@/src/core/rules";
 import { actionsForType } from "@/src/core/fallback/actions";
@@ -105,22 +104,23 @@ function CaseStudy({
       className="scroll-mt-4 space-y-3 rounded-[var(--site-radius)] border-t-2 pt-4"
       style={{ borderColor: focused ? "var(--site-accent)" : "var(--paper-border)" }}
     >
-      {/* 上方：左配图，右标题与一句话概要 */}
+      {/* 上方：左侧典例来源链接，右侧标题与一句话概要 */}
       <div className="flex gap-3">
-        <AssetImage
-          name={`case-${trap.id.replace(/^trap-/, "")}.png`}
-          alt={`${title}典例合同配图`}
-          className="h-24 w-20 shrink-0 rounded object-cover"
-          placeholderColor="#e3d6bc"
-          placeholder={
-            <span
-              className="vertical-rl font-title text-xs"
-              style={{ color: "var(--paper-muted)" }}
-            >
-              典例配图
-            </span>
-          }
-        />
+        <a
+          href={trap.caseSourceUrl}
+          target="_blank"
+          rel="noreferrer"
+          title={`查看典例来源：${title}`}
+          className="flex h-24 w-20 shrink-0 items-center justify-center rounded border"
+          style={{ borderColor: "var(--paper-border)", backgroundColor: "#e3d6bc" }}
+        >
+          <span
+            className="vertical-rl font-title text-xs"
+            style={{ color: "var(--site-accent)" }}
+          >
+            典例来源
+          </span>
+        </a>
         <div className="min-w-0 space-y-1">
           <h3 className="font-title text-base leading-snug">{title}</h3>
           <p className="text-[15px] leading-[1.7] text-muted-foreground">
