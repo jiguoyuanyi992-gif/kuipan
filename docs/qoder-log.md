@@ -47,9 +47,18 @@
 - npm run build 通过。
 - dev/kuipan-qa.mjs 76/76（桌面＋移动双视口、控制台 0 error）；照契九类页签全部不再显示「整理中」，各类注意事项彼此不同，清单「已核对 0 / N」与典例分析、签约前检查清单齐备。
 
+### 部署与线上验收（2026-11-17）
+
+- prepare_site / publish_site（actionId 011b23e2-1757-4f60-b735-cadb9a071ce2，预授权）：published=true，access_mode=public，线上 https://kuipan-odzma4gogrf.qoder.zone 。平台写入的描述符已随 7499841 提交。
+- dev/online-verify.mjs 扩为「租房回归＋套餐/保险/预付卡/租车四份编造合同真实模型分析＋照契九类页签」，共 30 项断言。四份线上合同均为编造（标题行含「线上验证示例，虚构」），本地预检判型与专属命中后再上线跑。
+- 连跑三轮：前两轮 29/31，失败的两项都是租房旧断言「签前怎么办」「可能相关条文（仅供参考）」——这两块是条件渲染（前者只在无法律依据时出现、后者只在 aiSuggested 项出现），本轮模型把租房条款全部归到规则命中（verified 直接显示依据）、未返回 aiSuggested 项，故不出现；该两条路径由本地 fixture QA（paste-result）与单元测试覆盖，非回归。改为确定性断言后第三轮 **30/30 全过**。
+- 四类新合同三轮均判型正确（当前：套餐/保险/预付卡/租车），每类专属规则标题命中 ≥2，法律依据与 flk.npc.gov.cn 链接可见，无「智能分析暂不可用」降级；照契九类页签均不再「整理中」；控制台 0 error。未触发 §七「模型 ≥2 次归 other」停机条件。
+- get_function_logs（近 1 小时）：/app/analyze 全部 200，无 5xx，单批耗时 3.4–9.3 秒。
+- 截图（待补：online-rent.png、online-plan.png、online-insurance.png、online-prepaid.png、online-carrental.png、online-contracts-driving.png；自动截图现于 %TEMP%/kuipan-online/，由用户挑选放入 docs/shots/）。
+
 ### 改了哪些文件
 
-引擎批：src/core/types.ts、src/core/scene/index.ts、src/core/llm/prompt.ts 等（见 05b54a1）。各类批次：src/core/rules/rules.json、src/core/traps/traps.json、src/core/traps/checklists.json、src/core/articles/articles.json、data/contracts.json、src/core/examples/index.ts、src/core/fallback/actions.ts、src/core/__tests__/（scene/rules/traps/articles/loanRules/planRules/certRules/insuranceRules/prepaidRules/carrentalRules/drivingRules）、dev/kuipan-qa.mjs、docs/qoder-log.md。
+引擎批：src/core/types.ts、src/core/scene/index.ts、src/core/llm/prompt.ts 等（见 05b54a1）。各类批次：src/core/rules/rules.json、src/core/traps/traps.json、src/core/traps/checklists.json、src/core/articles/articles.json、data/contracts.json、src/core/examples/index.ts、src/core/fallback/actions.ts、src/core/__tests__/（scene/rules/traps/articles/loanRules/planRules/certRules/insuranceRules/prepaidRules/carrentalRules/drivingRules）、dev/kuipan-qa.mjs、dev/online-verify.mjs、docs/qoder-log.md。
 
 ## M4 后追加 · 捉鬼录新增 10 只鬼并装 12 张图（2026-11-17，不打 tag）
 
