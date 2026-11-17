@@ -152,12 +152,38 @@ const cert = `考研培训服务协议（示例，虚构）
 乙方（签字）：周九
 `;
 
+const insurance = `人身保险合同（示例，虚构）
+
+投保人：吴十
+联系电话：13400134000
+保险人：示例人寿保险公司
+
+第一条 投保确认
+投保人已阅读并理解全部条款，勾选投保即视为知悉并同意本合同全部内容。
+
+第二条 等待期与免赔
+本合同等待期90日，等待期内确诊疾病的，不承担给付保险金责任。每次事故免赔额为10000元，免赔额部分由投保人自理。
+
+第三条 责任免除
+责任免除条款详见保险条款附件，投保时不再单独提示。
+
+第四条 保险费
+年交保费6000元，交费期间20年，保费按年缴纳。
+
+第五条 合同解除
+投保人解除合同的，保险人按照合同约定退还保险单的现金价值。
+
+保险人（盖章）：示例人寿保险公司
+投保人（签字）：吴十
+`;
+
 export const examples: ExampleContract[] = [
   { id: "ex-rent", label: "租房合同示例", type: "rent", fabricated: true, text: rent },
   { id: "ex-intern", label: "实习协议示例", type: "internship", fabricated: true, text: intern },
   { id: "ex-loan", label: "培训分期借款示例", type: "loan", fabricated: true, text: loan },
   { id: "ex-plan", label: "通信套餐示例", type: "plan", fabricated: true, text: plan },
   { id: "ex-cert", label: "考研培训示例", type: "cert", fabricated: true, text: cert },
+  { id: "ex-insurance", label: "人身保险示例", type: "insurance", fabricated: true, text: insurance },
   { id: "ex-clean", label: "通用协议示例", type: "other", fabricated: true, text: clean },
 ];
 

@@ -115,15 +115,17 @@
       "id": "insurance",
       "label": "保险",
       "ruleIds": [
+        "insurance-exempt-hidden",
+        "insurance-waiting-deductible",
+        "insurance-default-bundled",
+        "insurance-hesitation-missing",
+        "insurance-surrender-loss",
         "common-auto-renew",
-        "common-prepaid-no-refund",
         "common-exempt-liability",
-        "common-penalty-excessive",
-        "common-unilateral-change",
-        "common-jurisdiction",
         "common-personal-info"
       ],
-      "trapIds": []
+      "trapIds": ["trap-insurance-exempt-hidden", "trap-insurance-default-bundled"],
+      "checklist": "insurance"
     },
     {
       "id": "prepaid",

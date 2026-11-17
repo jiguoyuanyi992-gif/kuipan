@@ -181,6 +181,10 @@ for (const vp of [
   await sleep(300);
   txt = await bodyText();
   record(vp.name, "contracts-loan", txt.includes("已核对 0 / 8") && txt.includes("分期") && txt.includes("预付费用概不退还"));
+  await clickText("保险");
+  await sleep(300);
+  txt = await bodyText();
+  record(vp.name, "contracts-insurance", txt.includes("已核对 0 / 7") && txt.includes("免责条款未作显著提示或说明") && txt.includes("典例分析") && txt.includes("签约前检查清单"));
   await clickText("租房");
   await sleep(300);
 

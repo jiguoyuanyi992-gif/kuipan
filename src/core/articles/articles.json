@@ -232,5 +232,44 @@
     "verified": true,
     "reviewer": "执行层自动引用",
     "reviewNote": "检索日期 2026-11-17；flk 详情页正文标题：中华人民共和国消费者权益保护法实施条例；quote 逐字取自该页官方 DOCX 全文。"
+  },
+  {
+    "id": "insurance-11",
+    "law": "中华人民共和国保险法",
+    "article": "第十一条",
+    "quote": "订立保险合同，应当协商一致，遵循公平原则确定各方的权利和义务。除法律、行政法规规定必须保险的外，保险合同自愿订立。",
+    "summary": "除法律、行政法规规定必须保险的外，保险合同自愿订立",
+    "scenes": ["insurance"],
+    "sourceUrl": "https://flk.npc.gov.cn/detail?id=2c909fdd678bf17901678bf7c4060811",
+    "effectiveOn": "2015-04-24",
+    "verified": true,
+    "reviewer": "执行层自动引用",
+    "reviewNote": "检索日期 2026-11-17；flk 详情页正文标题：中华人民共和国保险法；quote 逐字取自对应页面官方 DOCX 全文。"
+  },
+  {
+    "id": "insurance-17",
+    "law": "中华人民共和国保险法",
+    "article": "第十七条第二款",
+    "quote": "对保险合同中免除保险人责任的条款，保险人在订立合同时应当在投保单、保险单或者其他保险凭证上作出足以引起投保人注意的提示，并对该条款的内容以书面或者口头形式向投保人作出明确说明；未作提示或者明确说明的，该条款不产生效力。",
+    "summary": "免责条款须作足以引起投保人注意的提示并明确说明，未提示或未说明的该条款不产生效力",
+    "scenes": ["insurance"],
+    "sourceUrl": "https://flk.npc.gov.cn/detail?id=2c909fdd678bf17901678bf7c4060811",
+    "effectiveOn": "2015-04-24",
+    "verified": true,
+    "reviewer": "执行层自动引用",
+    "reviewNote": "检索日期 2026-11-17；flk 详情页正文标题：中华人民共和国保险法；quote 逐字取自对应页面官方 DOCX 全文。"
+  },
+  {
+    "id": "insurance-47",
+    "law": "中华人民共和国保险法",
+    "article": "第四十七条",
+    "quote": "投保人解除合同的，保险人应当自收到解除合同通知之日起三十日内，按照合同约定退还保险单的现金价值。",
+    "summary": "投保人解除合同的，保险人应自收到通知之日起三十日内按约定退还保单现金价值",
+    "scenes": ["insurance"],
+    "sourceUrl": "https://flk.npc.gov.cn/detail?id=2c909fdd678bf17901678bf7c4060811",
+    "effectiveOn": "2015-04-24",
+    "verified": true,
+    "reviewer": "执行层自动引用",
+    "reviewNote": "检索日期 2026-11-17；flk 详情页正文标题：中华人民共和国保险法；quote 逐字取自对应页面官方 DOCX 全文。"
   }
 ]

@@ -713,5 +713,73 @@
     "verified": true,
     "reviewer": "执行层自动引用",
     "reviewNote": "检索日期 2026-11-17；flk 详情页正文标题：中华人民共和国民法典；quote 逐字取自该页官方 DOCX 全文，并与 jsjc.gov.cn 转载页核对一致。"
+  },
+  {
+    "id": "trap-insurance-exempt-hidden",
+    "scene": "insurance",
+    "oneLiner": "投保时没人讲免责，理赔时才说这也不赔那也不赔",
+    "story": "",
+    "traits": [
+      "免责条款混在几十页条款里，没有加粗或单独提示",
+      "投保页面一句「已阅读并理解全部条款」代替逐条说明",
+      "业务员只讲保什么，不讲不保什么"
+    ],
+    "beforeSign": [
+      "要求把责任免除条款逐条讲清，哪些情况不赔落到纸面",
+      "核对投保单上免责条款是否加粗或单独列出",
+      "投保过程录音或截图，留存对方说明过的证据"
+    ],
+    "afterHit": [
+      "找出免责条款与投保时的说明记录，核对是否作过提示",
+      "向保险公司书面提出异议，要求说明拒赔依据",
+      "协商不成拨打 12378 银行保险消费者投诉维权热线反映"
+    ],
+    "legalBasis": [
+      {
+        "law": "中华人民共和国保险法",
+        "article": "第十七条第二款",
+        "quote": "对保险合同中免除保险人责任的条款，保险人在订立合同时应当在投保单、保险单或者其他保险凭证上作出足以引起投保人注意的提示，并对该条款的内容以书面或者口头形式向投保人作出明确说明；未作提示或者明确说明的，该条款不产生效力。",
+        "effectiveOn": "2015-04-24",
+        "sourceUrl": "https://flk.npc.gov.cn/detail?id=2c909fdd678bf17901678bf7c4060811",
+        "reprintUrl": "https://scjgj.beijing.gov.cn/cxfw/flfgcxfw/qyjgl/202006/t20200621_1929600.html"
+      }
+    ],
+    "verified": true,
+    "reviewer": "执行层自动引用",
+    "reviewNote": "检索日期 2026-11-17；flk 详情页正文标题：中华人民共和国保险法；quote 逐字取自该页官方 DOCX 全文，并与 scjgj.beijing.gov.cn 转载页核对一致。"
+  },
+  {
+    "id": "trap-insurance-default-bundled",
+    "scene": "insurance",
+    "oneLiner": "办贷款顺手「被投保」，保费藏在月供里",
+    "story": "",
+    "traits": [
+      "借款、办卡页面保险默认勾选，不取消就一起买了",
+      "保费分摊进月供，不单独列明金额",
+      "没人告知这份保险可以单独买或不买"
+    ],
+    "beforeSign": [
+      "提交前逐项核对勾选框，取消不需要的保险",
+      "问清保费金额、缴费方式，要求单独列明",
+      "确认保险与借款是否绑定，能否只借款不投保"
+    ],
+    "afterHit": [
+      "留存借款页面截图、还款计划与保单，核对扣款明细",
+      "向保险公司与贷款机构书面提出退保退费",
+      "协商不成拨打 12378 银行保险消费者投诉维权热线反映"
+    ],
+    "legalBasis": [
+      {
+        "law": "中华人民共和国保险法",
+        "article": "第十一条",
+        "quote": "订立保险合同，应当协商一致，遵循公平原则确定各方的权利和义务。除法律、行政法规规定必须保险的外，保险合同自愿订立。",
+        "effectiveOn": "2015-04-24",
+        "sourceUrl": "https://flk.npc.gov.cn/detail?id=2c909fdd678bf17901678bf7c4060811",
+        "reprintUrl": "https://scjgj.beijing.gov.cn/cxfw/flfgcxfw/qyjgl/202006/t20200621_1929600.html"
+      }
+    ],
+    "verified": true,
+    "reviewer": "执行层自动引用",
+    "reviewNote": "检索日期 2026-11-17；flk 详情页正文标题：中华人民共和国保险法；quote 逐字取自该页官方 DOCX 全文，并与 scjgj.beijing.gov.cn 转载页核对一致。"
   }
 ]

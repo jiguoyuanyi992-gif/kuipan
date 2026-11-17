@@ -8,7 +8,6 @@ import { CONTRACT_TYPES } from "../types";
 // 专属规则尚未补齐的类型在此显式豁免；每补完一类移除一项。
 // 被跳过（凑不够 4 条 flk 依据）的类型保留在名单里并在 qoder-log 记录原因。
 const PENDING_DEDICATED: string[] = [
-  "insurance",
   "prepaid",
   "carrental",
   "driving",

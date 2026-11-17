@@ -76,6 +76,20 @@
         { "id": "cert-party", "label": "合同抬头机构与宣传、收款方是同一家，核对过" },
         { "id": "cert-proof", "label": "宣传截图、聊天记录和缴费凭证都留底了" }
       ]
+    },
+    {
+      "id": "insurance",
+      "label": "保险",
+      "storageKey": "qqy:checklist:insurance",
+      "items": [
+        { "id": "ins-exempt", "label": "免责条款逐条问清了，哪些情况不赔写在纸上" },
+        { "id": "ins-waiting", "label": "等待期多长、等待期内出险怎么处理，确认过" },
+        { "id": "ins-deductible", "label": "免赔额、免赔率与赔付比例问清了" },
+        { "id": "ins-hesitation", "label": "犹豫期天数与期内退保是否全额退费，写进合同" },
+        { "id": "ins-cashvalue", "label": "现金价值表看过，知道提前退保能退多少" },
+        { "id": "ins-bundle", "label": "投保是自己勾选的，没有被默认搭售，保费金额单独列明" },
+        { "id": "ins-party", "label": "保险公司名称、产品名称与宣传核对过，缴费凭证留底" }
+      ]
     }
   ]
 }

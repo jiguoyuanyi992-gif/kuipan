@@ -12,6 +12,7 @@ export const GENERAL_ACTIONS: string[] = [
 export const SCENE_EXTRA_ACTIONS: Partial<Record<ContractType, string[]>> = {
   rent: ["可以咨询当地 12345 政务服务热线。"],
   internship: ["可以先问学校实习指导老师。", "劳动权益问题可拨 12333。"],
+  insurance: ["保险消费纠纷可拨 12378 银行保险消费者投诉维权热线。"],
 };
 
 export function actionsForType(type: ContractType): string[] {
