@@ -55,9 +55,45 @@
 - **首页**：钟馗判官主视觉（zhongkui.png，未到位用墨色占位）+ 中央「呈上生死簿」上传入口；四种输入（粘贴 / Word·PDF / 照片≤6张 / 示例）流程与提示文案不变；示例标注「示例，虚构」。
 - **结果页**：判词批注风——概览卡与条款写在宣纸上，朱笔圈注命中句，风险详情为朱砂左批线卡片；「查看同类案例」跳照契对应类型卷轴。
 - **捉鬼录**：圆形青铜照妖镜（mirror 位）+ 当前鬼画像（ghost-*.png）；信息卡字段：鬼名 / 比喻 / 常出没 / 应对策略；下方缩略图点击切换。数据 `data/ghosts.json`。
-- **照契**：先选合同类型，再展开卷轴（scroll-top/bottom.png 轴杆 + 纸面）；检查清单在卷轴上方（勾选沿用 `qqy:checklist:*`）；卷轴两栏：注意事项（法律依据，只按 rule_id 读规则库且仅 verified=true，否则「整理中」）/ 典例分析（左配图右标题概要，下方整宽分析，重要词变红）。数据 `data/contracts.json`，法条不复制原文。套餐 / 考证 / 保险无数据，整卷「整理中」。
+- **照契**：先选合同类型，再展开卷轴（CSS 渐变绘制上下木轴 + 两端圆形轴头 + 左右细窄裱边 + 宣纸色纸面，纸纹用 CSS 渐变，不引用外部图片；见第 8 节）；检查清单在卷轴上方（勾选沿用 `qqy:checklist:*`），每条前置 2~4 字「重点标签」小色块（5 类固定色，见第 8 节）；卷轴两栏：注意事项（法律依据，只按 rule_id 读规则库且仅 verified=true，否则「整理中」）/ 典例分析（左配图右标题概要，下方整宽分析，重要词变红）。数据 `data/contracts.json`，法条不复制原文。套餐 / 考证 / 保险无数据，整卷「整理中」。
 
 ## 7. 素材约定
 
-- 图片放 `public/assets/`（Vite 产物也输出 /assets，素材必须在 public 下）：zhongkui.png、mirror.png、scroll-top.png、scroll-bottom.png、paper-texture.png、seal-red.png、ghost-xiangliu.png、ghost-taotie.png、ghost-jiuweihu.png、case-<ruleId>.png。
+- 图片放 `public/assets/`（Vite 产物也输出 /assets，素材必须在 public 下）：zhongkui.png、mirror.png、seal-red.png、ghost-xiangliu.png、ghost-taotie.png、ghost-jiuweihu.png、case-<ruleId>.png。scroll-top.png / scroll-bottom.png / paper-texture.png 自 2026-11-17 起不再使用，照契卷轴全部 CSS 绘制（见第 8 节）。
 - 构建/启动时扫描 public/assets 生成清单（vite 虚拟模块 `virtual:asset-manifest`）；AssetImage 对缺失素材渲染占位色块、**不发请求**，避免 404 控制台错误。放入图片后重启 dev 或重新 build 即生效。
+
+## 8. 照契卷轴主题与清单重点标签（2026-11-17 天赐指令）
+
+只改样式与展示结构，不动文案、法条、数据结构、路由与勾选逻辑。实现见 `src/globals.css` 的 `.qq-*` / `.chk-*` 段与 `src/components/Checklist.tsx` 的 `CHECKLIST_TAGS` 展示层映射。
+
+### 8.1 页面背景与卷轴
+
+- 照契页背景：暗茶色竖向渐变 `linear-gradient(180deg,#3f3020,#2b2115 45%,#1e1710)`（`.qq-page`），沉稳无花纹。
+- 轴杆：CSS 渐变木轴（`.qq-rod`），两端 `::before/::after` 圆形轴头；不再引用 scroll-top/bottom.png。
+- 裱边：纸面左右细窄深色边（`.qq-mount`，≤480px 收窄到 6px）。
+- 纸面：`#f3e9d2` 底 + 极轻 CSS 渐变纸纹（`.qq-paper`），不引用 paper-texture.png。
+- 展开动画：`.qq-unroll` 自上而下 `clip-path` 展开 350ms ease-out，`prefers-reduced-motion: reduce` 时关闭。
+- 两栏分隔：md 以上 `.qq-col-divide` 淡墨细线。
+
+### 8.2 类型签条与印章
+
+- 类型切换（`.qq-tab`）：木牌/签条样式；选中态朱砂红底 + 朱砂描边（`#b23a2e`）。
+- 「契」字朱砂印章（`.seal`）统一用于清单标题、卷轴主标题与两栏区块标题前。
+
+### 8.3 清单重点标签（5 类固定色）
+
+每条清单句子前置 2~4 字标签，浅底（`#fefdf8`）+ 深色字 + 同色细边框，宽度按最长 4 字固定（句子左对齐），宋体系 600 字重。全站只用以下 5 色：
+
+| 类别 | 色值 | 含义 | data-cat |
+|---|---|---|---|
+| 主体 | `#B23A2E` 朱砂红 | 签约人身份、房屋性质 | `subject` |
+| 金钱 | `#9A6B1F` 赭金 | 押金、水电网费用、付款方式 | `money` |
+| 留证 | `#2F4F6F` 靛青 | 抄表留底、拍照留证 | `evidence` |
+| 条款 | `#3E6B4F` 松绿 | 违约金、进屋通知 | `terms` |
+| 期限 | `#6B4A5E` 紫褐 | 租期、续租、退租通知 | `deadline` |
+
+- 行与行淡墨细线分隔，勾选框与标签垂直居中，行高一致。
+- 已勾选：正文变淡 + 细删除线，标签保持原色但透明度降到 0.62。
+- 标签文字与浅底对比度均 ≥ WCAG AA（最浅的赭金 `#9A6B1F` 对 `#fefdf8` ≈ 4.6:1）。
+- 保留「已核对 x / N」计数与「勾选只存在你自己的浏览器里」提示。
+- 9 类清单全部套用；租房 10 条标签按天赐给定文案，其余 8 类自行提炼 2~4 字归入上述 5 类。

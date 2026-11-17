@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import contractsJson from "../../data/contracts.json";
-import { AssetImage, assetUrl } from "@/src/components/AssetImage";
+import { AssetImage } from "@/src/components/AssetImage";
 import { Checklist } from "@/src/components/Checklist";
 import { ruleById } from "@/src/core/rules";
 import { actionsForType } from "@/src/core/fallback/actions";
@@ -72,7 +72,7 @@ function RedText({ text }: { text: string }) {
 function BulletList({ items }: { items: string[] }) {
   if (items.length === 0) return null;
   return (
-    <ul className="list-disc space-y-1 pl-5 text-sm leading-relaxed">
+    <ul className="list-disc space-y-1 pl-5 text-[15px] leading-[1.7]">
       {items.map((t, i) => (
         <li key={i}>
           <RedText text={t} />
@@ -123,7 +123,7 @@ function CaseStudy({
         />
         <div className="min-w-0 space-y-1">
           <h3 className="font-title text-base leading-snug">{title}</h3>
-          <p className="text-sm leading-relaxed text-muted-foreground">
+          <p className="text-[15px] leading-[1.7] text-muted-foreground">
             <RedText text={trap.oneLiner} />
           </p>
         </div>
@@ -132,7 +132,7 @@ function CaseStudy({
       {/* 下方整宽：分析文字，全部来自现有陷阱库与规则库字段 */}
       <div className="space-y-2.5">
         {trap.story && (
-          <p className="text-sm leading-relaxed text-muted-foreground">{trap.story}</p>
+          <p className="text-[15px] leading-[1.7] text-muted-foreground">{trap.story}</p>
         )}
         <div className="space-y-1">
           <p className="text-xs font-medium text-muted-foreground">哪个条款是坑</p>
@@ -141,7 +141,7 @@ function CaseStudy({
         {rule?.why && (
           <div className="space-y-1">
             <p className="text-xs font-medium text-muted-foreground">为什么</p>
-            <p className="text-sm leading-relaxed">
+            <p className="text-[15px] leading-[1.7]">
               <RedText text={rule.why} />
             </p>
           </div>
@@ -224,10 +224,10 @@ export function ContractsPage({ focusTrapId, hasAnalysis, onBack, onCheckRule }:
   const scene: ContractType = (CONTRACT_TYPES as readonly string[]).includes(type.id)
     ? (type.id as ContractType)
     : "other";
-  const texture = assetUrl("paper-texture.png");
 
   return (
-    <main className="mx-auto flex w-full max-w-[1100px] flex-col gap-5 px-4 py-6 sm:px-5 sm:py-8">
+    <div className="qq-page flex-1">
+      <main className="mx-auto flex w-full max-w-[1100px] flex-col gap-5 px-4 py-6 sm:px-5 sm:py-8">
       <header className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-3">
           <button
@@ -252,12 +252,7 @@ export function ContractsPage({ focusTrapId, hasAnalysis, onBack, onCheckRule }:
               role="tab"
               aria-selected={on}
               onClick={() => setTypeId(t.id)}
-              className="rounded-[var(--site-radius)] border px-3.5 py-1.5 font-title text-sm"
-              style={{
-                borderColor: on ? "var(--site-accent)" : "var(--site-border)",
-                color: on ? "var(--site-fg)" : "var(--site-muted)",
-                backgroundColor: on ? "var(--site-surface)" : "transparent",
-              }}
+              className="qq-tab"
             >
               {t.label}
             </button>
@@ -265,22 +260,16 @@ export function ContractsPage({ focusTrapId, hasAnalysis, onBack, onCheckRule }:
         })}
       </div>
 
+      {/* 选定类型后，清单+卷轴这一组自上而下展开（350ms，prefers-reduced-motion 下关闭） */}
+      <div key={type.id} className="qq-unroll flex flex-col gap-5">
       {/* 检查清单在卷轴上方，勾选状态沿用原 localStorage key */}
-      {type.checklist && <Checklist key={type.id} category={type.checklist} />}
+      {type.checklist && <Checklist category={type.checklist} />}
 
-      {/* 卷轴：上下轴杆 + 纸面 */}
-      <div>
-        <AssetImage
-          name="scroll-top.png"
-          alt=""
-          className="h-6 w-full object-cover"
-          placeholderColor="#3d3021"
-          placeholder={null}
-        />
-        <div
-          className="paper space-y-6 border-x border-border px-4 py-5 sm:px-6"
-          style={texture ? { backgroundImage: `url(${texture})` } : undefined}
-        >
+      {/* 卷轴：上下木轴（CSS 绘制，两端轴头）+ 左右裱边 + 宣纸色纸面 */}
+      <div className="qq-scroll">
+        <div className="qq-rod" aria-hidden />
+        <div className="qq-mount">
+        <div className="paper qq-paper space-y-6 px-4 py-5 sm:px-6">
           <h2 className="flex items-center gap-2 font-title text-xl">
             <span className="seal h-7 w-7 text-xs" aria-hidden>
               契
@@ -290,9 +279,14 @@ export function ContractsPage({ focusTrapId, hasAnalysis, onBack, onCheckRule }:
 
           <div className="grid gap-8 md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
             <section className="space-y-3">
-              <h3 className="font-title text-base">注意事项（法律依据）</h3>
+              <h3 className="flex items-center gap-2 font-title text-base">
+                <span className="seal h-5 w-5 text-[10px]" aria-hidden>
+                  契
+                </span>
+                注意事项（法律依据）
+              </h3>
               {verifiedRules.length === 0 ? (
-                <div className="space-y-1 text-sm text-muted-foreground">
+                <div className="space-y-1 text-[15px] leading-[1.7] text-muted-foreground">
                   <p className="font-medium">签前怎么办</p>
                   <ul className="list-disc space-y-1 pl-5">
                     {actionsForType(scene).map((a, i) => (
@@ -304,10 +298,10 @@ export function ContractsPage({ focusTrapId, hasAnalysis, onBack, onCheckRule }:
                 <ul className="space-y-3">
                   {verifiedRules.map((r) => (
                     <li key={r.id} className="space-y-1 border-l-2 pl-3" style={{ borderColor: "var(--site-accent)" }}>
-                      <p className="font-title text-sm">{r.title}</p>
+                      <p className="font-title text-[15px]">{r.title}</p>
                       {r.legalBasis.map((lb, i) => (
                         <div key={i} className="space-y-0.5">
-                          <p className="text-xs leading-relaxed text-muted-foreground">
+                          <p className="text-[15px] leading-[1.7]">
                             {lb.law} {lb.article}：{lb.quote}
                           </p>
                           <p className="text-[11px] text-muted-foreground">
@@ -345,8 +339,13 @@ export function ContractsPage({ focusTrapId, hasAnalysis, onBack, onCheckRule }:
               )}
             </section>
 
-            <section className="space-y-4">
-              <h3 className="font-title text-base">典例分析</h3>
+            <section className="qq-col-divide space-y-4">
+              <h3 className="flex items-center gap-2 font-title text-base">
+                <span className="seal h-5 w-5 text-[10px]" aria-hidden>
+                  契
+                </span>
+                典例分析
+              </h3>
               {cases.length === 0 ? (
                 <p className="text-sm text-muted-foreground">整理中</p>
               ) : (
@@ -370,14 +369,11 @@ export function ContractsPage({ focusTrapId, hasAnalysis, onBack, onCheckRule }:
             </section>
           </div>
         </div>
-        <AssetImage
-          name="scroll-bottom.png"
-          alt=""
-          className="h-6 w-full object-cover"
-          placeholderColor="#3d3021"
-          placeholder={null}
-        />
+        </div>
+        <div className="qq-rod" aria-hidden />
+      </div>
       </div>
     </main>
+    </div>
   );
 }

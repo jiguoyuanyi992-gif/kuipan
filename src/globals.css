@@ -256,3 +256,160 @@ body {
     button, a { transition-duration: 0ms; }
   }
 }
+
+/* ========== 照契 · 卷轴式主题（2026-11-17 天赐指令，登记于 docs/design-spec.md） ==========
+   暗茶色页面背景 + CSS 绘制木轴卷轴 + 宣纸色纸面；不引用外部图片。
+   清单重点标签只用 5 个类别色：主体朱砂、金钱赭金、留证靛青、条款松绿、期限紫褐。 */
+
+.qq-page {
+  background: linear-gradient(180deg, #3f3020 0%, #2b2115 45%, #1e1710 100%);
+}
+
+/* 类型切换：木牌签条，选中态朱砂红底 */
+.qq-tab {
+  font-family: var(--font-title);
+  font-weight: 600;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  padding: 0.4rem 0.95rem;
+  border-radius: 3px;
+  border: 1px solid rgba(201, 162, 75, 0.38);
+  background: linear-gradient(180deg, #4d3c27 0%, #3a2c1c 60%, #2e2315 100%);
+  color: #e0d2b4;
+  box-shadow: inset 0 1px 0 rgba(255, 240, 210, 0.1), 0 1px 3px rgba(0, 0, 0, 0.35);
+}
+.qq-tab[aria-selected="true"] {
+  border-color: #b23a2e;
+  color: #f6ecd9;
+  background: linear-gradient(180deg, #8c3527 0%, #6e2a1e 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 220, 190, 0.18), 0 0 0 1px rgba(178, 58, 46, 0.55);
+}
+
+/* 展开动画：自上而下 350ms，减弱动效时关闭 */
+.qq-unroll {
+  transform-origin: top center;
+  animation: qq-unroll 350ms ease-out both;
+}
+@keyframes qq-unroll {
+  from {
+    clip-path: inset(0 0 100% 0);
+    opacity: 0.55;
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .qq-unroll {
+    animation: none;
+  }
+}
+
+/* 轴杆：CSS 渐变木轴，两端圆形轴头 */
+.qq-rod {
+  position: relative;
+  height: 18px;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #6b5236 0%, #46331f 40%, #241a0e 85%, #171007 100%);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+}
+.qq-rod::before,
+.qq-rod::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  transform: translateY(-50%);
+  background: radial-gradient(circle at 35% 32%, #7a5c3a 0%, #4a3722 55%, #241a0d 100%);
+  border: 1px solid #171007;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.45);
+}
+.qq-rod::before {
+  left: -10px;
+}
+.qq-rod::after {
+  right: -10px;
+}
+
+/* 裱边：纸面左右细窄深色边，窄屏收窄 */
+.qq-mount {
+  padding: 0 12px;
+  background: linear-gradient(90deg, #241a0e, #35281a 50%, #241a0e);
+}
+@media (max-width: 480px) {
+  .qq-mount {
+    padding: 0 6px;
+  }
+}
+
+/* 宣纸纸面：#F3E9D2 底 + 极轻纸纹（CSS 渐变，不用图片） */
+.qq-paper {
+  background-color: #f3e9d2;
+  background-image:
+    repeating-linear-gradient(90deg, rgba(120, 95, 60, 0.045) 0 1px, transparent 1px 4px),
+    repeating-linear-gradient(0deg, rgba(120, 95, 60, 0.035) 0 1px, transparent 1px 5px),
+    radial-gradient(120% 80% at 50% 0%, rgba(255, 250, 235, 0.5), transparent 60%);
+  box-shadow: inset 0 0 24px rgba(90, 70, 40, 0.12);
+}
+
+/* 纸面内两栏之间：淡墨细线（md 以上） */
+@media (min-width: 768px) {
+  .qq-col-divide {
+    border-left: 1px solid rgba(38, 32, 26, 0.16);
+    padding-left: 2rem;
+  }
+}
+
+/* 清单面板：卷宗纸卡，细线分隔各行 */
+.chk-panel {
+  background-color: #f3e9d2;
+  border: 1px solid #6b5a3e;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.25);
+}
+.chk-list .chk-row {
+  border-bottom: 1px solid rgba(38, 32, 26, 0.1);
+}
+.chk-list .chk-row:last-child {
+  border-bottom: 0;
+}
+
+/* 重点标签：浅底 + 深色字 + 同色细边框（统一一种）；宽度按最长 4 字固定 */
+.chk-tag {
+  box-sizing: border-box;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(4em + 0.9rem);
+  padding: 0.12em 0;
+  border-radius: 3px;
+  border: 1px solid currentColor;
+  background-color: #fefdf8;
+  font-family: var(--font-title);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: 0.02em;
+}
+.chk-tag[data-cat="subject"] {
+  color: #b23a2e; /* 朱砂红 · 主体 */
+}
+.chk-tag[data-cat="money"] {
+  color: #9a6b1f; /* 赭金 · 金钱 */
+}
+.chk-tag[data-cat="evidence"] {
+  color: #2f4f6f; /* 靛青 · 留证 */
+}
+.chk-tag[data-cat="terms"] {
+  color: #3e6b4f; /* 松绿 · 条款 */
+}
+.chk-tag[data-cat="deadline"] {
+  color: #6b4a5e; /* 紫褐 · 期限 */
+}
+/* 已勾选：标签保持原色但降低透明度（正文淡化+删除线由行内类处理） */
+.chk-row[data-checked] .chk-tag {
+  opacity: 0.62;
+}
