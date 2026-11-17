@@ -4,6 +4,28 @@
 > 红线：只出现编造或脱敏样例，不得含真实合同内容、真实姓名、身份证、手机号、住址、公司名。
 > 截图由用户用系统截图工具放入 docs/shots/，文件名带里程碑编号；缺图写「（待补：xxx.png）」，不编造截图内容。
 
+## M4 后追加 · 捉鬼录新增 10 只鬼并装 12 张图（2026-11-17，不打 tag）
+
+### 做了什么
+
+- data/ghosts.json 末尾按指令原样追加 10 条：pixiu、qiongqi、huapi、gudiao、shuigui、shen、changgui、wangliang、mengpo、wuchang（字段 id/name/metaphor/scenes/strategy，顺序不变）；现有 3 条（相柳/饕餮/九尾狐）文字逐字未动；页面代码未改。
+- public/assets/ 装图 12 张：指令表 11 张＋饕餮替换（替换旧饕餮图由天赐本条消息明确指定）。图与鬼的对应按画面内容逐张识别：九头蛇衔钱=相柳、吞钱串神兽=貔貅、翼虎衔卷按天平=穷奇、揭面具=画皮鬼、角鹰抓钱袋=蛊雕、水中伸手者=水鬼、贝楼海市=蜃、提灯者身后虎眼=伥鬼、回廊迷墙=魍魉、捧碗老妇=孟婆、高帽沙漏绳索=无常、牛角贪食兽首=饕餮。九尾狐天赐未给图，继续占位（占位显示「九」字，不发请求、无 404）。
+- 压缩：源图为 2.0–6.4MB 的大尺寸 PNG；ffmpeg lanczos 缩至 640×640＋palettegen 256 色＋paletteuse(bayer)，保持 PNG 格式与文件名、不裁剪；12 张全部一次达标 ≤300KB。压缩前后字节数：相柳 5487098→225187；貔貅 5846460→237354；穷奇 6346781→262389；画皮鬼 5923379→243935；蛊雕 6085867→251550；水鬼 5266887→244047；蜃 5513884→227016；伥鬼 2050622→226487；魍魉 6449951→274520；孟婆 5637274→246732；无常 4699298→206099；饕餮 4780349→199817（旧饕餮图 525951 字节本身超限，本次一并替换）。
+
+### 验证
+
+- npm test 116/116 全绿；npm run build 通过；dist/assets 含 12 张 ghost 图。
+- dev/kuipan-qa.mjs 68/68（桌面＋移动双视口、控制台 0 error、no-asset-404 过）；截图 desktop-ghosts.png、mobile-ghosts.png（%TEMP%/kuipan-qa/）：13 只鬼、12 只有图、九尾狐占位、375px 无溢出。
+- 线上复验（headless＋普通 UA，临时脚本放 %TEMP% 不进仓库）：13 个切换按钮、12 张 img naturalWidth>0、1 个占位、圆镜正常、双视口 scrollWidth 无溢出、控制台 0 error、网络 0 个 4xx；截图 online-ghosts-desktop.png、online-ghosts-mobile.png（%TEMP%/kuipan-online/）。curl 核对线上 12 张图与本地逐字节一致。
+
+### 部署与运行记录
+
+- prepare_site/publish_site 各一次（预授权）：actionId a8b0b382-3c59-4e9e-80b0-75dee8268e0d，publishOperationId 01a1e7e5-910e-73d8-9ad4-2e17d481443a；get_publish_status published=true、committed=true、access_mode=public；线上 bundle 已换为 index-DeP82r6g.js（curl 首页核对）。
+
+### 改了哪些文件
+
+data/ghosts.json、public/assets/ghost-*.png ×12、docs/qoder-log.md。
+
 ## M4 后追加 · 三项任务完成后发布与线上复验（2026-11-17，不打 tag）
 
 ### 部署与运行记录
