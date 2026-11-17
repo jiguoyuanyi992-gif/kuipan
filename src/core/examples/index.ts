@@ -227,6 +227,28 @@ const carrental = `汽车租赁合同（示例，虚构）
 乙方（签字）：陈十一
 `;
 
+const driving = `机动车驾驶培训合同（示例，虚构）
+
+甲方（驾校）：示例机动车驾驶员培训学校
+乙方（学员）：褚十二
+联系电话：13100131000
+
+第一条 培训内容
+甲方为乙方提供C1驾驶证培训，宣传一费制全包，培训费3800元。补考费、考场模拟费、陪练费另收。
+
+第二条 培训安排
+练车预约与排课以甲方安排为准。甲方有权根据经营情况单方变更训练场地。
+
+第三条 退费
+乙方报名后要求退学的，扣除已培训学时费用百分之三十的管理费，其余费用不予退还。
+
+第四条 生效
+本合同自乙方缴费时生效。
+
+甲方（盖章）：示例机动车驾驶员培训学校
+乙方（签字）：褚十二
+`;
+
 export const examples: ExampleContract[] = [
   { id: "ex-rent", label: "租房合同示例", type: "rent", fabricated: true, text: rent },
   { id: "ex-intern", label: "实习协议示例", type: "internship", fabricated: true, text: intern },
@@ -236,6 +258,7 @@ export const examples: ExampleContract[] = [
   { id: "ex-insurance", label: "人身保险示例", type: "insurance", fabricated: true, text: insurance },
   { id: "ex-prepaid", label: "健身办卡示例", type: "prepaid", fabricated: true, text: prepaid },
   { id: "ex-carrental", label: "租车合同示例", type: "carrental", fabricated: true, text: carrental },
+  { id: "ex-driving", label: "驾校培训示例", type: "driving", fabricated: true, text: driving },
   { id: "ex-clean", label: "通用协议示例", type: "other", fabricated: true, text: clean },
 ];
 

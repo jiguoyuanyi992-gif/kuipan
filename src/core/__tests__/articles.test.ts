@@ -64,6 +64,9 @@ describe("封闭条文清单", () => {
     expect(carrental).toContain("civil-714");
     expect(carrental).toContain("civil-511-2");
     expect(carrental).toContain("civil-511-4");
+    const driving = articlesForType("driving").map((a) => a.id);
+    expect(driving).toContain("civil-511-4");
+    expect(driving).toContain("consumer-impl-10-1");
     const other = articlesForType("other").map((a) => a.id);
     expect(other).toContain("consumer-26");
     expect(other).toContain("consumer-53");

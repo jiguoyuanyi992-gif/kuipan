@@ -118,6 +118,20 @@
         { "id": "cr-party", "label": "租车公司资质与门店核对过，合同抬头一致" },
         { "id": "cr-proof", "label": "交接单、付款凭证、车况照片都留底了" }
       ]
+    },
+    {
+      "id": "driving",
+      "label": "驾校",
+      "storageKey": "qqy:checklist:driving",
+      "items": [
+        { "id": "dr-fees", "label": "补考费、模拟费、陪练费是否包含在学费里，逐项列明了" },
+        { "id": "dr-refund", "label": "退学退费怎么算、扣哪些费用，写在合同里" },
+        { "id": "dr-term", "label": "培训期限与完成时限写清楚，没有留白" },
+        { "id": "dr-booking", "label": "约车方式、练车频次与时段取消规则问清了" },
+        { "id": "dr-site", "label": "训练场地写进合同，换场地要先协商一致" },
+        { "id": "dr-party", "label": "驾校培训资质核对过，合同抬头与报名点一致" },
+        { "id": "dr-proof", "label": "缴费凭证、合同、宣传截图都留底了" }
+      ]
     }
   ]
 }

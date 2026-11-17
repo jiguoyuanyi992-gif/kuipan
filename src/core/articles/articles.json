@@ -356,7 +356,7 @@
     "article": "第五百一十一条第四项",
     "quote": "履行期限不明确的，债务人可以随时履行，债权人也可以随时请求履行，但是应当给对方必要的准备时间。",
     "summary": "履行期限不明确的，可随时履行或请求履行，但应给对方必要准备时间",
-    "scenes": ["carrental"],
+    "scenes": ["carrental", "driving"],
     "sourceUrl": "https://flk.npc.gov.cn/detail?id=ff808081729d1efe01729d50b5c500bf",
     "effectiveOn": "2021-01-01",
     "verified": true,

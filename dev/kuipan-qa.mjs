@@ -193,6 +193,10 @@ for (const vp of [
   await sleep(300);
   txt = await bodyText();
   record(vp.name, "contracts-carrental", txt.includes("已核对 0 / 7") && txt.includes("取车验车单方记录") && txt.includes("典例分析") && txt.includes("签约前检查清单"));
+  await clickText("驾校");
+  await sleep(300);
+  txt = await bodyText();
+  record(vp.name, "contracts-driving", txt.includes("已核对 0 / 7") && txt.includes("一费制却另收补考模拟陪练费") && txt.includes("典例分析") && txt.includes("签约前检查清单"));
   await clickText("租房");
   await sleep(300);
 

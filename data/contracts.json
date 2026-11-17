@@ -164,15 +164,18 @@
       "id": "driving",
       "label": "驾校",
       "ruleIds": [
-        "common-auto-renew",
-        "common-prepaid-no-refund",
-        "common-exempt-liability",
+        "driving-hidden-fees",
+        "driving-narrow-refund",
+        "driving-term-missing",
+        "driving-booking-unilateral",
+        "driving-site-change",
         "common-penalty-excessive",
         "common-unilateral-change",
-        "common-jurisdiction",
+        "common-exempt-liability",
         "common-personal-info"
       ],
-      "trapIds": []
+      "trapIds": ["trap-driving-hidden-fees", "trap-driving-narrow-refund"],
+      "checklist": "driving"
     }
   ]
 }
