@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { AssetImage, assetUrl } from "@/src/components/AssetImage";
 import { extractFile } from "@/src/core/extract";
-import { examples } from "@/src/core/examples";
 import { demoContract } from "@/src/core/examples/demo";
 import {
   MAX_PAGE_IMAGES,
@@ -357,22 +356,12 @@ export function InputPage({ onAnalyze, checkHint }: Props) {
       </section>
 
       <section className="space-y-2.5">
-        <h2 className="font-title text-lg">先用示例试试（示例，虚构）</h2>
+        <h2 className="font-title text-lg">先用示例试试</h2>
         <div className="flex flex-wrap gap-2.5">
-          {examples.map((ex) => (
-            <button
-              key={ex.id}
-              type="button"
-              onClick={() => onAnalyze(ex.text, "example")}
-              className="rounded-[var(--site-radius)] border border-border bg-[var(--site-surface)] px-4 py-1.5 text-sm hover:border-[var(--site-gold)]"
-            >
-              {ex.label}
-            </button>
-          ))}
           <button
             type="button"
             onClick={() => onAnalyze(demoContract.text, "example")}
-            className="rounded-[var(--site-radius)] border px-4 py-1.5 text-sm max-sm:order-first"
+            className="rounded-[var(--site-radius)] border px-4 py-1.5 text-sm"
             style={{
               borderColor: "var(--site-accent)",
               color: "var(--site-fg)",

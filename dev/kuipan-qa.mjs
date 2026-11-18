@@ -160,45 +160,49 @@ for (const vp of [
   ov = await hOverflow();
   record(vp.name, "ghosts-no-h-overflow", ov.sw <= ov.cw, JSON.stringify(ov));
 
-  // 照契：默认租房卷轴 + 清单；套餐占位；贷款分期清单
+  // 照契：默认合卷，需先点租房展卷；套餐占位；贷款分期清单
   await clickText("照契");
   await sleep(400);
+  txt = await bodyText();
+  record(vp.name, "contracts-closed", txt.includes("请选类型，展开卷轴"));
+  await clickText("租房");
+  await sleep(1000); // 展卷 800ms
   txt = await bodyText();
   record(
     vp.name,
     "contracts-rent",
-    txt.includes("签约前检查清单") && txt.includes("注意事项（法律依据）") && txt.includes("典例分析") && txt.includes("已核对 0 / 10"),
+    txt.includes("签约前检查") && txt.includes("注意事项（法律依据）") && txt.includes("典例分析") && txt.includes("已核对 0 / 10"),
   );
   await shot(`${vp.name}-contracts`, true);
   ov = await hOverflow();
   record(vp.name, "contracts-no-h-overflow", ov.sw <= ov.cw, JSON.stringify(ov));
   await clickText("套餐");
-  await sleep(300);
+  await sleep(1300); // 收卷 400ms + 展卷 800ms
   txt = await bodyText();
-  record(vp.name, "contracts-plan-basis", txt.includes("自动续费或自动续约") && txt.includes("典例分析") && txt.includes("低价体验到期") && txt.includes("签约前检查清单"));
+  record(vp.name, "contracts-plan-basis", txt.includes("自动续费或自动续约") && txt.includes("典例分析") && txt.includes("低价体验到期") && txt.includes("签约前检查"));
   await shot(`${vp.name}-contracts-plan`, true);
   await clickText("贷款分期");
-  await sleep(300);
+  await sleep(1300);
   txt = await bodyText();
   record(vp.name, "contracts-loan", txt.includes("已核对 0 / 8") && txt.includes("分期") && txt.includes("预付费用概不退还"));
   await clickText("保险");
-  await sleep(300);
+  await sleep(1300);
   txt = await bodyText();
-  record(vp.name, "contracts-insurance", txt.includes("已核对 0 / 7") && txt.includes("免责条款未作显著提示或说明") && txt.includes("典例分析") && txt.includes("签约前检查清单"));
+  record(vp.name, "contracts-insurance", txt.includes("已核对 0 / 7") && txt.includes("免责条款未作显著提示或说明") && txt.includes("典例分析") && txt.includes("签约前检查"));
   await clickText("预付卡");
-  await sleep(300);
+  await sleep(1300);
   txt = await bodyText();
-  record(vp.name, "contracts-prepaid", txt.includes("已核对 0 / 7") && txt.includes("退卡扣高额手续费或概不退卡") && txt.includes("典例分析") && txt.includes("签约前检查清单"));
+  record(vp.name, "contracts-prepaid", txt.includes("已核对 0 / 7") && txt.includes("退卡扣高额手续费或概不退卡") && txt.includes("典例分析") && txt.includes("签约前检查"));
   await clickText("租车");
-  await sleep(300);
+  await sleep(1300);
   txt = await bodyText();
-  record(vp.name, "contracts-carrental", txt.includes("已核对 0 / 7") && txt.includes("取车验车单方记录") && txt.includes("典例分析") && txt.includes("签约前检查清单"));
+  record(vp.name, "contracts-carrental", txt.includes("已核对 0 / 7") && txt.includes("取车验车单方记录") && txt.includes("典例分析") && txt.includes("签约前检查"));
   await clickText("驾校");
-  await sleep(300);
+  await sleep(1300);
   txt = await bodyText();
-  record(vp.name, "contracts-driving", txt.includes("已核对 0 / 7") && txt.includes("一费制却另收补考模拟陪练费") && txt.includes("典例分析") && txt.includes("签约前检查清单"));
+  record(vp.name, "contracts-driving", txt.includes("已核对 0 / 7") && txt.includes("一费制却另收补考模拟陪练费") && txt.includes("典例分析") && txt.includes("签约前检查"));
   await clickText("租房");
-  await sleep(300);
+  await sleep(1300);
 
   // 清单勾选 + 刷新持久化（沿用 qqy:checklist:* key）
   const before = await evaluate(
@@ -216,6 +220,8 @@ for (const vp of [
   await sleep(1200);
   await clickText("照契");
   await sleep(400);
+  await clickText("租房"); // 合卷默认收起，需展卷后才渲染清单
+  await sleep(1000);
   const persisted = await evaluate(
     `(() => { const c=document.querySelector('input[type=checkbox]'); return c ? c.checked : null; })()`,
   );
@@ -239,11 +245,11 @@ for (const vp of [
   ov = await hOverflow();
   record(vp.name, "result-no-h-overflow", ov.sw <= ov.cw, JSON.stringify(ov));
 
-  // 条款目录跳转（main 内 nav，避开全局导航）
+  // 条款目录跳转：滚动目标是左栏「合同原文」独立滚动容器；内容不足一屏时容器不可滚，视为通过
   const jumped = await evaluate(
-    `(() => { const before=window.scrollY; const nav=document.querySelector('main nav'); const btns=[...nav.querySelectorAll('button')]; const b=btns[btns.length-1]; b.click(); return new Promise(r=>setTimeout(()=>r({before, after:window.scrollY}),1200)); })()`,
+    `(() => { const sc=document.querySelector('section[aria-label="合同原文"] .overflow-y-auto'); const nav=document.querySelector('main nav'); const btns=[...nav.querySelectorAll('button')]; const b=btns[btns.length-1]; const before=sc?sc.scrollTop:window.scrollY; const scrollable=sc?sc.scrollHeight>sc.clientHeight:true; b.click(); return new Promise(r=>setTimeout(()=>{ const after=sc?sc.scrollTop:window.scrollY; r({before, after, scrollable}); },1200)); })()`,
   );
-  record(vp.name, "toc-jump", jumped && jumped.after !== jumped.before, JSON.stringify(jumped));
+  record(vp.name, "toc-jump", jumped && (!jumped.scrollable || jumped.after !== jumped.before), JSON.stringify(jumped));
 
   // 类型改选
   await evaluate(
