@@ -8,6 +8,9 @@ import { join } from "node:path";
 import { setTimeout as sleep } from "node:timers/promises";
 
 const URL_BASE = process.argv[2] ?? "http://127.0.0.1:4173/";
+// 线上模式：真实模型延迟天然可捕捉 running；不打本地 Fetch 拦截。
+// 平台网关按 UA 拦 headless，必须覆盖为普通 Chrome UA。
+const live = /^https:/.test(URL_BASE);
 const CHROME = "C:/Program Files/Google/Chrome/Application/chrome.exe";
 const PORT = 9224;
 const outDir = join(tmpdir(), "qqy-1118");
@@ -20,6 +23,7 @@ const chrome = spawn(CHROME, [
   "--no-first-run",
   "--no-default-browser-check",
   "--hide-scrollbars",
+  "--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
   "about:blank",
 ]);
 
@@ -122,7 +126,7 @@ async function setVp(width, height) {
 }
 async function gotoHome() {
   await send("Page.navigate", { url: URL_BASE });
-  await sleep(1400);
+  await sleep(live ? 4000 : 1400);
 }
 
 // —— 三态提示条（点击演示合同，页面内轮询抓 running→done） ——
@@ -217,8 +221,10 @@ if ((process.env.QQY_EXPECT ?? "") === "degraded") {
   }
 
   // —— running→done 三态（analyze 注入 2.5s 延迟：running 截图 + 375 溢出检查） ——
-  throttleMs = 2500;
-  await send("Fetch.enable", { patterns: [{ urlPattern: "*analyze*" }] });
+  if (!live) {
+    throttleMs = 2500;
+    await send("Fetch.enable", { patterns: [{ urlPattern: "*analyze*" }] });
+  }
   await setVp(1280, 900);
   await gotoHome();
   await evaluate(`(() => { const b=[...document.querySelectorAll('button')].find(x=>x.textContent.includes('高命中演示合同')); if(!b) return false; b.click(); return true; })()`);
@@ -244,11 +250,13 @@ if ((process.env.QQY_EXPECT ?? "") === "degraded") {
   await sleep(600);
   await shot("banner-done-375");
   throttleMs = 0;
-  await send("Fetch.disable");
+  if (!live) await send("Fetch.disable");
 
   // —— 改选类型重新分析：应重新进入 running ——
-  throttleMs = 2500;
-  await send("Fetch.enable", { patterns: [{ urlPattern: "*analyze*" }] });
+  if (!live) {
+    throttleMs = 2500;
+    await send("Fetch.enable", { patterns: [{ urlPattern: "*analyze*" }] });
+  }
   await setVp(1280, 900);
   await gotoHome();
   await evaluate(`(() => { const b=[...document.querySelectorAll('button')].find(x=>x.textContent.includes('高命中演示合同')); b.click(); return true; })()`);
@@ -257,13 +265,15 @@ if ((process.env.QQY_EXPECT ?? "") === "degraded") {
   await sleep(400);
   const reRunning = await evaluate(`(() => {const el=document.querySelector('.judge-banner[data-status="running"]'); return el?el.innerText.replace(/\\n/g,' '):null;})()`);
   record("reanalyze", "back-to-running", !!reRunning && reRunning.includes("判官审阅中"), String(reRunning));
-  await send("Fetch.disable");
+  if (!live) await send("Fetch.disable");
   throttleMs = 0;
 
   // —— prefers-reduced-motion：静态兜底，不播动效 ——
   await send("Emulation.setEmulatedMedia", { features: [{ name: "prefers-reduced-motion", value: "reduce" }] });
-  throttleMs = 2500;
-  await send("Fetch.enable", { patterns: [{ urlPattern: "*analyze*" }] });
+  if (!live) {
+    throttleMs = 2500;
+    await send("Fetch.enable", { patterns: [{ urlPattern: "*analyze*" }] });
+  }
   await gotoHome();
   await evaluate(`(() => { const b=[...document.querySelectorAll('button')].find(x=>x.textContent.includes('高命中演示合同')); b.click(); return true; })()`);
   await sleep(700);
@@ -277,7 +287,7 @@ if ((process.env.QQY_EXPECT ?? "") === "degraded") {
   const rmDone = await evaluate(`(() => new Promise((resolve)=>{const t0=performance.now();const iv=setInterval(()=>{const el=document.querySelector('.judge-banner[data-status="done"]'); if(el){clearInterval(iv);resolve({stampAnim:getComputedStyle(el.querySelector('.judge-stamp')).animationName, bannerAnim:getComputedStyle(el).animationName});}else if(performance.now()-t0>25000){clearInterval(iv);resolve(null);}},50);}))()`);
   record("reduced-motion", "done-static", !!rmDone && rmDone.stampAnim === "none" && rmDone.bannerAnim === "none", JSON.stringify(rmDone));
   await shot("banner-reduced-motion");
-  await send("Fetch.disable");
+  if (!live) await send("Fetch.disable");
   throttleMs = 0;
   await send("Emulation.setEmulatedMedia", { features: [{ name: "prefers-reduced-motion", value: "" }] });
 }

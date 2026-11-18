@@ -4,6 +4,35 @@
 > 红线：只出现编造或脱敏样例，不得含真实合同内容、真实姓名、身份证、手机号、住址、公司名。
 > 截图由用户用系统截图工具放入 docs/shots/，文件名带里程碑编号；缺图写「（待补：xxx.png）」，不编造截图内容。
 
+## M4 后追加 · 首页压矮＋导航副标题＋分析等待特效（2026-11-18，不打 tag）
+
+### 做了什么
+
+- 按天赐《指令-首页压矮_导航副标题_分析等待特效》只改界面层（`InputPage.tsx`、`SiteChrome.tsx`、`ResultPage.tsx`、`globals.css`），`src/core/`、`functions/`、prompt、规则库、数据文件未动，未装新库，动画全部 CSS。
+- 任务1：粘贴框 `rows 10→5`（保留 resize-y）；hero `h-[45vh]/md:h-[50vh]` 压为 `h-[26vh] min-h-[190px] / md:h-[42vh] min-h-[240px]`；主列 gap/py、输入卡与示例区间距收紧；示例按钮 `py-2→py-1.5`，375px 下「高命中演示合同」`max-sm:order-first` 排首位。实测 800×1016 上传 802/示例按钮 995、375×812 上传 658/示例按钮 803 均在首屏内，钟馗眼睛两视口都保留在画面里。
+- 任务2：导航三项加 10px 副标题（首页·呈上合同／捉鬼录·收费套路／照契·典例清单），次要色 `--site-muted`，下划线选中态不变；375px 三项单行、右缘 212px 无溢出。
+- 任务3：结果页三态提示条 `.judge-banner`（固定高 3.4rem，`role="status"`+`aria-live="polite"`）——running「判官审阅中……」印章呼吸＋朱笔沿底边来回扫动；done 朱印「判」落下 0.6s 一次（挂载触发不重播）＋「判决已下，共查出 N 处」＋4s 后条身收成朱红细线不消失；unavailable 虚线细条、原文案逐字保留。`prefers-reduced-motion: reduce` 全部静态兜底。改选类型重新分析重新从 running 开始（线上实测）。
+- 口径说明（与指令假设不符处）：`analysis.modelCalls` 只在 done 时由 `analyze.ts` 写入，running 期间为空；指令要求「只改界面层、不改 analyze.ts」，故 running 进度显示「朱笔逐批圈点，当前已标出 N 处」（findings 数），done 显示真实「智能批次 ok/total 全部返回」。要严格实现 running 期「已返回 2/6 批」需改 `src/lib/analyze.ts` 与 `modelPass.ts` 的批次回调，超出本次范围，留天赐裁定。
+- 新增 `dev/指令1118-qa.mjs`：双视口首屏/导航/三态/重分析/减弱动效 23 项 CDP 断言；本地用 Fetch 拦截注入 2.5s 延迟与 500 故障，线上模式自动关拦截并覆盖普通 Chrome UA。
+
+### 报错与解决
+
+- 首轮 QA：375×812 示例区整体在折叠线下、800×1016 演示按钮差 110px → 二次压缩 hero/间距＋order-first 后全过；试错 1 轮。
+- running 截图被 done 抢先（探针在 done 才返回）→ QA 改「点击→等待→截图→轮询 done」分步；`settled` 断言在 4s 延迟动画前误过 → 等待 4.8s 后硬断言 inset 阴影含朱红。试错 1 轮。
+- 线上 headless 默认 UA 会被平台网关 403（x-blocked-reason=Bot detected）→ 沿用交接文档 §5 口径加 `--user-agent` 普通 Chrome UA。试错 0（直接照抄已知配方）。
+
+### 验收结果
+
+- `npm test` 213/213；`npm run build` 通过，bundle `index-ClbutL-p.js` / `index-CgAxCvSW.css`。
+- 本地 QA 23/23（fixture＋Fetch 注入）；`QQY_EXPECT=degraded` 注入 500：unavailable 提示条正常、页面不白屏；控制台应用级 0 error。
+- 截图（%TEMP%/qqy-1118/，待补 docs/shots/：m4plus-1118-input-800.png、m4plus-1118-input-375.png、m4plus-1118-banner-running.png、m4plus-1118-banner-done.png、m4plus-1118-unavailable.png）。
+
+### 部署与线上验证
+
+- 提交 a753918；prepare_site actionId db57413d-5780-4861-a3e8-3928faa303d3（首次 descriptorStatus=pending，同 actionId 同输入重试转 written）；publishOperationId 01a1ed0f-df99-7a51-a9a3-6c67556d2440，state=succeeded、committed=true、access_mode=public。
+- 线上 https://kuipan-odzma4gogrf.qoder.zone ：curl 首页 bundle 名与本地 dist 一致；`node dev/指令1118-qa.mjs https://…` 线上 23/23 全过（真实模型：running 动效→done 落印「判决已下，共查出 6/8 处 智能批次 1/1 全部返回」、双视口首屏、重分析回 running、减弱动效静态）；get_function_logs 近 1 小时 /app/analyze 全 200、无 5xx。
+- 未完成项：无。
+
 ## M4 后追加 · 捉鬼录镜框三次换为实物铜镜图（2026-11-17，不打 tag）
 
 ### 做了什么
