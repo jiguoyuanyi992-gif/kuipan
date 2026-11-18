@@ -119,7 +119,7 @@ export function ResultPage({
                 border: "1px solid var(--site-accent)",
               }}
             >
-              示例，虚构
+              示例，真实案例已脱敏
             </span>
           )}
         </div>

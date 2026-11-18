@@ -137,6 +137,11 @@ for (const vp of [
   record(vp.name, "home-load", txt.includes("馗判") && txt.includes("呈上生死簿"));
   record(
     vp.name,
+    "demo-real-case-label",
+    txt.includes("高命中演示合同（真实案例，已脱敏）") && txt.includes("案例来源"),
+  );
+  record(
+    vp.name,
     "footer-disclaimer",
     txt.includes("AI参考意见，不构成法律意见。") &&
       (await evaluate(
@@ -237,7 +242,7 @@ for (const vp of [
   await clickText("高命中演示合同");
   await sleep(2200);
   txt = await bodyText();
-  record(vp.name, "demo-result", txt.includes("需重点留意") && txt.includes("缺失的条款"));
+  record(vp.name, "demo-result", txt.includes("需重点留意") && txt.includes("缺失的条款") && txt.includes("示例，真实案例已脱敏"));
   record(vp.name, "demo-model-merged", txt.includes("AI 生成") && !txt.includes("智能分析暂不可用"));
   const marks = await evaluate("document.querySelectorAll('mark.brush-mark').length");
   record(vp.name, "demo-brush-marks", marks > 0, `marks=${marks}`);

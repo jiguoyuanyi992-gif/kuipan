@@ -4,8 +4,8 @@ export interface ExampleContract {
   id: string;
   label: string;
   type: ContractType;
-  // 全部为编造内容，页面须标注「示例，虚构」。
-  fabricated: true;
+  // 内容来源标记：true=编造（页面标「示例，虚构」）；false=真实案例脱敏整理（页面标「真实案例，已脱敏」）。
+  fabricated: boolean;
   text: string;
 }
 
