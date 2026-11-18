@@ -221,7 +221,7 @@ export function InputPage({ onAnalyze, checkHint }: Props) {
           >
             签合同如签生死簿 · 钟馗来判
           </p>
-          <h1 className="font-title text-4xl sm:text-5xl">呈上生死簿</h1>
+          <h1 className="font-title-bold text-4xl sm:text-5xl">呈上生死簿</h1>
           <p className="max-w-md text-sm text-muted-foreground">
             租房、实习兼职合同，粘贴、上传或拍照呈上；朱笔圈出风险条款，判词逐条批注。
           </p>
@@ -246,7 +246,7 @@ export function InputPage({ onAnalyze, checkHint }: Props) {
         style={texture ? { backgroundImage: `url(${texture})` } : undefined}
       >
         <div className="space-y-2">
-          <label htmlFor="contract" className="font-title text-base">
+          <label htmlFor="contract" className="font-title-med text-base">
             粘贴合同文本
           </label>
           <textarea
@@ -361,12 +361,12 @@ export function InputPage({ onAnalyze, checkHint }: Props) {
       </section>
 
       <section className="space-y-2.5">
-        <h2 className="font-title text-lg">先用示例试试</h2>
+        <h2 className="font-title-med text-lg">先用示例试试</h2>
         <div className="flex flex-wrap gap-2.5">
           <button
             type="button"
             onClick={() => onAnalyze(demoContract.text, "example")}
-            className="rounded-[var(--site-radius)] border px-4 py-1.5 text-sm"
+            className="rounded-[var(--site-radius)] border px-4 py-1.5 font-title-med text-sm"
             style={{
               borderColor: "var(--site-accent)",
               color: "var(--site-fg)",
@@ -397,7 +397,7 @@ export function InputPage({ onAnalyze, checkHint }: Props) {
         <button
           type="button"
           onClick={start}
-          className="w-full rounded-[var(--site-radius)] px-5 py-3 font-title text-base font-medium sm:w-auto"
+          className="w-full rounded-[var(--site-radius)] px-5 py-3 font-title-med text-base sm:w-auto"
           style={{
             backgroundColor: "var(--site-accent)",
             color: "var(--site-on-accent)",

@@ -214,3 +214,11 @@
 - 主视觉文案容器加 `writing-mode: vertical-rl`：flex-col 主轴随之变为右→左，引导句、标题「呈上生死簿」、说明句依次成列，符合传统竖排阅读顺序；说明句超列高时自动向左换列。
 - 桌面与移动视口同一口径（移动 375px 下说明约 3 列，仍可读）；容器与列组在黑色渐变区垂直居中，不越界（kuipan-qa 双视口 home-hero-vertical + home-no-h-overflow 断言）。
 - 字号体系不变：引导句 text-xs tracking-[0.3em]（竖排下变为列内字距）、标题 text-4xl/5xl、说明 text-sm。
+
+## 16. 首页视觉水墨化：全局思源宋体系＋辅助文字竖排（2026-11-18 天赐指令）
+
+- 字体：`--site-font` 由系统无衬线栈改为思源宋体本地栈（Noto Serif SC → Source Han Serif SC → Songti SC → STSong → SimSun → serif），全站正文/说明/按钮随 body 继承，零下载。不引 Google Fonts CDN：大陆访问不稳，且视觉门禁铁律要求 CJK webfont 必须子集化、正文零加载；未装思源宋体的机器落宋体，同为衬线笔锋，水墨基调一致。
+- 字重工具类：`.font-title-med`（500，导航/分区标题/按钮）、`.font-title-bold`（700，主标题）；自定义类优先级高于 Tailwind 工具类，`font-title + font-bold` 组合会被 600 压住，需整类替换。
+- 顶部导航：思源宋体 500、text-base（16px）、字距 0.12em；主标题「呈上生死簿」700 保持竖排；第三行辅助文字竖排 14px Regular，作标题左侧装饰列，超长自动向左换列。
+- 色彩：现有 token 已满足建议值（正文暖米 #EFE5D0、金 #C9A24B、朱砂 #C93A2E），本轮未改。
+- 回归：kuipan-qa 新增 home-serif-fonts（导航/正文族、导航 500、h1 700）与 home-hero-vertical，双视口 86/86。

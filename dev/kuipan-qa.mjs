@@ -144,6 +144,13 @@ for (const vp of [
   );
   record(
     vp.name,
+    "home-serif-fonts",
+    await evaluate(
+      `(() => { const nav=document.querySelector('nav button'); const nf=getComputedStyle(nav).fontFamily; const bf=getComputedStyle(document.body).fontFamily; const nw=getComputedStyle(nav).fontWeight; const h1=document.querySelector('h1'); return nf.includes('Noto Serif SC') && bf.includes('Noto Serif SC') && Number(nw)===500 && getComputedStyle(h1).fontWeight==='700'; })()`,
+    ),
+  );
+  record(
+    vp.name,
     "demo-real-case-label",
     txt.includes("高命中演示合同（真实案例，已脱敏）") &&
       txt.includes("案例来源") &&

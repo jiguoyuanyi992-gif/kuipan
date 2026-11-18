@@ -60,7 +60,7 @@ export function SiteHeader({
                 type="button"
                 onClick={() => onNav(item.key)}
                 aria-current={on ? "page" : undefined}
-                className="flex flex-col items-center border-b-2 px-2.5 py-1 font-title text-base leading-tight sm:px-3"
+                className="flex flex-col items-center border-b-2 px-2.5 py-1 font-title-med text-base leading-tight tracking-[0.12em] sm:px-3"
                 style={{
                   borderColor: on ? "var(--site-accent)" : "transparent",
                   color: on ? "var(--site-fg)" : "var(--site-muted)",

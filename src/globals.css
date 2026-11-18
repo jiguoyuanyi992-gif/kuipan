@@ -122,8 +122,11 @@ body {
   --site-muted: #a89b83;
   --site-border: #3a3125;
   --site-gold: #c9a24b;
-  --site-font: -apple-system, "PingFang SC", "Microsoft YaHei",
-    "Source Han Sans SC", "Noto Sans CJK SC", sans-serif;
+  /* 2026-11-18 天赐指令：全局转思源宋体系。走本地字体栈零加载（视觉门禁铁律：
+     正文不引 CJK webfont；Google Fonts CDN 大陆不稳）。未装思源宋体的机器落宋体，
+     同为衬线笔锋，水墨基调一致。 */
+  --site-font: "Noto Serif SC", "Source Han Serif SC", "Songti SC", "STSong",
+    SimSun, serif;
   --site-radius: 4px;
   --site-space: 1;
   --site-type: 1;
@@ -149,6 +152,20 @@ body {
 .font-title {
   font-family: var(--font-title);
   font-weight: 600;
+  line-height: 1.3;
+}
+
+/* 思源宋体 Medium（2026-11-18 天赐字体规格）：导航、分区标题与按钮用 500 字重 */
+.font-title-med {
+  font-family: var(--font-title);
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+/* 主标题 Bold 700（同上规格）；自定义类需覆盖 .font-title 的 600，故一并声明 */
+.font-title-bold {
+  font-family: var(--font-title);
+  font-weight: 700;
   line-height: 1.3;
 }
 

@@ -4,6 +4,28 @@
 > 红线：只出现编造或脱敏样例，不得含真实合同内容、真实姓名、身份证、手机号、住址、公司名。
 > 截图由用户用系统截图工具放入 docs/shots/，文件名带里程碑编号；缺图写「（待补：xxx.png）」，不编造截图内容。
 
+## M4 后追加 · 首页水墨化：全局思源宋体＋辅助文字竖排（2026-11-18，不打 tag）
+
+### 关键提示词（天赐需求原话节选）
+
+- 「需求：优化首页视觉风格，匹配水墨传统审美……将横向排列改为纵向排列……字体方案推荐：思源宋体系（Noto Serif SC）……顶部三列导航：思源宋体 Medium（500）、16-18px、字间距 0.1-0.15em……主标题 Bold（700）保持纵向排列……技术实现参考：引入思源宋体 CDN」。
+
+### 报错与解决（试错 1 次）
+
+- kuipan-qa home-serif-fonts 双视口失败：CDP 探针定位到 h1 计算字重 600 而非 700——`.font-title` 自定义类（非 layer）压过 Tailwind `font-bold` 工具类。解法：新增 `.font-title-bold` 整类替换。第二次跑 86/86 全绿。
+
+### 取舍登记（与视觉门禁一致性）
+
+- 未采用需求里的 Google Fonts CDN 引法：大陆访问不稳 + 门禁铁律「CJK webfont 必须子集化、正文系统字体栈零加载」。改为思源宋体本地优先栈（落宋体同为衬线）；色彩建议值现有 token 已覆盖，未改。
+
+### 部署与运行记录
+
+- npm test 228/228；build 通过；kuipan-qa 双视口 86/86（新增 home-serif-fonts）。prepare/publish actionId 09223f27-ffcd-46f3-ae2d-3fc418c78119 succeeded。
+
+### 线上链接与验证方式
+
+- 真实浏览器强刷复验：bundle index-De2v1p3p.js；h1 writing-mode=vertical-rl、字重 700；导航 500 且族名 Noto Serif SC；body 同栈。截图（待补：m4-serif-hero-desktop.png、m4-serif-hero-mobile.png）。
+
 ## M4 后追加 · 首页横幅三行文案改竖排（2026-11-18，不打 tag）
 
 ### 关键提示词（天赐原话）
