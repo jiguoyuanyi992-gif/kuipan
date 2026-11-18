@@ -183,8 +183,8 @@ export function InputPage({ onAnalyze, checkHint }: Props) {
 
   return (
     <main className="mx-auto flex w-full max-w-3xl flex-col gap-4 px-4 py-4 sm:px-5 sm:py-6">
-      {/* 钟馗判官主视觉：横幅高度压缩，保证首屏能看到粘贴框以下的上传与示例入口；图靠右、左侧渐变到纯黑 */}
-      <section className="relative h-[26vh] min-h-[190px] overflow-hidden bg-black md:h-[42vh] md:min-h-[240px]">
+      {/* 钟馗判官主视觉：上半屏横幅，图靠右、左侧渐变到纯黑，文案落在黑区（2026-11-18 天赐指令改回原高度，露出全脸） */}
+      <section className="relative h-[45vh] min-h-[260px] overflow-hidden bg-black md:h-[50vh]">
         <AssetImage
           name="zhongkui.jpg"
           alt="钟馗判官主视觉"
