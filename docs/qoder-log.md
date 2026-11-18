@@ -4,6 +4,17 @@
 > 红线：只出现编造或脱敏样例，不得含真实合同内容、真实姓名、身份证、手机号、住址、公司名。
 > 截图由用户用系统截图工具放入 docs/shots/，文件名带里程碑编号；缺图写「（待补：xxx.png）」，不编造截图内容。
 
+## M4 后追加 · 首页 hero 改回原高度露出钟馗全脸（2026-11-18，不打 tag）
+
+### 我说了什么 / 改了什么
+
+- 天赐在发布预览里圈选首页 hero 区（当时 26vh 压缩版只见鼻子以下）：「这里改回原来的，要钟馗露出全脸」。
+- `InputPage.tsx` hero 恢复原值 `h-[45vh] min-h-[260px] md:h-[50vh]`；其余压缩项（粘贴框 5 行、间距、示例按钮 py-1.5、375 演示合同排首位）保留。
+- 代价如实报告：800×1016 下「高命中演示合同」回到折叠线下（top≈1042），375×812 下上传按钮底部略超折叠线（top≈778）——首屏可见性与全脸二选一，本条按天赐指令取全脸。
+- 提交 b28c3f0；prepare_site actionId 07e60f2f-664e-4266-af17-77c7effd560a（pending→同输入重试 written）；publishOperationId 01a1ed33-c009-76d3-8ba7-9c700379e551，succeeded、committed、public。
+- 线上核对：bundle `index-BxG2fep1.js`/`index-CTMsfrp7.css` 与本地一致；无痕式 headless 截图 1366×900 全脸（额带、双目、鼻、须、髯完整）、375×812 与原移动版一致。npm test 213/213。
+- 截图（%TEMP%/qqy-hero/，待补 docs/shots/：m4plus-1118-hero-revert-1366.png、m4plus-1118-hero-revert-375.png）。
+
 ## M4 后追加 · 照契卷轴改造（2026-11-18，不打 tag）
 
 ### 关键提示词（天赐指令原文摘录）
