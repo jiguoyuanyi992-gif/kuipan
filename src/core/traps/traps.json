@@ -3,7 +3,7 @@
     "id": "trap-rent-deposit-forfeit",
     "scene": "rent",
     "oneLiner": "押金怎么退全靠口头说，退租时被逐项扣光",
-    "caseSourceUrl": "http://jsj.zs.gov.cn/attachment/0/369/369024/1852618.pdf#page=11",
+    "caseSourceUrl": "https://zfcxjst.gd.gov.cn/attachment/0/371/371273/2577029.pdf#page=6",
     "story": "",
     "traits": [
       "合同只写「押金不予退还」或「押金归甲方所有」，不写扣减依据",
@@ -185,7 +185,7 @@
     "id": "trap-rent-penalty-high",
     "scene": "rent",
     "oneLiner": "提前退租要赔几个月租金，还不许你找人接手",
-    "caseSourceUrl": "http://jsj.zs.gov.cn/attachment/0/369/369024/1852618.pdf#page=15",
+    "caseSourceUrl": "https://zfcxjst.gd.gov.cn/attachment/0/371/371273/2577029.pdf#page=9",
     "story": "",
     "traits": [
       "违约金写成两个月以上租金或固定高额数字",
@@ -263,7 +263,7 @@
     "id": "trap-intern-unpaid-probation",
     "scene": "internship",
     "oneLiner": "头几个月叫培训或考察，一分钱不给，用完就说你不合适",
-    "caseSourceUrl": "https://www.bzvtc.edu.cn/attachment/sites/item/2024_05/13_14/e2c2d2e12313f450.pdf#page=9",
+    "caseSourceUrl": "http://www.moe.gov.cn/srcsite/A07/moe_737/s3876_qt/202201/W020231218539873596108.docx#page=7",
     "story": "",
     "traits": [
       "试用期、培训期、学习期不付钱",
@@ -304,7 +304,7 @@
     "id": "trap-intern-collects-money",
     "scene": "internship",
     "oneLiner": "还没入职先交钱：服装费、体检费、押金，证件还被扣下",
-    "caseSourceUrl": "https://www.bzvtc.edu.cn/attachment/sites/item/2024_05/13_14/e2c2d2e12313f450.pdf#page=17",
+    "caseSourceUrl": "http://www.moe.gov.cn/srcsite/A07/moe_737/s3876_qt/202201/W020231218539873596108.docx#page=8",
     "story": "",
     "traits": [
       "以任何名义在入职前收取费用，且不开发票或收据",

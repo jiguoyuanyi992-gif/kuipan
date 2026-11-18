@@ -1,11 +1,20 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import contractsJson from "../../data/contracts.json";
 import { Checklist } from "@/src/components/Checklist";
+import { PdfViewer } from "@/src/components/PdfViewer";
 import { ruleById } from "@/src/core/rules";
 import { actionsForType } from "@/src/core/fallback/actions";
 import { ruleIdForTrap, trapById, type TrapCategory } from "@/src/core/traps";
+import { localSourceFor } from "@/src/core/traps/sources";
 import { CONTRACT_TYPES } from "@/src/core/types";
 import type { ContractType, RiskRule, TrapEntry } from "@/src/core/types";
+
+export interface DocView {
+  src: string;
+  page?: number;
+  url: string;
+  title: string;
+}
 
 interface ContractTypeEntry {
   id: string;
@@ -87,16 +96,19 @@ function CaseStudy({
   onCheckRule,
   focused,
   caseRef,
+  onOpenDoc,
 }: {
   trap: TrapEntry;
   hasAnalysis: boolean;
   onCheckRule: (ruleId: string, title: string) => void;
   focused: boolean;
   caseRef?: (el: HTMLElement | null) => void;
+  onOpenDoc: (view: DocView) => void;
 }) {
   const ruleId = ruleIdForTrap(trap);
   const rule = ruleId ? ruleById(ruleId) : undefined;
   const title = rule?.title ?? trap.oneLiner;
+  const local = localSourceFor(trap.caseSourceUrl);
   return (
     <article
       ref={caseRef}
@@ -104,23 +116,47 @@ function CaseStudy({
       className="scroll-mt-4 space-y-3 rounded-[var(--site-radius)] border-t-2 pt-4"
       style={{ borderColor: focused ? "var(--site-accent)" : "var(--paper-border)" }}
     >
-      {/* 上方：左侧典例来源链接，右侧标题与一句话概要 */}
+      {/* 上方：左侧典例来源（本地托管走阅读器，其余保持直链），右侧标题与一句话概要 */}
       <div className="flex gap-3">
-        <a
-          href={trap.caseSourceUrl}
-          target="_blank"
-          rel="noreferrer"
-          title={`查看典例来源：${title}`}
-          className="flex h-24 w-20 shrink-0 items-center justify-center rounded border"
-          style={{ borderColor: "var(--paper-border)", backgroundColor: "#e3d6bc" }}
-        >
-          <span
-            className="vertical-rl font-title text-xs"
-            style={{ color: "var(--site-accent)" }}
+        {local ? (
+          <button
+            type="button"
+            onClick={() =>
+              onOpenDoc({
+                src: local.path,
+                page: local.page,
+                url: trap.caseSourceUrl!,
+                title,
+              })
+            }
+            title={`查看典例来源：${title}`}
+            className="flex h-24 w-20 shrink-0 cursor-pointer items-center justify-center rounded border"
+            style={{ borderColor: "var(--paper-border)", backgroundColor: "#e3d6bc" }}
           >
-            典例来源
-          </span>
-        </a>
+            <span
+              className="vertical-rl font-title text-xs"
+              style={{ color: "var(--site-accent)" }}
+            >
+              典例来源
+            </span>
+          </button>
+        ) : (
+          <a
+            href={trap.caseSourceUrl}
+            target="_blank"
+            rel="noreferrer"
+            title={`查看典例来源：${title}`}
+            className="flex h-24 w-20 shrink-0 items-center justify-center rounded border"
+            style={{ borderColor: "var(--paper-border)", backgroundColor: "#e3d6bc" }}
+          >
+            <span
+              className="vertical-rl font-title text-xs"
+              style={{ color: "var(--site-accent)" }}
+            >
+              典例来源
+            </span>
+          </a>
+        )}
         <div className="min-w-0 space-y-1">
           <h3 className="font-title text-base leading-snug">{title}</h3>
           <p className="text-[15px] leading-[1.7] text-muted-foreground">
@@ -199,6 +235,7 @@ export function ContractsPage({ focusTrapId, hasAnalysis, onBack, onCheckRule }:
   const pendingRef = useRef<string | null>(null);
   const tabBarRef = useRef<HTMLDivElement | null>(null);
   const focusRef = useRef<HTMLElement | null>(null);
+  const [docView, setDocView] = useState<DocView | null>(null);
 
   useEffect(() => {
     if (!focusTrap) return;
@@ -421,6 +458,7 @@ export function ContractsPage({ focusTrapId, hasAnalysis, onBack, onCheckRule }:
                                 }
                               : undefined
                           }
+                          onOpenDoc={setDocView}
                         />
                       ))
                     )}
@@ -445,6 +483,15 @@ export function ContractsPage({ focusTrapId, hasAnalysis, onBack, onCheckRule }:
         )}
       </div>
     </main>
+      {docView && (
+        <PdfViewer
+          src={docView.src}
+          page={docView.page}
+          title={docView.title}
+          sourceUrl={docView.url}
+          onClose={() => setDocView(null)}
+        />
+      )}
     </div>
   );
 }

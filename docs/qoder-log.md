@@ -4,6 +4,34 @@
 > 红线：只出现编造或脱敏样例，不得含真实合同内容、真实姓名、身份证、手机号、住址、公司名。
 > 截图由用户用系统截图工具放入 docs/shots/，文件名带里程碑编号；缺图写「（待补：xxx.png）」，不编造截图内容。
 
+## M4 后追加 · 典例来源本地托管 + 内置 pdf.js 阅读器（2026-11-18，不打 tag）
+
+### 我说了什么 / 改了什么
+
+- 天赐反馈（附截图）：「还有这个典例来源，电脑点击可以直接跳转链接，手机不行，手机点开是文件下载」。
+- 经确认选定方案「本地托管 + 内置阅读器」：官方示范文本 PDF 下载到 `public/docs/`（14 份，6.0MB），照契页「典例来源」签条改为站内弹层渲染，跨站直链保留为「原链接」兜底。移动端对跨站 PDF 普遍是下载而非预览，只有同源托管 + canvas 渲染能修。
+
+### 做了什么
+
+- 下载 14 份官方文件到 `public/docs/`（含广东/北京/上海示范文本、职校实习规定 docx→Word COM 转 PDF、柳州考证、保险/预付卡/租车/驾校等）；4 个失效外链重新取证（gd 需浏览器 UA、bzvtc 404 换 MOE 官方《职业学校学生实习管理规定》、liuzhou 403、boccfc 412 均由 UA 修复）。
+- `src/core/traps/sources.ts`：外链基址 → 站内路径映射 + `localSourceFor()` 解析 `#page=N`；`src/components/PdfViewer.tsx`：pdf.js 弹层（懒加载 worker、cMap、按宽适配缩放、翻页/页码/Esc 关闭/加载失败兜底原链接）；`ContractsPage.tsx` 签条在有本地映射时开弹层、否则维持直链。
+- pdfjs v6.5.438 两处坑：① `render()` 必须传 `canvas`（旧 `canvasContext` 写法 tsc TS2345 阻断构建，1 次改对）；② Node 24 无 `Uint8Array.prototype.toHex` 与 `Map.getOrInsertComputed`，Node 侧探测需 polyfill，浏览器不受影响。
+- **ink 像素核查发现中山示范文本（jsj.zs.gov.cn 1852618.pdf）除前两页外 38 页全部空白**：重新下载字节一致，是源站文件本身残缺。把引用它的两条租房典例（押金退还、违约金过高）改锚到广东示范文本实页：`traps.json` → `…2577029.pdf#page=6`（押金抵扣与返还条款）、`#page=9`（违约金与解除条款）。全库 22 处锚点 ink/文本双检 0 坏（脚本 dev/典例来源阅读器qa.mjs 保留；探测临时脚本已删）。
+- 中山残缺 PDF `public/docs/zs-rent-contract.pdf` 暂留仓库（无任何典例再引用；删除属 git 之外删除，待天赐授权）。
+- 测试：`src/core/__tests__/sources.test.ts` 6 项（映射解析、#page 越界、非文件 URL 不映射、回归守卫：文件型 URL 必须有本地映射）；npm test 229/229；npm run build 通过，dist 13MB（含 docs 6.0MB + pdf-cmaps 240KB）。
+
+### 部署与线上验证
+
+- prepare_site actionId 1cd9a490-81e7-4fb5-a195-b9a3e95d01ba（pending→同输入重试 written）；publishOperationId 01a1ee79-a7c6-7ab3-9633-b0e21e25645b，succeeded、committed、public。
+- 线上 https://kuipan-odzma4gogrf.qoder.zone `node dev/典例来源阅读器qa.mjs https://…` 13/13：桌面 1280×900 与移动 375×812 均「租房→典例来源→弹层渲染广东 p6/15、翻页 6→7→6、Esc 关闭」，控制台应用级 0 error。截图（%TEMP%/qqy-docviewer/，待补 docs/shots/：m4plus-1118-docviewer-desktop.png、m4plus-1118-docviewer-mobile.png）。
+- get_function_logs 最近 1 小时空记录（阅读器为纯静态路径，不触 Function；无 5xx 证据）。
+
+### 迭代对比
+
+- 改之前什么样：手机端点「典例来源」直接变成文件下载，看不到条款原文。
+- 我说了什么：「电脑点击可以直接跳转链接，手机不行，手机点开是文件下载」，选定「本地托管 + 内置阅读器」。
+- 改之后什么样：点签条在站内弹层直接渲染对应条款页（页码定位、翻页、Esc 关闭），桌面手机一致；核查中顺带发现并修掉了 2 处指向空白页的坏锚点。
+
 ## M4 后追加 · 金额期限提取双轨兜底（正则 + 模型 extractedTerms）（2026-11-18，不打 tag）
 
 ### 关键提示词（天赐指令原文摘录）
