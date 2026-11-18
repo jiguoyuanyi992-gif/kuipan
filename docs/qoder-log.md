@@ -4,6 +4,35 @@
 > 红线：只出现编造或脱敏样例，不得含真实合同内容、真实姓名、身份证、手机号、住址、公司名。
 > 截图由用户用系统截图工具放入 docs/shots/，文件名带里程碑编号；缺图写「（待补：xxx.png）」，不编造截图内容。
 
+## M4 后追加 · 金额期限提取双轨兜底（正则 + 模型 extractedTerms）（2026-11-18，不打 tag）
+
+### 关键提示词（天赐指令原文摘录）
+
+- 「结果页押金、期限、违约金、月租全显示破折号，概览卡空白。原因是 …正则只能匹配『月租金为1500元』『押金6000元』『租期12个月』这类写法，实际合同用词五花八门」
+- 「双轨兜底：本地正则先抽取（extractAmounts，逻辑不变），模型返回时带回 extractedTerms: { monthlyRent?, deposit?, penalty?, termMonths? }，本地抽不到时用模型的值填上」
+- 「不改 src/core/redact/index.ts 的正则（保留原逻辑，作为第一道防线）。不动规则库、contracts.json、典例数据」
+- 「只提取明确出现的数值，不要推测或计算」
+
+### 做了什么
+
+- `src/core/types.ts` 新增 `ExtractedTerms`；`src/core/llm/prompt.ts` 追加第 8 条提取要求并扩 JSON 示例行；`src/core/llm/schema.ts` 给 `modelResponseSchema` 加可选 `extractedTerms` 校验（数字/数字字符串归一化，脏值/null 归 undefined，不因脏值连坐整批 findings）；`src/lib/modelPass.ts` 把各批 `extractedTerms` 按字段跨批合并进 `ModelPassResult`；`src/lib/analyze.ts` 新增 `mergeAmounts`（本地 ?? 模型，押金/违约金倍数按合并后最终值重算），仅在 done 路径替换 `amounts`，降级路径不动。
+- 与指令的两处落地差异（架构适配，非策略变更）：① Function 是薄代理，prompt/schema 实际在客户端 `src/core/llm/`，任务 2/3 落在 prompt.ts/schema.ts，`functions/` 零改动；② 各批只见到部分条款块，字段可能分散在不同批次，故按字段跨批合并而非 `batches.find(...)` 只取首批。
+- 关键发现：脱敏占位符只替换正则命中的写法——正则漏掉的特殊写法（「租金:1500元/月」「保证金4500元」「壹仟伍佰元整」「起止日期」）原样进请求体，模型兜底与正则第一道防线天然互补，redact 不用动。
+- 新增测试 10 项（schema 归一化/空对象/负数 3、modelPass 跨批合并 2、analyzeAll 兜底三态 3、mergeAmounts 单元 2）：npm test 223/223；npm run build 通过。
+
+### 部署与线上验证
+
+- prepare_site actionId d517519f-1e4c-4e54-b81a-5925d2d0163a（pending→同输入重试 written）；publishOperationId 01a1ee57-8dad-799a-b617-c2b7137576df，succeeded、committed、public。
+- 线上 https://kuipan-odzma4gogrf.qoder.zone bundle `index-BfLKHzJ2.js`/`index-CTMsfrp7.css` 与本地 dist 一致。
+- 线上真实模型 QA `node dev/金额期限兜底qa.mjs https://…` 10/10：A 特殊写法合同（正则全抽不到）概览卡显示 ¥1,500 / ¥4,500（月租×3）/ 12 个月 / ¥3,000、未走降级；B 高命中演示合同本地正则值未被模型覆盖（¥2,000、¥6,000（月租×3））；控制台应用级 0 error。截图（%TEMP%/qqy-terms/，待补 docs/shots/：m4plus-1118-terms-A.png、m4plus-1118-terms-B.png）。
+- get_function_logs 最近 1 小时返回空（日志摄取延迟），以页面未降级 + 真实模型数值落卡作为 /analyze 200 的间接证据。
+
+### 迭代对比
+
+- 改之前什么样：结果页概览卡月租/押金/期限/违约金全显示「—」（本地正则匹配不到实际合同的多种写法）。
+- 我说了什么：天赐指令「金额期限提取兜底（正则 + 模型双轨）」，模型返回带 extractedTerms，本地抽不到时填空。
+- 改之后什么样：特殊写法合同四项数值全部显示且押金倍数自动重算；正则能抽到的合同显示不变；模型没抽到时保持「—」、不白屏。
+
 ## M4 后追加 · 首页 hero 改回原高度露出钟馗全脸（2026-11-18，不打 tag）
 
 ### 我说了什么 / 改了什么

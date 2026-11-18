@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { analyzeAll } from "../analyze";
+import { analyzeAll, mergeAmounts } from "../analyze";
 import { runModelPass, stripFences } from "../modelPass";
 import { chunk } from "@/src/core/chunk";
-import type { Block } from "@/src/core/types";
+import type { AmountTerms, Block } from "@/src/core/types";
 
 function blocks(n: number): Block[] {
   return Array.from({ length: n }, (_, i) => ({
@@ -152,5 +152,119 @@ describe("analyzeAll 主路径 + 降级", () => {
     );
     const final = await analyzeAll(text, "paste", undefined, undefined, () => {});
     expect(final.modelStatus).toBe("unavailable");
+  });
+});
+
+describe("runModelPass extractedTerms 跨批合并", () => {
+  it("字段分散在不同批次时按字段合并（首批只有 termMonths 也能补齐金额）", async () => {
+    let n = 0;
+    const fetchImpl = vi.fn(async () => {
+      n++;
+      const extractedTerms =
+        n % 2 === 1
+          ? { termMonths: 12 }
+          : { monthlyRent: "1,500", deposit: 4500 };
+      return modelResponse({ contractType: "rent", findings: [], extractedTerms });
+    }) as unknown as typeof fetch;
+    const result = await runModelPass(blocks(20), [], () => {}, fetchImpl);
+    expect(result.extractedTerms).toEqual({
+      monthlyRent: 1500,
+      deposit: 4500,
+      termMonths: 12,
+      penalty: undefined,
+    });
+  });
+
+  it("全部批次都无 extractedTerms → 空对象（全 undefined），不报错", async () => {
+    const fetchImpl = vi.fn(async () =>
+      modelResponse({ contractType: "rent", findings: [] }),
+    ) as unknown as typeof fetch;
+    const result = await runModelPass(blocks(8), [], () => {}, fetchImpl);
+    expect(result.extractedTerms).toEqual({
+      monthlyRent: undefined,
+      deposit: undefined,
+      penalty: undefined,
+      termMonths: undefined,
+    });
+  });
+});
+
+describe("analyzeAll 金额期限模型兜底", () => {
+  // 本地正则抽不到的特殊写法：月租「租金:1500元/月」、押金「保证金」、期限「服务期」。
+  const specialText = `第一条 费用
+租金:1500元/月，乙方另付保证金4500元，违约方支付违约金3000元。
+
+第二条 期限
+服务期自2024年1月1日至2024年12月31日。
+`;
+
+  it("正则抽不到时用模型值填空，倍数按最终值重算", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () =>
+        modelResponse({
+          contractType: "rent",
+          findings: [],
+          extractedTerms: { monthlyRent: 1500, deposit: 4500, penalty: 3000, termMonths: 12 },
+        }),
+      ),
+    );
+    const final = await analyzeAll(specialText, "paste", undefined, undefined, () => {});
+    expect(final.modelStatus).toBe("done");
+    expect(final.amounts.monthlyRent).toBe(1500);
+    expect(final.amounts.deposit).toBe(4500);
+    expect(final.amounts.depositMonths).toBe(3);
+    expect(final.amounts.penaltyMonths).toBe(2);
+    expect(final.amounts.termMonths).toBe(12);
+  });
+
+  it("模型返回空 extractedTerms 时 amounts 保持本地值，不报错", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => modelResponse({ contractType: "rent", findings: [], extractedTerms: {} })),
+    );
+    const final = await analyzeAll(specialText, "paste", undefined, undefined, () => {});
+    expect(final.modelStatus).toBe("done");
+    expect(final.amounts.monthlyRent).toBeUndefined();
+    expect(final.amounts.deposit).toBeUndefined();
+    expect(final.amounts.termMonths).toBeUndefined();
+  });
+
+  it("正则能抽到时本地值优先，模型值不覆盖", async () => {
+    // 本地正则可抽到「月租金为人民币2000元，押金6000元」→ depositMonths=3。
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () =>
+        modelResponse({
+          contractType: "rent",
+          findings: [],
+          extractedTerms: { monthlyRent: 9999, deposit: 1, termMonths: 1 },
+        }),
+      ),
+    );
+    const text = `第一条 租赁期限
+租期12个月，月租金为人民币2000元，押金6000元。
+`;
+    const final = await analyzeAll(text, "paste", undefined, undefined, () => {});
+    expect(final.amounts.monthlyRent).toBe(2000);
+    expect(final.amounts.deposit).toBe(6000);
+    expect(final.amounts.depositMonths).toBe(3);
+    expect(final.amounts.termMonths).toBe(12);
+  });
+});
+
+describe("mergeAmounts 单元", () => {
+  const local: AmountTerms = { monthlyRent: 2000, currency: "CNY" };
+
+  it("本地缺失字段用模型值补，倍数按合并后重算", () => {
+    const m = mergeAmounts(local, { deposit: 6000 });
+    expect(m.monthlyRent).toBe(2000);
+    expect(m.deposit).toBe(6000);
+    expect(m.depositMonths).toBe(3);
+  });
+
+  it("monthlyRent 为 0 时不产生 Infinity 倍数", () => {
+    const m = mergeAmounts({ currency: "CNY" }, { monthlyRent: 0, deposit: 6000 });
+    expect(m.depositMonths).toBeUndefined();
   });
 });

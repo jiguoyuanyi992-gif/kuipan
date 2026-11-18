@@ -73,6 +73,56 @@ describe("llm schema 硬校验", () => {
     const bad = valid.replace('"aiSuggested":false', '"aiSuggested":"false"');
     expect(parseModelResponse(bad).ok).toBe(false);
   });
+
+  it("extractedTerms 数值与数字字符串归一化，脏值归 undefined 不连坐整批", () => {
+    const r = parseModelResponse(
+      JSON.stringify({
+        contractType: "rent",
+        findings: [],
+        extractedTerms: {
+          monthlyRent: "1,500",
+          deposit: 3000,
+          penalty: null,
+          termMonths: "壹仟伍佰",
+          currency: "CNY",
+        },
+      }),
+    );
+    expect(r.ok).toBe(true);
+    expect(r.extractedTerms?.monthlyRent).toBe(1500);
+    expect(r.extractedTerms?.deposit).toBe(3000);
+    expect(r.extractedTerms?.penalty).toBeUndefined();
+    expect(r.extractedTerms?.termMonths).toBeUndefined();
+  });
+
+  it("extractedTerms 缺失或空对象 → 全 undefined，findings 照常通过", () => {
+    const missing = parseModelResponse(valid);
+    expect(missing.ok).toBe(true);
+    expect(missing.extractedTerms?.deposit).toBeUndefined();
+    const empty = parseModelResponse(
+      JSON.stringify({ contractType: "rent", findings: [], extractedTerms: {} }),
+    );
+    expect(empty.ok).toBe(true);
+    expect(empty.extractedTerms).toEqual({
+      monthlyRent: undefined,
+      deposit: undefined,
+      penalty: undefined,
+      termMonths: undefined,
+    });
+  });
+
+  it("extractedTerms 负数与 Infinity 拒绝归 undefined", () => {
+    const r = parseModelResponse(
+      JSON.stringify({
+        contractType: "rent",
+        findings: [],
+        extractedTerms: { monthlyRent: -100, deposit: "abc" },
+      }),
+    );
+    expect(r.ok).toBe(true);
+    expect(r.extractedTerms?.monthlyRent).toBeUndefined();
+    expect(r.extractedTerms?.deposit).toBeUndefined();
+  });
 });
 
 describe("llm 合并去重", () => {

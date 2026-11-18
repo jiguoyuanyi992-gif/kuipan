@@ -13,6 +13,7 @@ import type {
   ContractDoc,
   ContractSource,
   ContractType,
+  ExtractedTerms,
   Finding,
   ModelFinding,
   OverallRisk,
@@ -101,6 +102,7 @@ export async function analyzeAll(
       ...base,
       findings,
       overall: overallRisk(findings),
+      amounts: mergeAmounts(base.amounts, result.extractedTerms),
       modelStatus: "done",
       modelCalls: { ok: result.okBatches, total: result.totalBatches },
       aiType: voteType(result.contractTypes),
@@ -112,6 +114,31 @@ export async function analyzeAll(
     onUpdate(degraded);
     return degraded;
   }
+}
+
+// 金额期限双轨兜底：本地正则抽到了就用本地的，抽不到用模型的值填空；
+// 押金/违约金倍数按合并后的最终值重算。降级路径不调用本函数，amounts 保持本地值。
+export function mergeAmounts(local: AmountTerms, llm: ExtractedTerms): AmountTerms {
+  const monthlyRent = local.monthlyRent ?? llm.monthlyRent;
+  const deposit = local.deposit ?? llm.deposit;
+  const penalty = local.penalty ?? llm.penalty;
+  const termMonths = local.termMonths ?? llm.termMonths;
+  const round2 = (n: number) => Number(n.toFixed(2));
+  return {
+    monthlyRent,
+    deposit,
+    depositMonths:
+      deposit !== undefined && monthlyRent
+        ? round2(deposit / monthlyRent)
+        : undefined,
+    penalty,
+    penaltyMonths:
+      penalty !== undefined && monthlyRent
+        ? round2(penalty / monthlyRent)
+        : undefined,
+    termMonths,
+    currency: local.currency,
+  };
 }
 
 function voteType(types: string[]): ContractType | undefined {

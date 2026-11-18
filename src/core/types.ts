@@ -156,6 +156,14 @@ export interface AmountTerms {
   currency: string;
 }
 
+// 模型兜底提取的金额与期限：本地正则抽不到时用于填空（不进 Finding[]）。
+export interface ExtractedTerms {
+  monthlyRent?: number;
+  deposit?: number;
+  penalty?: number;
+  termMonths?: number;
+}
+
 export interface RedactionResult {
   // 脱敏后文本（姓名/身份证/手机号/住址已移除，金额/期限换比例占位符）。
   redactedText: string;
