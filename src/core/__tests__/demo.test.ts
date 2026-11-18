@@ -37,6 +37,12 @@ describe("高命中演示合同（真实案例脱敏版）", () => {
     expect(a.penalty).toBe(1000);
   });
 
+  it("真实案例必须登记可点开的出处链接", () => {
+    expect(demoContract.fabricated).toBe(false);
+    expect(demoContract.sourceNote).toContain("半岛都市报");
+    expect(demoContract.sourceUrl).toMatch(/^https:\/\//);
+  });
+
   it("不含禁用词表述", () => {
     const banned = ["违法", "无效", "可起诉", "一定", "肯定", "必然", "安全", "放心签", "保证", "承诺", "没问题"];
     for (const w of banned) expect(demoContract.text).not.toContain(w);

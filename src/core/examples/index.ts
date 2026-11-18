@@ -6,6 +6,9 @@ export interface ExampleContract {
   type: ContractType;
   // 内容来源标记：true=编造（页面标「示例，虚构」）；false=真实案例脱敏整理（页面标「真实案例，已脱敏」）。
   fabricated: boolean;
+  // 真实案例的出处（fabricated:false 时提供）：展示在合同原文旁，指向公开报道原文。
+  sourceNote?: string;
+  sourceUrl?: string;
   text: string;
 }
 

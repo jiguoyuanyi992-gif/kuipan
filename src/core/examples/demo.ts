@@ -42,5 +42,7 @@ export const demoContract: ExampleContract = {
   label: "高命中演示合同",
   type: "rent",
   fabricated: false,
+  sourceNote: "半岛都市报 2026 年 10 月报道的大学毕业生租房押金纠纷",
+  sourceUrl: "https://www.bandao.cn/a/1792028815754399901.html",
   text,
 };

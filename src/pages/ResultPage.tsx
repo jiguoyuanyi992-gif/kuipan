@@ -7,6 +7,7 @@ import {
   TYPE_LABEL,
 } from "@/src/components/riskMeta";
 import { blockSeverity, type Analysis } from "@/src/lib/analyze";
+import { demoContract } from "@/src/core/examples/demo";
 import type { Block, ContractType, Finding } from "@/src/core/types";
 import { CONTRACT_TYPES } from "@/src/core/types";
 
@@ -129,7 +130,19 @@ export function ResultPage({
           右＝分析结果；窄屏上下堆叠，原文在上。 */}
       <div className="grid min-w-0 gap-6 md:grid-cols-[minmax(0,4fr)_minmax(0,6fr)] md:items-start">
         <section aria-label="合同原文" className="min-w-0 md:sticky md:top-6">
-          <h2 className="mb-2 font-title text-lg">合同原文</h2>
+          <div className="mb-2 flex flex-wrap items-baseline justify-between gap-2">
+            <h2 className="font-title text-lg">合同原文</h2>
+            {isExample && demoContract.sourceUrl && (
+              <a
+                href={demoContract.sourceUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-muted-foreground underline decoration-dotted underline-offset-4 hover:text-foreground"
+              >
+                原文出处：{demoContract.sourceNote} ↗
+              </a>
+            )}
+          </div>
           <div className="paper max-h-[45vh] overflow-y-auto rounded-[var(--site-radius)] border border-border p-4 sm:p-5 md:max-h-[calc(100vh-9rem)]">
             <div className="space-y-3 whitespace-pre-wrap break-words font-mono text-sm leading-relaxed">
               {doc.blocks.map((b) => {

@@ -372,8 +372,16 @@ export function InputPage({ onAnalyze, checkHint }: Props) {
           </button>
         </div>
         <p className="text-xs text-muted-foreground">
-          案例来源：半岛都市报 2026 年 10
-          月报道的大学毕业生租房押金纠纷，合同条款为真实内容脱敏整理，人物与机构均为泛称。
+          案例来源：
+          <a
+            href={demoContract.sourceUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline decoration-dotted underline-offset-4 hover:text-foreground"
+          >
+            {demoContract.sourceNote}（原文报道 ↗）
+          </a>
+          ，合同条款为真实内容脱敏整理，人物与机构均为泛称。
         </p>
       </section>
 

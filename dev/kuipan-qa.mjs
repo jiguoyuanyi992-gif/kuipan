@@ -138,7 +138,11 @@ for (const vp of [
   record(
     vp.name,
     "demo-real-case-label",
-    txt.includes("高命中演示合同（真实案例，已脱敏）") && txt.includes("案例来源"),
+    txt.includes("高命中演示合同（真实案例，已脱敏）") &&
+      txt.includes("案例来源") &&
+      (await evaluate(
+        `(() => { const a=[...document.querySelectorAll('a')].find(x=>(x.href||'').includes('bandao.cn')); return !!a && a.target==='_blank' && (a.rel||'').includes('noopener'); })()`,
+      )),
   );
   record(
     vp.name,
@@ -246,6 +250,13 @@ for (const vp of [
   record(vp.name, "demo-model-merged", txt.includes("AI 生成") && !txt.includes("智能分析暂不可用"));
   const marks = await evaluate("document.querySelectorAll('mark.brush-mark').length");
   record(vp.name, "demo-brush-marks", marks > 0, `marks=${marks}`);
+  record(
+    vp.name,
+    "demo-source-link",
+    await evaluate(
+      `(() => { const a=[...document.querySelectorAll('section[aria-label="合同原文"] a')].find(x=>(x.href||'').includes('bandao.cn')); return !!a && a.target==='_blank' && (a.rel||'').includes('noopener') && a.textContent.includes('原文出处'); })()`,
+    ),
+  );
   await shot(`${vp.name}-result`, true);
   ov = await hOverflow();
   record(vp.name, "result-no-h-overflow", ov.sw <= ov.cw, JSON.stringify(ov));
