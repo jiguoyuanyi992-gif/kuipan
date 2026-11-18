@@ -4,6 +4,29 @@
 > 红线：只出现编造或脱敏样例，不得含真实合同内容、真实姓名、身份证、手机号、住址、公司名。
 > 截图由用户用系统截图工具放入 docs/shots/，文件名带里程碑编号；缺图写「（待补：xxx.png）」，不编造截图内容。
 
+## M4 后追加 · 首页横幅三行文案改竖排（2026-11-18，不打 tag）
+
+### 关键提示词（天赐原话）
+
+- 「这三行文字改成纵向排列」（在站点预览里框选首页横幅文案块「签合同如签生死簿 · 钟馗来判／呈上生死簿／租房、实习兼职合同……」后批注）
+
+### 改了什么
+
+- InputPage 主视觉文案容器加 `writing-mode: vertical-rl`：三行依次成竖列，右起读序（引导句→标题→说明），说明句超高自动向左换列；字号与配色不动。design-spec §15 登记。
+
+### 报错与解决
+
+- 线上复验第一次读到旧 bundle（horizontal-tb）：ego 标签页复用缓存页，`location.reload()` 后新包 index-CAHe0v8v.js 生效——老坑第二次踩中，已并入记忆文件。
+
+### 部署与运行记录
+
+- npm test 228/228；`npm run build` 通过；kuipan-qa 双视口 84/84（新增 home-hero-vertical 断言，桌面/移动截图确认竖排列序正确）。
+- prepare_site/publish_site actionId 44402345-8edb-4899-98bf-67cbb8faa1a2 发布成功，operation succeeded。
+
+### 线上链接与验证方式
+
+- https://kuipan-odzma4gogrf.qoder.zone 无痕/真实浏览器复验：h1 computed writing-mode = vertical-rl，横幅三列右起排布正常。截图（待补：m4-hero-vertical-desktop.png、m4-hero-vertical-mobile.png）。
+
 ## M4 后追加 · 高命中示例换真实案例脱敏版（2026-11-18，不打 tag）
 
 ### 追加 · 合同原文旁附出处链接（同日，天赐指令「把原文出处的链接附上，附在原文旁边」）

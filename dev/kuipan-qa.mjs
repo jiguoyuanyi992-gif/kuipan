@@ -137,6 +137,13 @@ for (const vp of [
   record(vp.name, "home-load", txt.includes("馗判") && txt.includes("呈上生死簿"));
   record(
     vp.name,
+    "home-hero-vertical",
+    (await evaluate(
+      `getComputedStyle(document.querySelector('h1')).writingMode`,
+    )) === "vertical-rl",
+  );
+  record(
+    vp.name,
     "demo-real-case-label",
     txt.includes("高命中演示合同（真实案例，已脱敏）") &&
       txt.includes("案例来源") &&

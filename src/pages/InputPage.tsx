@@ -209,7 +209,12 @@ export function InputPage({ onAnalyze, checkHint }: Props) {
               "linear-gradient(to right, #000 0%, #000 34%, rgba(0,0,0,0.82) 50%, rgba(0,0,0,0) 76%)",
           }}
         />
-        <div className="relative flex h-full max-w-[86%] flex-col justify-center gap-3 px-5 sm:max-w-[62%] sm:px-8">
+        {/* 三行文案竖排（2026-11-18 天赐指令）：vertical-rl 下 flex-col 主轴变为右→左，
+            引导句、标题、说明依次成列，长句自动向左换列。 */}
+        <div
+          className="relative flex h-full max-w-[86%] flex-col justify-center gap-3 px-5 sm:max-w-[62%] sm:px-8"
+          style={{ writingMode: "vertical-rl" }}
+        >
           <p
             className="text-xs tracking-[0.3em]"
             style={{ color: "var(--site-gold)" }}

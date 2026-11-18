@@ -208,3 +208,9 @@
 - 结果页「合同原文」标题行右侧（窄屏自动换行到下一行）：小字链接「原文出处：半岛都市报 2026 年 10 月报道的大学毕业生租房押金纠纷 ↗」，`target="_blank" rel="noopener noreferrer"`，仅在示例来源（source==="example"）且 `demoContract.sourceUrl` 存在时显示。
 - 首页来源行同步：「案例来源：」后的案例描述改为同一 URL 的可点链接（原文报道 ↗）。
 - 数据层：`ExampleContract` 新增可选 `sourceNote`/`sourceUrl`；出处只登记在示例数据，页面不得硬编码 URL。测试 `demo.test.ts` 断言真实案例必须有 https 出处；`kuipan-qa.mjs` 双视口断言首页与合同原文区块各有一个 bandao.cn 外链。
+
+## 15. 首页横幅三行文案竖排（2026-11-18 天赐指令）
+
+- 主视觉文案容器加 `writing-mode: vertical-rl`：flex-col 主轴随之变为右→左，引导句、标题「呈上生死簿」、说明句依次成列，符合传统竖排阅读顺序；说明句超列高时自动向左换列。
+- 桌面与移动视口同一口径（移动 375px 下说明约 3 列，仍可读）；容器与列组在黑色渐变区垂直居中，不越界（kuipan-qa 双视口 home-hero-vertical + home-no-h-overflow 断言）。
+- 字号体系不变：引导句 text-xs tracking-[0.3em]（竖排下变为列内字距）、标题 text-4xl/5xl、说明 text-sm。
