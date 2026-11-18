@@ -3,6 +3,8 @@ import { checklistFor, type TrapCategory } from "@/src/core/traps";
 
 interface Props {
   category: TrapCategory;
+  // 嵌入卷轴纸面时去掉自己的外框材质，只保留内容（2026-11-18 照契卷轴指令）。
+  embedded?: boolean;
 }
 
 const KEY_ITEM_COUNT = 3;
@@ -111,7 +113,7 @@ function save(key: string, value: Record<string, boolean>) {
   }
 }
 
-export function Checklist({ category }: Props) {
+export function Checklist({ category, embedded = false }: Props) {
   const list = checklistFor(category);
   const [checked, setChecked] = useState<Record<string, boolean>>(() =>
     load(list?.storageKey ?? `qqy:checklist:${category}`),
@@ -128,13 +130,19 @@ export function Checklist({ category }: Props) {
   const visible = showAll ? list.items : list.items.slice(0, KEY_ITEM_COUNT);
 
   return (
-    <section className="paper chk-panel rounded-[var(--site-radius)] p-3.5 sm:p-4">
+    <section
+      className={
+        embedded
+          ? "space-y-1.5"
+          : "paper chk-panel rounded-[var(--site-radius)] p-3.5 sm:p-4"
+      }
+    >
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h2 className="flex items-center gap-2 font-title text-base">
           <span className="seal h-5 w-5 text-[10px]" aria-hidden>
             契
           </span>
-          签约前检查清单
+          {embedded ? "签约前检查" : "签约前检查清单"}
         </h2>
         <span className="text-xs text-muted-foreground">
           已核对 {done} / {list.items.length}

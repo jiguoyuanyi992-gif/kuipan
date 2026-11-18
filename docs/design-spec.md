@@ -122,3 +122,35 @@
 ## 10. 照契 · 典例来源链接（2026-11-17 天赐指令）
 
 典例分析左位的「典例配图」占位盒整体废弃，改为可点的「典例来源」链接盒：朱红竖排四字＋纸色底（`#e3d6bc`）＋细边框，尺寸与原占位盒一致（h-24 w-20），`target="_blank" rel="noreferrer"`。链接来自 `TrapEntry.caseSourceUrl`（types.ts 新增可选字段），数据落在 `src/core/traps/traps.json` 26 条（租房 6／实习兼职 4／贷款分期 4／套餐 2／考证 2／保险 2／预付卡 2／租车 2／驾校 2），逐条对应天赐提供的《照契 · 全板块典例来源总表》：官方示范文本/公告 PDF 直链，PDF 带 `#page=N` 页码锚点；对应关系按 trap id 与总表占位文件名（`case-<id去前缀>.png`）逐一核对，抽查 5 条 HEAD 均 200。实现见 `src/pages/ContractsPage.tsx` `CaseStudy`。
+
+## 11. 照契卷轴 · 轴做实、清单并入、合卷初始态与展收动画（2026-11-18 天赐指令）
+
+只改界面层（`src/pages/ContractsPage.tsx`、`src/components/Checklist.tsx`、`src/globals.css`），不动 `src/core/`、`functions/`、规则库与 `contracts.json`；不引第三方库、不用外部图片，动画全部 CSS + 少量 React 状态。
+
+### 11.1 木轴与装裱尺寸、配色
+
+- 轴杆 `.qq-rod`：高 26px，纵向渐变 `#a07a4a → #6b4f2e(45%) → #2a1d0f` 做圆柱感，顶部 2px 细高光 + 底部内暗 + 外投影；`flex:none` 不随压缩。
+- 轴头 `.qq-rod::before/::after`：短圆柱（12×36px，圆角 4px），帽面朱红渐变 `#d4593f → #b23a2e(40%) → #6e1f15`＋描边 `#40100a`＋顶高光。全站轴头统一朱红（与 `--site-accent`、选中签条同色），不用古金。
+- 伸出量：桌面裱边 12px＋轴头外探 6px ≈ 每端 18px；≤480px 裱边收为 6px、轴头外探 2px（≈8px），已实测 375px 无横向滚动条。
+- 绫边 `.qq-silk`：纸面上下各一条 10px，`#7a2a20 → #5a1d16` 渐变，夹在轴与纸之间；上绫边固定在顶轴之下，下绫边随下轴走（见 11.3）。
+- 裱边 `.qq-mount`：由与页背景糊在一起的深棕改为暗棕红 `#43241a ↔ #55301f`，左右 12px（窄屏 6px）。
+- 纸面 `.qq-paper`：保留 `#f3e9d2`＋CSS 纸纹，新增左右各一条 `inset 16px` 内阴影，做出卷过的纸的压暗边。
+
+### 11.2 清单并入卷轴
+
+- 卷轴上方独立的 `.chk-panel` 卡片废弃。`Checklist` 新增 `embedded` 属性（默认 false，不影响其它调用方）：为 true 时去掉自己的 paper/边框/圆角，标题改「签约前检查」，作为纸面第一栏全宽显示，带原朱红「契」印章。
+- 清单与典例两栏之间用 `.qq-divider` 淡墨细线分隔。
+- 保持不变：localStorage key（`qqy:checklist:<category>`）、5 类别色标签、「已核对 x / n」计数、「查看全部 n 项」折叠、「勾选只存在你自己的浏览器里」句。
+
+### 11.3 合卷初始态与展收动画
+
+- 初始态：首次进入照契（无 `focusTrapId`）不默认选中任何类型，显示合卷——上下两轴贴合，中间纸签「请选类型，展开卷轴」。带 `focusTrapId` 进入则直接展开对应类型并定位典例。
+- 展卷：上轴固定；纸面用 `grid-template-rows: 0fr → 1fr` + `overflow:hidden` 从 0 展开到内容高度，800ms ease-out；下轴＋下绫边包在 `.qq-rollfoot`（`position:sticky; bottom:0`）里贴住可见底边下行，完全展开后落回纸尾。内容 300ms 延迟后 300ms 淡入。
+- 换卷：已展开时点另一类型，先收卷 400ms（下轴上行），换数据后再展 800ms；收卷期间新点击只记最后一次；点已选中类型不做任何事。
+- 视野：点击后若签条栏不在视口内，`scrollIntoView` 平滑滚到签条栏，不强制滚到下轴。
+- 降级与无障碍：`prefers-reduced-motion: reduce` 时全部即时切换、无过渡；签条保持 `role="tab"`，卷轴区 `role="tabpanel"` + `aria-live="polite"`，合卷时屏幕阅读器读到「请选类型，展开卷轴」。
+- 选中签条下方加 6px 朱红三角（`.qq-tab[aria-selected="true"]::after`）指向卷轴；未选中无装饰。
+
+### 11.4 验收记录（2026-11-18）
+
+`dev/照契卷轴qa.mjs`（CDP，1366×900 与 375×812）：合卷初始态、下轴随展卷从 277px 移动到 5023px、清单在纸面内且无独立卡片、勾选刷新保留、换卷先收后展、同类型点击不折叠、最长类型（驾校）下轴落位正确、375 无横向溢出、reduced-motion 即时、结果页「查看同类案例」跳入直展——18/18 通过，控制台 0 error。

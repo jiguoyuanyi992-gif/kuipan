@@ -265,8 +265,9 @@ body {
   background: linear-gradient(180deg, #3f3020 0%, #2b2115 45%, #1e1710 100%);
 }
 
-/* 类型切换：木牌签条，选中态朱砂红底 */
+/* 类型切换：木牌签条，选中态朱砂红底 + 下方朱红小三角指向卷轴（2026-11-18 照契卷轴指令） */
 .qq-tab {
+  position: relative;
   font-family: var(--font-title);
   font-weight: 600;
   font-size: 0.875rem;
@@ -284,75 +285,156 @@ body {
   background: linear-gradient(180deg, #8c3527 0%, #6e2a1e 100%);
   box-shadow: inset 0 1px 0 rgba(255, 220, 190, 0.18), 0 0 0 1px rgba(178, 58, 46, 0.55);
 }
-
-/* 展开动画：自上而下 350ms，减弱动效时关闭 */
-.qq-unroll {
-  transform-origin: top center;
-  animation: qq-unroll 350ms ease-out both;
+.qq-tab[aria-selected="true"]::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -8px;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border: 6px solid transparent;
+  border-top-color: #b23a2e;
+  border-bottom: 0;
 }
-@keyframes qq-unroll {
-  from {
-    clip-path: inset(0 0 100% 0);
-    opacity: 0.55;
+
+/* 展卷/收卷：grid-template-rows 0fr→1fr（800ms 展 / 400ms 收），下轴随纸面底边移动；
+   内容在展开过半时淡入（300ms 延迟 + 300ms）。prefers-reduced-motion 时全部即时切换。 */
+.qq-rollwrap {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 400ms ease-in;
+}
+.qq-rollwrap[data-open="true"] {
+  grid-template-rows: 1fr;
+  transition: grid-template-rows 800ms ease-out;
+}
+.qq-rolltrack {
+  overflow: hidden;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+/* 下轴＋下绫边贴住展卷前沿：内容比可见区高时粘在 clip 底边，展开完毕落回纸尾 */
+.qq-rollfoot {
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
+  flex: none;
+}
+.qq-rollwrap .qq-paper {
+  opacity: 0;
+  transition: opacity 150ms ease-in;
+}
+.qq-rollwrap[data-open="true"] .qq-paper {
+  opacity: 1;
+  transition: opacity 300ms ease-out 300ms;
+}
+@media (prefers-reduced-motion: reduce) {
+  .qq-rollwrap,
+  .qq-rollwrap[data-open="true"],
+  .qq-rollwrap .qq-paper,
+  .qq-rollwrap[data-open="true"] .qq-paper {
+    transition: none;
   }
-  to {
-    clip-path: inset(0 0 0 0);
+  .qq-rollwrap .qq-paper {
     opacity: 1;
   }
 }
-@media (prefers-reduced-motion: reduce) {
-  .qq-unroll {
-    animation: none;
-  }
-}
 
-/* 轴杆：CSS 渐变木轴，两端圆形轴头 */
+/* 轴杆：26px 粗木轴，纵向渐变做出圆柱感，两端各伸出纸宽约 18px，轴头为短圆柱、帽面朱红 */
 .qq-rod {
   position: relative;
-  height: 18px;
-  border-radius: 4px;
-  background: linear-gradient(180deg, #6b5236 0%, #46331f 40%, #241a0e 85%, #171007 100%);
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+  flex: none;
+  height: 26px;
+  border-radius: 6px;
+  background: linear-gradient(180deg, #a07a4a 0%, #6b4f2e 45%, #2a1d0f 100%);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 236, 200, 0.38),
+    inset 0 -3px 4px rgba(0, 0, 0, 0.45),
+    0 3px 7px rgba(0, 0, 0, 0.55);
 }
 .qq-rod::before,
 .qq-rod::after {
   content: "";
   position: absolute;
   top: 50%;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
+  width: 12px;
+  height: 36px;
+  border-radius: 4px;
   transform: translateY(-50%);
-  background: radial-gradient(circle at 35% 32%, #7a5c3a 0%, #4a3722 55%, #241a0d 100%);
-  border: 1px solid #171007;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.45);
+  background: linear-gradient(180deg, #d4593f 0%, #b23a2e 40%, #6e1f15 100%);
+  border: 1px solid #40100a;
+  box-shadow: inset 0 2px 0 rgba(255, 205, 175, 0.45), 0 2px 5px rgba(0, 0, 0, 0.5);
 }
 .qq-rod::before {
-  left: -10px;
+  left: -6px;
 }
 .qq-rod::after {
-  right: -10px;
+  right: -6px;
 }
 
-/* 裱边：纸面左右细窄深色边，窄屏收窄 */
+/* 合卷态：两轴贴合，中间一条纸签写提示 */
+.qq-closed-tag {
+  display: flex;
+  justify-content: center;
+  padding: 0.9rem 0;
+  background: linear-gradient(90deg, #43241a 0%, #55301f 50%, #43241a 100%);
+}
+.qq-closed-tag span {
+  font-family: var(--font-title);
+  font-size: 0.875rem;
+  letter-spacing: 0.08em;
+  color: #6b5a3e;
+  background: #efe2c4;
+  border: 1px solid #b23a2e;
+  border-radius: 3px;
+  padding: 0.3rem 1.1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+}
+
+/* 绫边：纸面上下各一条深红细边，夹在轴与纸之间 */
+.qq-silk {
+  flex: none;
+  height: 10px;
+  background: linear-gradient(180deg, #7a2a20 0%, #5a1d16 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 190, 160, 0.16), inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+}
+
+/* 裱边：纸面左右细窄暗棕红边，不与页背景糊在一起；窄屏收窄、轴头伸出量收到约 8px */
 .qq-mount {
   padding: 0 12px;
-  background: linear-gradient(90deg, #241a0e, #35281a 50%, #241a0e);
+  background: linear-gradient(90deg, #43241a 0%, #55301f 50%, #43241a 100%);
 }
 @media (max-width: 480px) {
   .qq-mount {
     padding: 0 6px;
   }
+  .qq-rod::before {
+    left: -2px;
+  }
+  .qq-rod::after {
+    right: -2px;
+  }
 }
 
-/* 宣纸纸面：#F3E9D2 底 + 极轻纸纹（CSS 渐变，不用图片） */
+/* 宣纸纸面：#F3E9D2 底 + 极轻纸纹（CSS 渐变，不用图片）；左右内阴影像卷过的纸 */
 .qq-paper {
   background-color: #f3e9d2;
   background-image:
     repeating-linear-gradient(90deg, rgba(120, 95, 60, 0.045) 0 1px, transparent 1px 4px),
     repeating-linear-gradient(0deg, rgba(120, 95, 60, 0.035) 0 1px, transparent 1px 5px),
     radial-gradient(120% 80% at 50% 0%, rgba(255, 250, 235, 0.5), transparent 60%);
-  box-shadow: inset 0 0 24px rgba(90, 70, 40, 0.12);
+  box-shadow:
+    inset 16px 0 22px -16px rgba(56, 38, 18, 0.55),
+    inset -16px 0 22px -16px rgba(56, 38, 18, 0.55),
+    inset 0 0 24px rgba(90, 70, 40, 0.12);
+}
+
+/* 纸面内：清单与两栏之间的淡墨细线 */
+.qq-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(38, 32, 26, 0.28) 12%, rgba(38, 32, 26, 0.28) 88%, transparent);
 }
 
 /* 纸面内两栏之间：淡墨细线（md 以上） */

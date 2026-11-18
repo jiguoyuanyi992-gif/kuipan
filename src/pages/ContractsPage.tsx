@@ -184,24 +184,74 @@ interface Props {
   onCheckRule: (ruleId: string, title: string) => void;
 }
 
+// 合卷(未选类型) → 点击展开(800ms) → 点另一类型先收卷(400ms)再展卷。
+type RollPhase = "closed" | "opening" | "open" | "collapsing";
+
+function prefersReducedMotion(): boolean {
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
 export function ContractsPage({ focusTrapId, hasAnalysis, onBack, onCheckRule }: Props) {
   const focusTrap = focusTrapId ? trapById(focusTrapId) : undefined;
-  const [typeId, setTypeId] = useState<string>(
-    () => (focusTrap && typeForTrap(focusTrap.id)?.id) || contractTypes[0]?.id || "",
-  );
+  const initialType = (focusTrap && typeForTrap(focusTrap.id)?.id) || null;
+  const [typeId, setTypeId] = useState<string | null>(initialType);
+  const [phase, setPhase] = useState<RollPhase>(initialType ? "open" : "closed");
+  const pendingRef = useRef<string | null>(null);
+  const tabBarRef = useRef<HTMLDivElement | null>(null);
   const focusRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     if (!focusTrap) return;
     const t = typeForTrap(focusTrap.id);
-    if (t) setTypeId(t.id);
+    if (t) {
+      setTypeId(t.id);
+      setPhase("open");
+    }
   }, [focusTrap]);
 
   useEffect(() => {
     if (focusTrap) focusRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   }, [focusTrap, typeId]);
 
-  const type = contractTypes.find((t) => t.id === typeId) ?? contractTypes[0];
+  // 收卷期间不响应新点击，只记录最后一次；400ms 后换数据再展卷。
+  useEffect(() => {
+    if (phase !== "collapsing") return;
+    const timer = setTimeout(() => {
+      if (pendingRef.current) setTypeId(pendingRef.current);
+      pendingRef.current = null;
+      // 先以 0fr 渲染一帧，再触发 800ms 展开过渡。
+      requestAnimationFrame(() => requestAnimationFrame(() => setPhase("open")));
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [phase]);
+
+  function selectType(id: string) {
+    if (id === typeId && phase !== "closed") return; // 点已选中的类型：不折叠
+    if (prefersReducedMotion()) {
+      setTypeId(id);
+      setPhase("open");
+      return;
+    }
+    if (phase === "collapsing") {
+      pendingRef.current = id;
+      return;
+    }
+    if (typeId === null) {
+      setTypeId(id);
+      setPhase("opening");
+      requestAnimationFrame(() => requestAnimationFrame(() => setPhase("open")));
+    } else {
+      pendingRef.current = id;
+      setPhase("collapsing");
+    }
+    // 卷轴顶部不在视口内时，把签条栏滚到视口上方附近（不强制滚到下轴）。
+    const rect = tabBarRef.current?.getBoundingClientRect();
+    if (rect && (rect.bottom < 0 || rect.top > window.innerHeight)) {
+      tabBarRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }
+
+  const type = typeId ? contractTypes.find((t) => t.id === typeId) : undefined;
 
   // 法律依据只从规则库按 rule_id 读取，且只显示 verified=true 的条目。
   const verifiedRules = useMemo<RiskRule[]>(
@@ -220,10 +270,12 @@ export function ContractsPage({ focusTrapId, hasAnalysis, onBack, onCheckRule }:
     [type],
   );
 
-  if (!type) return null;
-  const scene: ContractType = (CONTRACT_TYPES as readonly string[]).includes(type.id)
+  const scene: ContractType = type && (CONTRACT_TYPES as readonly string[]).includes(type.id)
     ? (type.id as ContractType)
     : "other";
+
+  // opening/collapsing 都以合起高度渲染，open 才展开——保证首帧 0fr 后再触发过渡。
+  const dataOpen = phase === "open" ? "true" : "false";
 
   return (
     <div className="qq-page flex-1">
@@ -242,16 +294,16 @@ export function ContractsPage({ focusTrapId, hasAnalysis, onBack, onCheckRule }:
         <span className="text-xs text-muted-foreground">先选类型，再展开卷轴</span>
       </header>
 
-      <div className="flex flex-wrap gap-2" role="tablist" aria-label="合同类型">
+      <div ref={tabBarRef} className="scroll-mt-4 flex flex-wrap gap-2 pb-2" role="tablist" aria-label="合同类型">
         {contractTypes.map((t) => {
-          const on = t.id === type.id;
+          const on = t.id === typeId;
           return (
             <button
               key={t.id}
               type="button"
               role="tab"
               aria-selected={on}
-              onClick={() => setTypeId(t.id)}
+              onClick={() => selectType(t.id)}
               className="qq-tab"
             >
               {t.label}
@@ -260,118 +312,137 @@ export function ContractsPage({ focusTrapId, hasAnalysis, onBack, onCheckRule }:
         })}
       </div>
 
-      {/* 选定类型后，清单+卷轴这一组自上而下展开（350ms，prefers-reduced-motion 下关闭） */}
-      <div key={type.id} className="qq-unroll flex flex-col gap-5">
-      {/* 检查清单在卷轴上方，勾选状态沿用原 localStorage key */}
-      {type.checklist && <Checklist category={type.checklist} />}
-
-      {/* 卷轴：上下木轴（CSS 绘制，两端轴头）+ 左右裱边 + 宣纸色纸面 */}
-      <div className="qq-scroll">
+      {/* 卷轴：上下木轴（CSS 绘制，两端短圆柱轴头）+ 深红绫边 + 暗棕裱边 + 宣纸色纸面。
+          合卷时两轴贴合，中间一条签条；展开时上轴固定，下轴随纸面底边下行。 */}
+      <div className="qq-scroll flex flex-col" role="tabpanel" aria-live="polite" aria-label="合同卷轴">
         <div className="qq-rod" aria-hidden />
-        <div className="qq-mount">
-        <div className="paper qq-paper space-y-6 px-4 py-5 sm:px-6">
-          <h2 className="flex items-center gap-2 font-title text-xl">
-            <span className="seal h-7 w-7 text-xs" aria-hidden>
-              契
-            </span>
-            {type.label}
-          </h2>
+        {type && <div className="qq-silk" aria-hidden />}
+        {type ? (
+          <div className="qq-rollwrap" data-open={dataOpen}>
+            <div className="qq-rolltrack">
+              <div className="qq-mount">
+              <div className="qq-paper paper space-y-5 px-4 py-5 sm:px-6 sm:space-y-6">
+                {type.checklist && (
+                  <>
+                    <Checklist category={type.checklist} embedded />
+                    <div className="qq-divider" aria-hidden />
+                  </>
+                )}
+                <h2 className="flex items-center gap-2 font-title text-xl">
+                  <span className="seal h-7 w-7 text-xs" aria-hidden>
+                    契
+                  </span>
+                  {type.label}
+                </h2>
 
-          <div className="grid gap-8 md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
-            <section className="space-y-3">
-              <h3 className="flex items-center gap-2 font-title text-base">
-                <span className="seal h-5 w-5 text-[10px]" aria-hidden>
-                  契
-                </span>
-                注意事项（法律依据）
-              </h3>
-              {verifiedRules.length === 0 ? (
-                <div className="space-y-1 text-[15px] leading-[1.7] text-muted-foreground">
-                  <p className="font-medium">签前怎么办</p>
-                  <ul className="list-disc space-y-1 pl-5">
-                    {actionsForType(scene).map((a, i) => (
-                      <li key={i}>{a}</li>
-                    ))}
-                  </ul>
-                </div>
-              ) : (
-                <ul className="space-y-3">
-                  {verifiedRules.map((r) => (
-                    <li key={r.id} className="space-y-1 border-l-2 pl-3" style={{ borderColor: "var(--site-accent)" }}>
-                      <p className="font-title text-[15px]">{r.title}</p>
-                      {r.legalBasis.map((lb, i) => (
-                        <div key={i} className="space-y-0.5">
-                          <p className="text-[15px] leading-[1.7]">
-                            {lb.law} {lb.article}：{lb.quote}
-                          </p>
-                          <p className="text-[11px] text-muted-foreground">
-                            {lb.sourceUrl ? (
-                              <a
-                                href={lb.sourceUrl}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="underline hover:text-[var(--site-accent)]"
-                              >
-                                来源：{lb.source}
-                              </a>
-                            ) : (
-                              <>来源：{lb.source}</>
-                            )}
-                          </p>
-                          {lb.reprintUrl && (
-                            <p className="text-[11px] text-muted-foreground">
-                              参考转载（不作依据）：
-                              <a
-                                href={lb.reprintUrl}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="underline hover:text-[var(--site-accent)]"
-                              >
-                                {new URL(lb.reprintUrl).hostname}
-                              </a>
-                            </p>
-                          )}
-                        </div>
-                      ))}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </section>
+                <div className="grid gap-8 md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
+                  <section className="space-y-3">
+                    <h3 className="flex items-center gap-2 font-title text-base">
+                      <span className="seal h-5 w-5 text-[10px]" aria-hidden>
+                        契
+                      </span>
+                      注意事项（法律依据）
+                    </h3>
+                    {verifiedRules.length === 0 ? (
+                      <div className="space-y-1 text-[15px] leading-[1.7] text-muted-foreground">
+                        <p className="font-medium">签前怎么办</p>
+                        <ul className="list-disc space-y-1 pl-5">
+                          {actionsForType(scene).map((a, i) => (
+                            <li key={i}>{a}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    ) : (
+                      <ul className="space-y-3">
+                        {verifiedRules.map((r) => (
+                          <li key={r.id} className="space-y-1 border-l-2 pl-3" style={{ borderColor: "var(--site-accent)" }}>
+                            <p className="font-title text-[15px]">{r.title}</p>
+                            {r.legalBasis.map((lb, i) => (
+                              <div key={i} className="space-y-0.5">
+                                <p className="text-[15px] leading-[1.7]">
+                                  {lb.law} {lb.article}：{lb.quote}
+                                </p>
+                                <p className="text-[11px] text-muted-foreground">
+                                  {lb.sourceUrl ? (
+                                    <a
+                                      href={lb.sourceUrl}
+                                      target="_blank"
+                                      rel="noreferrer"
+                                      className="underline hover:text-[var(--site-accent)]"
+                                    >
+                                      来源：{lb.source}
+                                    </a>
+                                  ) : (
+                                    <>来源：{lb.source}</>
+                                  )}
+                                </p>
+                                {lb.reprintUrl && (
+                                  <p className="text-[11px] text-muted-foreground">
+                                    参考转载（不作依据）：
+                                    <a
+                                      href={lb.reprintUrl}
+                                      target="_blank"
+                                      rel="noreferrer"
+                                      className="underline hover:text-[var(--site-accent)]"
+                                    >
+                                      {new URL(lb.reprintUrl).hostname}
+                                    </a>
+                                  </p>
+                                )}
+                              </div>
+                            ))}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </section>
 
-            <section className="qq-col-divide space-y-4">
-              <h3 className="flex items-center gap-2 font-title text-base">
-                <span className="seal h-5 w-5 text-[10px]" aria-hidden>
-                  契
-                </span>
-                典例分析
-              </h3>
-              {cases.length === 0 ? (
-                <p className="text-sm text-muted-foreground">整理中</p>
-              ) : (
-                cases.map((trap) => (
-                  <CaseStudy
-                    key={trap.id}
-                    trap={trap}
-                    hasAnalysis={hasAnalysis}
-                    onCheckRule={onCheckRule}
-                    focused={trap.id === focusTrapId}
-                    caseRef={
-                      trap.id === focusTrapId
-                        ? (el) => {
-                            focusRef.current = el;
+                  <section className="qq-col-divide space-y-4">
+                    <h3 className="flex items-center gap-2 font-title text-base">
+                      <span className="seal h-5 w-5 text-[10px]" aria-hidden>
+                        契
+                      </span>
+                      典例分析
+                    </h3>
+                    {cases.length === 0 ? (
+                      <p className="text-sm text-muted-foreground">整理中</p>
+                    ) : (
+                      cases.map((trap) => (
+                        <CaseStudy
+                          key={trap.id}
+                          trap={trap}
+                          hasAnalysis={hasAnalysis}
+                          onCheckRule={onCheckRule}
+                          focused={trap.id === focusTrapId}
+                          caseRef={
+                            trap.id === focusTrapId
+                              ? (el) => {
+                                  focusRef.current = el;
+                                }
+                              : undefined
                           }
-                        : undefined
-                    }
-                  />
-                ))
-              )}
-            </section>
+                        />
+                      ))
+                    )}
+                  </section>
+                </div>
+              </div>
+              </div>
+              {/* 下轴＋绫边贴住展卷的前沿：随 clip 底边下行，完全展开后落回纸尾 */}
+              <div className="qq-rollfoot">
+                <div className="qq-silk" aria-hidden />
+                <div className="qq-rod" aria-hidden />
+              </div>
+            </div>
           </div>
-        </div>
-        </div>
-        <div className="qq-rod" aria-hidden />
-      </div>
+        ) : (
+          <>
+            <div className="qq-closed-tag" aria-hidden>
+              <span>请选类型，展开卷轴</span>
+            </div>
+            <div className="qq-rod" aria-hidden />
+          </>
+        )}
       </div>
     </main>
     </div>
