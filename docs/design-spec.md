@@ -222,3 +222,8 @@
 - 顶部导航：思源宋体 500、text-base（16px）、字距 0.12em；主标题「呈上生死簿」700 保持竖排；第三行辅助文字竖排 14px Regular，作标题左侧装饰列，超长自动向左换列。
 - 色彩：现有 token 已满足建议值（正文暖米 #EFE5D0、金 #C9A24B、朱砂 #C93A2E），本轮未改。
 - 回归：kuipan-qa 新增 home-serif-fonts（导航/正文族、导航 500、h1 700）与 home-hero-vertical，双视口 86/86。
+
+## 17. 横幅文案排布定稿：手机竖排、桌面横排（2026-11-18 天赐看图后定稿）
+
+- 推翻 §15 的「双视口同竖排」：`globals.css .hero-copy` 默认 `writing-mode: vertical-rl`，`@media (min-width: 768px)` 改回 `horizontal-tb`；InputPage 文案容器由内联样式改为该类。§16 的思源宋体字体规格不受影响，全部保留。
+- 回归口径变更：kuipan-qa 断言改名 home-hero-orientation，按视口期望（mobile=vertical-rl、desktop=horizontal-tb），双视口 86/86。

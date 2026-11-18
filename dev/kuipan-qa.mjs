@@ -135,12 +135,15 @@ for (const vp of [
   await sleep(1200);
   let txt = await bodyText();
   record(vp.name, "home-load", txt.includes("馗判") && txt.includes("呈上生死簿"));
+  // 2026-11-18 天赐定稿：手机竖排、桌面横排（.hero-copy 按 768px 切换）
+  const expectWM = vp.name === "mobile" ? "vertical-rl" : "horizontal-tb";
   record(
     vp.name,
-    "home-hero-vertical",
+    "home-hero-orientation",
     (await evaluate(
       `getComputedStyle(document.querySelector('h1')).writingMode`,
-    )) === "vertical-rl",
+    )) === expectWM,
+    `expect=${expectWM}`,
   );
   record(
     vp.name,

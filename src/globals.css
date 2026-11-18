@@ -174,6 +174,16 @@ body {
   letter-spacing: 0.18em;
 }
 
+/* 首页横幅文案排布（2026-11-18 天赐定稿）：窄屏保持竖排列，≥768px 改回原来横排三行 */
+.hero-copy {
+  writing-mode: vertical-rl;
+}
+@media (min-width: 768px) {
+  .hero-copy {
+    writing-mode: horizontal-tb;
+  }
+}
+
 /* 纸面作用域：内部继续用 bg-background / border-border / text-muted-foreground
    等既有工具类，变量在纸内换成纸色，逻辑组件无需感知主题。 */
 .paper {

@@ -4,6 +4,24 @@
 > 红线：只出现编造或脱敏样例，不得含真实合同内容、真实姓名、身份证、手机号、住址、公司名。
 > 截图由用户用系统截图工具放入 docs/shots/，文件名带里程碑编号；缺图写「（待补：xxx.png）」，不编造截图内容。
 
+## M4 后追加 · 横幅排布定稿：手机竖排、桌面改回横排（2026-11-18，不打 tag）
+
+### 关键提示词（天赐原话）
+
+- 「我看了图，我决定手机版不改了，电脑的还是改回原来横向排列的字」
+
+### 改了什么
+
+- 新增 `.hero-copy`：默认竖排（手机保留 §15 效果），≥768px 回到横排三行（§15 前形态）；§16 宋体字体规格全部保留。design-spec §17 登记，覆盖 §15 双视口同竖排口径。
+
+### 部署与运行记录
+
+- npm test 228/228；build 通过；kuipan-qa 双视口 86/86（断言改 home-hero-orientation：mobile=vertical-rl、desktop=horizontal-tb）。prepare/publish actionId d518591c-e94b-4f9c-8af5-6405ed103e02 succeeded。
+
+### 线上链接与验证方式
+
+- 真实浏览器强刷复验：bundle index-DoyRos7q.js，桌面 h1 writing-mode=horizontal-tb、字体仍 Noto Serif SC 栈；手机竖排由 QA 375px 断言覆盖。截图（待补：m4-hero-final-desktop.png、m4-hero-final-mobile.png）。
+
 ## M4 后追加 · 首页水墨化：全局思源宋体＋辅助文字竖排（2026-11-18，不打 tag）
 
 ### 关键提示词（天赐需求原话节选）
