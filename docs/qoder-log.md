@@ -4,6 +4,38 @@
 > 红线：只出现编造或脱敏样例，不得含真实合同内容、真实姓名、身份证、手机号、住址、公司名。
 > 截图由用户用系统截图工具放入 docs/shots/，文件名带里程碑编号；缺图写「（待补：xxx.png）」，不编造截图内容。
 
+## M4 后追加 · 照契卷轴改造（2026-11-18，不打 tag）
+
+### 关键提示词（天赐指令原文摘录）
+
+- 「轴做实：轴杆加粗到约 26px，颜色整体提亮一档，要和背景拉开……轴比纸宽，两端各伸出约 18px，轴头加长成短圆柱（不是小圆球），帽面用朱红或古金（二选一，全站统一）」
+- 「清单并入卷轴，作为第一栏……Checklist 新增一个 embedded 属性（默认 false，其它用到的地方不受影响）」
+- 「首次进入照契（没有 focusTrapId）时，不默认选中任何类型，显示一卷合着的卷轴：上下两根轴贴在一起，中间一条签写『请选类型，展开卷轴』」
+- 「用 grid-template-rows: 0fr → 1fr 加 overflow: hidden，不要继续用 clip-path，否则下轴不会动。时长约 800ms，缓动用 ease-out」
+- 「当前这卷先收起，约 400ms……收起期间不响应新的点击，或者只记录最后一次点击」「点击已选中的同一类型：不做任何事（不折叠）」
+
+### 做了什么
+
+- 只改界面层：`src/pages/ContractsPage.tsx`、`src/components/Checklist.tsx`、`src/globals.css`，登记 `docs/design-spec.md` §11；`src/core/`、`functions/`、规则库、`contracts.json`、典例数据未动，未装库、未引图片。
+- 轴做实：`.qq-rod` 18px→26px，渐变提亮为 `#a07a4a→#6b4f2e→#2a1d0f`＋顶高光＋投影；轴头改 12×36px 短圆柱，帽面选朱红 `#b23a2e` 系（与 --site-accent/选中签条同色，全站统一）；桌面每端伸出≈18px，≤480px 收到≈8px；新增上下 10px 深红绫边 `.qq-silk`；裱边改暗棕红不与背景糊在一起；纸面左右加内阴影做卷纸感。
+- 清单并入：`Checklist` 加 `embedded` 属性（默认 false），为 true 去外框、标题「签约前检查」，进纸面第一栏，下接淡墨细线 `.qq-divider`；localStorage key、5 类别色标签、计数、折叠、隐私句全部不变。
+- 签条：选中项下方 6px 朱红三角指向卷轴；375px 自动换行不挤团。
+- 展卷/换卷状态机：合卷初始态（两轴贴合＋纸签）；`grid-template-rows 0fr→1fr` 800ms ease-out 展开、400ms 收起换卷、收卷期间只记最后一次点击、同类型点击不折叠；内容 300ms 延迟淡入；下轴＋下绫边包 `.qq-rollfoot`（sticky bottom）贴住展卷前沿下行——初版把下轴直接放裁剪区内部，实测动画全程下轴不跟随（rect 恒定 5023px），改 sticky 后 trace 277→5023 逐帧下行。
+- 无障碍：`prefers-reduced-motion` 即时切换（QA 断言 transitionDuration=0s、opacity=1.00）；`role=tabpanel`+`aria-live=polite`；带 focusTrapId 从结果页跳入直接展开定位。
+- 新增 `dev/照契卷轴qa.mjs`：CDP 双视口 18 项断言（合卷态/轴 26px/下轴跟随/清单在纸面/三角/勾选刷新保留/换卷先收后展/同类型不折叠/最长类型落位/375 无横向溢出/减弱动效/结果页跳入）。
+
+### 报错与解决
+
+- QA 首轮 2 项失败：① 下轴不随展卷移动（clip 区内布局恒定）→ 结构改为 sticky 前沿件，试错 1 轮；② 换卷断言抓到清单 h2 而非类型标题 → 选择器改 `.qq-paper > h2`，试错 1 轮。
+- 第二轮 `checklist-persist-refresh` 失败：同一 Chrome profile 复跑时旧勾选被再点一次变 false——是 QA 脚本不幂等，非产品缺陷；脚本先清 `qqy:checklist:*` 再勾选，18/18 全过。试错 1 轮。
+
+### 部署与线上验证
+
+- 提交 7006b5d；prepare_site actionId cb5851c7-2b89-4821-8c64-1358fb6fd6a1（首次 pending，同 actionId 同输入重试转 written）；publishOperationId 01a1ed23-39dc-7d85-961c-f5af8a2db6a0，state=succeeded、committed=true、access_mode=public。
+- 线上 https://kuipan-odzma4gogrf.qoder.zone ：首页 bundle `index-BbSUrmql.js`/`index-DMFspZCg.css` 与本地 dist 一致；`node dev/照契卷轴qa.mjs https://…` 线上 17/17 全过（线上模式跳过 fixture 专属跳入项）；get_function_logs 近 1 小时 /app/analyze 全 200、无 5xx。
+- 截图（%TEMP%/qqy-scroll/，待补 docs/shots/：m4plus-1118-scroll-closed-1366.png、m4plus-1118-scroll-open-rent-1366.png、m4plus-1118-scroll-open-rent-375.png、m4plus-1118-scroll-reduced-motion.png）。
+- 未完成项：无。
+
 ## M4 后追加 · 首页压矮＋导航副标题＋分析等待特效（2026-11-18，不打 tag）
 
 ### 做了什么
