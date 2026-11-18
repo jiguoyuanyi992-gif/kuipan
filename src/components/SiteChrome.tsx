@@ -3,10 +3,10 @@ import { DISCLAIMER } from "./Disclaimer";
 
 export type NavKey = "input" | "ghosts" | "contracts";
 
-const NAV_ITEMS: { key: NavKey; label: string }[] = [
-  { key: "input", label: "首页" },
-  { key: "ghosts", label: "捉鬼录" },
-  { key: "contracts", label: "照契" },
+const NAV_ITEMS: { key: NavKey; label: string; sub: string }[] = [
+  { key: "input", label: "首页", sub: "呈上合同" },
+  { key: "ghosts", label: "捉鬼录", sub: "收费套路" },
+  { key: "contracts", label: "照契", sub: "典例清单" },
 ];
 
 export function SiteHeader({
@@ -60,13 +60,19 @@ export function SiteHeader({
                 type="button"
                 onClick={() => onNav(item.key)}
                 aria-current={on ? "page" : undefined}
-                className="border-b-2 px-3 py-1.5 font-title text-base"
+                className="flex flex-col items-center border-b-2 px-2.5 py-1 font-title text-base leading-tight sm:px-3"
                 style={{
                   borderColor: on ? "var(--site-accent)" : "transparent",
                   color: on ? "var(--site-fg)" : "var(--site-muted)",
                 }}
               >
-                {item.label}
+                <span>{item.label}</span>
+                <span
+                  className="font-sans text-[10px] leading-tight"
+                  style={{ color: "var(--site-muted)" }}
+                >
+                  {item.sub}
+                </span>
               </button>
             );
           })}

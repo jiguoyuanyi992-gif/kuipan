@@ -182,9 +182,9 @@ export function InputPage({ onAnalyze, checkHint }: Props) {
   const texture = assetUrl("paper-texture.png");
 
   return (
-    <main className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-6 sm:px-5 sm:py-8">
-      {/* 钟馗判官主视觉：上半屏横幅，图靠右、左侧渐变到纯黑，文案落在黑区 */}
-      <section className="relative h-[45vh] min-h-[260px] overflow-hidden bg-black md:h-[50vh]">
+    <main className="mx-auto flex w-full max-w-3xl flex-col gap-4 px-4 py-4 sm:px-5 sm:py-6">
+      {/* 钟馗判官主视觉：横幅高度压缩，保证首屏能看到粘贴框以下的上传与示例入口；图靠右、左侧渐变到纯黑 */}
+      <section className="relative h-[26vh] min-h-[190px] overflow-hidden bg-black md:h-[42vh] md:min-h-[240px]">
         <AssetImage
           name="zhongkui.jpg"
           alt="钟馗判官主视觉"
@@ -238,7 +238,7 @@ export function InputPage({ onAnalyze, checkHint }: Props) {
       )}
 
       <section
-        className="paper space-y-4 rounded-[var(--site-radius)] border border-border p-4 sm:p-5"
+        className="paper space-y-3 rounded-[var(--site-radius)] border border-border p-4 sm:p-5"
         style={texture ? { backgroundImage: `url(${texture})` } : undefined}
       >
         <div className="space-y-2">
@@ -252,7 +252,7 @@ export function InputPage({ onAnalyze, checkHint }: Props) {
               setText(e.target.value);
               setSource("paste");
             }}
-            rows={10}
+            rows={5}
             placeholder="把租房或实习兼职合同全文粘贴到这里……"
             className="w-full resize-y rounded-[var(--site-radius)] border border-border bg-[var(--paper-soft)] p-3 text-sm leading-relaxed outline-none focus:border-[var(--site-accent)]"
           />
@@ -266,7 +266,7 @@ export function InputPage({ onAnalyze, checkHint }: Props) {
           <button
             type="button"
             onClick={() => fileRef.current?.click()}
-            className="rounded-[var(--site-radius)] border border-border px-4 py-2 text-sm hover:border-[var(--site-accent)]"
+            className="rounded-[var(--site-radius)] border border-border px-4 py-1.5 text-sm hover:border-[var(--site-accent)]"
           >
             上传 Word / PDF / 照片
           </button>
@@ -356,15 +356,15 @@ export function InputPage({ onAnalyze, checkHint }: Props) {
         )}
       </section>
 
-      <section className="space-y-3">
+      <section className="space-y-2.5">
         <h2 className="font-title text-lg">先用示例试试（示例，虚构）</h2>
-        <div className="flex flex-wrap gap-3">
+        <div className="flex flex-wrap gap-2.5">
           {examples.map((ex) => (
             <button
               key={ex.id}
               type="button"
               onClick={() => onAnalyze(ex.text, "example")}
-              className="rounded-[var(--site-radius)] border border-border bg-[var(--site-surface)] px-4 py-2 text-sm hover:border-[var(--site-gold)]"
+              className="rounded-[var(--site-radius)] border border-border bg-[var(--site-surface)] px-4 py-1.5 text-sm hover:border-[var(--site-gold)]"
             >
               {ex.label}
             </button>
@@ -372,7 +372,7 @@ export function InputPage({ onAnalyze, checkHint }: Props) {
           <button
             type="button"
             onClick={() => onAnalyze(demoContract.text, "example")}
-            className="rounded-[var(--site-radius)] border px-4 py-2 text-sm"
+            className="rounded-[var(--site-radius)] border px-4 py-1.5 text-sm max-sm:order-first"
             style={{
               borderColor: "var(--site-accent)",
               color: "var(--site-fg)",

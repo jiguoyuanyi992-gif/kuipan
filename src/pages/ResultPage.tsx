@@ -160,18 +160,58 @@ export function ResultPage({
             )}
         </div>
 
-        {analysis.modelStatus === "running" && (
-          <p className="text-sm text-muted-foreground">
-            智能分析批次返回中，结果将逐条补充。
-          </p>
-        )}
-        {analysis.modelStatus === "unavailable" && (
-          <p
-            className="text-sm"
-            style={{ color: "var(--risk-medium)" }}
+        {analysis.modelStatus !== "idle" && (
+          <div
+            className="judge-banner"
+            role="status"
+            aria-live="polite"
+            data-status={analysis.modelStatus}
           >
-            智能分析暂不可用，当前显示本地规则检查结果。
-          </p>
+            {analysis.modelStatus === "running" && (
+              <>
+                <span
+                  className="judge-seal-pulse seal h-8 w-8 shrink-0 text-sm"
+                  aria-hidden
+                >
+                  判
+                </span>
+                <span className="judge-banner-col">
+                  <span className="judge-banner-text">判官审阅中……</span>
+                  <span className="judge-banner-progress">
+                    {analysis.modelCalls
+                      ? `已返回 ${analysis.modelCalls.ok} / ${analysis.modelCalls.total} 批`
+                      : `朱笔逐批圈点，当前已标出 ${findings.length} 处`}
+                  </span>
+                </span>
+                <span className="judge-brush" aria-hidden />
+              </>
+            )}
+            {analysis.modelStatus === "done" && (
+              <>
+                <span className="judge-stamp seal h-8 w-8 shrink-0 text-sm" aria-hidden>
+                  判
+                </span>
+                <span className="judge-banner-col">
+                  <span className="judge-banner-text">
+                    判决已下，共查出 {findings.length} 处
+                  </span>
+                  {analysis.modelCalls && (
+                    <span className="judge-banner-progress">
+                      智能批次 {analysis.modelCalls.ok} / {analysis.modelCalls.total} 全部返回
+                    </span>
+                  )}
+                </span>
+              </>
+            )}
+            {analysis.modelStatus === "unavailable" && (
+              <span
+                className="judge-banner-text"
+                style={{ color: "var(--risk-medium)" }}
+              >
+                智能分析暂不可用，当前显示本地规则检查结果。
+              </span>
+            )}
+          </div>
         )}
 
         <p className="text-sm leading-relaxed">{overall.reason}</p>

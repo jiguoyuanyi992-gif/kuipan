@@ -657,3 +657,145 @@ body {
     mask-image: none !important;
   }
 }
+
+/* ========== 结果页 · 判官审阅提示条（2026-11-18 天赐指令） ==========
+   running / done / unavailable 三态共用固定高度提示条，切换不跳版；
+   running：朱笔沿底边来回划动 + 印章呼吸；done：朱印「判」落下一次（0.6s，
+   组件挂载触发，同一次分析不重播）+ 数秒后条身收成安静细线但不消失；
+   unavailable：虚线细条，保持原有文案。prefers-reduced-motion 全部静态。 */
+
+.judge-banner {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  box-sizing: border-box;
+  height: 3.4rem;
+  padding: 0 0.75rem;
+  border: 1px solid var(--paper-border);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.judge-banner[data-status="running"] {
+  border-color: rgba(201, 58, 46, 0.5);
+  background-color: rgba(201, 58, 46, 0.06);
+}
+.judge-banner[data-status="done"] {
+  border-color: rgba(201, 58, 46, 0.55);
+  background-color: rgba(201, 58, 46, 0.08);
+  animation: judge-banner-quiet 0.5s ease-out 4s both;
+}
+.judge-banner[data-status="unavailable"] {
+  border-style: dashed;
+}
+@keyframes judge-banner-quiet {
+  from {
+    background-color: rgba(201, 58, 46, 0.08);
+    border-color: rgba(201, 58, 46, 0.55);
+    box-shadow: none;
+  }
+  to {
+    background-color: transparent;
+    border-color: var(--paper-border);
+    box-shadow: inset 0 -2px 0 rgba(201, 58, 46, 0.35);
+  }
+}
+
+.judge-banner-col {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+}
+.judge-banner-text {
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+.judge-banner-progress {
+  font-size: 0.6875rem;
+  line-height: 1.4;
+  color: var(--paper-muted);
+}
+
+/* running：左侧小印呼吸闪烁 */
+.judge-seal-pulse {
+  animation: judge-seal-breathe 1.6s ease-in-out infinite;
+}
+@keyframes judge-seal-breathe {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* running：朱笔沿提示条底边来回划动 */
+.judge-brush {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  pointer-events: none;
+}
+.judge-brush::after {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 30%;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--site-accent) 42%,
+    var(--site-accent) 58%,
+    transparent
+  );
+  animation: judge-brush-sweep 1.8s ease-in-out infinite alternate;
+}
+@keyframes judge-brush-sweep {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(234%);
+  }
+}
+
+/* done：朱印「判」缩放淡入落下，约 0.6s，只播一次 */
+.judge-stamp {
+  animation: judge-stamp-drop 0.6s cubic-bezier(0.2, 0.7, 0.3, 1.2) both;
+}
+@keyframes judge-stamp-drop {
+  0% {
+    transform: scale(1.7) rotate(-10deg);
+    opacity: 0;
+  }
+  60% {
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) rotate(-3deg);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .judge-seal-pulse {
+    animation: none;
+  }
+  .judge-stamp {
+    animation: none;
+  }
+  .judge-brush::after {
+    animation: none;
+    width: 100%;
+  }
+  .judge-banner[data-status="done"] {
+    animation: none;
+    background-color: transparent;
+    box-shadow: inset 0 -2px 0 rgba(201, 58, 46, 0.35);
+  }
+}
