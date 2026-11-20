@@ -4,6 +4,15 @@
 > 红线：只出现编造或脱敏样例，不得含真实合同内容、真实姓名、身份证、手机号、住址、公司名。
 > 截图由用户用系统截图工具放入 docs/shots/，文件名带里程碑编号；缺图写「（待补：xxx.png）」，不编造截图内容。
 
+## M4 后追加 · 天池作品帖发布（2026-11-20，不打 tag）
+
+- 帖子：【Hack4Good】馗判：大学生合同防坑助手 → https://tianchi.aliyun.com/forum/post/1103285 （标签：实验代码；赛道绑定 2026 Qoder 高校创造力大赛 raceId 532536）
+- 正文来源：docs/tianchi-post-final.md（五段齐全：自我介绍/作品是什么/为什么做/怎么用4步/怎么用 Qoder 做出来的；帖内含 Qoder 账号、在线体验链接、GitHub 源码链接 https://github.com/jiguoyuanyi992-gif/kuipan ）
+- 口径变更（天赐 2026-11-20 定）：对外作品名「馗判」；宣传周期 3 天；演示脚本砍掉不做；帖内不配"怎么用"截图。
+- 发布方式：执行层经用户授权，用 EgoLite 浏览器（用户本人登录态 nick8666140901）在论坛 newPost 编辑器填正文、经 mditor 图床上传 5 张截图（docs/shots/m6-qoder-01~05）、选必填标签后点发布。
+- 发布后复验：帖子页 document.title 为帖标题；正文含 kuipan 在线链接与 GitHub 链接；5 张 static.tianchi 图床图片渲染正常。
+- 报错与解决：①合成 click 打开的是报名表单弹窗（未登录态），登录后仍误触——改用 hover 触发 ant-dropdown 抓 window.open 真实地址 /forum/newPost?type=0&operation=add&raceId=532536；②CDP 真实鼠标点击超时，退回 JS 事件派发；③发布首次被拦「请选择标签」——ant-select 下拉无选项渲染，直接点击「实验代码」文本节点通过校验。
+
 ## M4 后追加 · 横幅排布定稿：手机竖排、桌面改回横排（2026-11-18，不打 tag）
 
 ### 关键提示词（天赐原话）
